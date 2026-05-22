@@ -1,0 +1,3 @@
+Embeddings convert text into numerical vectors that represent meaning. In a notes system, embeddings allow semantic search: a query like “how do I keep AI answers grounded?” can retrieve notes about RAG evaluation, citation discipline, and prompt constraints even if those exact words do not appear.
+
+Embedding quality depends on the model, the chunk size, the text preprocessing, and the retrieval strategy. Small chunks may be precise but lose context. Large chunks preserve context but can dilute relevance. Hybrid search, which combines keyword search with vector search, often works better than either method alone, especially for names, acronyms, dates, and technical terms.
