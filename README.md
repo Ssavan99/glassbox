@@ -29,15 +29,15 @@ pip install -r requirements.txt
 conda activate second-brain-search
 ```
 
-1. Add notes
+# 1. Add notes
 
-Add your personal notes as .md or .txt files inside the notes/ folder.
+Add personal notes as .md or .txt files inside the notes/ folder.
 
 For this first version, the project chunks notes by paragraph, so each paragraph becomes one searchable chunk.
 
-2. Generate embeddings
+# 2. Generate embeddings
 
-Run this command whenever you add new notes or update existing notes:
+Run the following command whenever new notes are added or existing notes are updated:
 
 ```bash
 python src/embed_notes.py
@@ -56,7 +56,7 @@ The generated file will be stored here:
 data/embeddings.json
 ```
 
-3. Search your notes
+# 3. Search your notes
 
 After generating embeddings, start the search program:
 
