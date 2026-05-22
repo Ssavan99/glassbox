@@ -1,4 +1,4 @@
-# Second Brain Semantic Search
+# Semantic Search
 
 A minimal local semantic search system for personal notes.
 
