@@ -1,4 +1,9 @@
 .venv/
 __pycache__/
-data/embeddings.json
+*.pyc
 .DS_Store
+node_modules/
+web/dist/
+.llm_cache/
+.env
+data/embeddings.json
