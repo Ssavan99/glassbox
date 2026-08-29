@@ -13,7 +13,7 @@ renderer that switches on `kind`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 NODE_KINDS = frozenset(
     {
@@ -183,7 +183,9 @@ class TraceBuilder:
     Usage:
         b = TraceBuilder(architecture="naive", question=question)
         n1 = b.node("embed_query", "Embed the question", parents=[], explain="...", dims=384)
-        n2 = b.node("retrieve_dense", "Top-5 dense retrieval", parents=[n1], explain="...", results=[...], k=5)
+        n2 = b.node(
+            "retrieve_dense", "Top-5 dense", parents=[n1], explain="...", results=[...], k=5
+        )
         trace = b.build(answer=answer, metrics=metrics)
     """
 
