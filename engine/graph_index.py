@@ -36,7 +36,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 
-from engine.config import GRAPH_PATH
+from engine.config import GRAPH_MAX_HOP_CHUNKS, GRAPH_PATH
 
 
 def normalize_entity(name: str) -> str:
@@ -105,3 +105,72 @@ def load_graph() -> GraphData:
     return GraphData(
         entities=entities, edges=edges, communities=communities, adjacency=dict(adjacency)
     )
+
+
+def seed_entities(query: str, graph: GraphData) -> list[str]:
+    """Heuristic (non-LLM) entity matching: find which known entities are
+    mentioned in the query text. Must stay non-LLM — the Graph architecture's
+    online budget is exactly one LLM call (the final generate), per §3.3.
+
+    Longest entities are checked first so a more specific multi-word entity
+    ("embedding dimension") wins over a shorter one that's also a substring
+    of the query ("embedding"), and matching is word-boundary-aware so e.g.
+    the entity "trace" doesn't spuriously match inside an unrelated word.
+    Spaces and hyphens are treated as equivalent word separators on both
+    sides, so a spaced entity ("needle in a haystack") still matches a
+    hyphenated mention in the query ("needle-in-a-haystack") and vice versa.
+    """
+    query_lower = query.lower()
+    candidates = sorted(graph.entities.keys(), key=len, reverse=True)
+    matched = []
+    for entity_id in candidates:
+        parts = re.split(r"[\s-]+", entity_id)
+        pattern = r"\b" + r"[\s-]+".join(re.escape(p) for p in parts) + r"\b"
+        if re.search(pattern, query_lower):
+            matched.append(entity_id)
+    return matched
+
+
+def expand_hops(
+    seed_ids: list[str],
+    graph: GraphData,
+    hops: int = 2,
+    max_chunks: int = GRAPH_MAX_HOP_CHUNKS,
+) -> tuple[list[str], list[GraphEdge]]:
+    """BFS outward from the seed entities up to `hops` steps, returning the
+    chunk ids to use as retrieved context (capped at `max_chunks`, preferring
+    chunks belonging to higher-degree/higher-centrality entities when
+    truncation is needed) and the subgraph edges connecting visited entities
+    (for the graph_expand node's payload)."""
+    visited = set(seed_ids)
+    frontier = set(seed_ids)
+    for _ in range(hops):
+        next_frontier: set[str] = set()
+        for entity_id in frontier:
+            next_frontier |= graph.adjacency.get(entity_id, set())
+        next_frontier -= visited
+        if not next_frontier:
+            break
+        visited |= next_frontier
+        frontier = next_frontier
+
+    edges_used = [e for e in graph.edges if e.src in visited and e.dst in visited]
+
+    degree = {entity_id: len(graph.adjacency.get(entity_id, ())) for entity_id in visited}
+    ordered_entities = sorted(visited, key=lambda e: -degree.get(e, 0))
+
+    chunk_ids: list[str] = []
+    seen_chunks: set[str] = set()
+    for entity_id in ordered_entities:
+        entity = graph.entities.get(entity_id)
+        if entity is None:
+            continue
+        for chunk_id in entity.chunk_ids:
+            if chunk_id in seen_chunks:
+                continue
+            seen_chunks.add(chunk_id)
+            chunk_ids.append(chunk_id)
+            if len(chunk_ids) >= max_chunks:
+                return chunk_ids, edges_used
+
+    return chunk_ids, edges_used
