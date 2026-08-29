@@ -17,7 +17,7 @@ from __future__ import annotations
 import time
 from collections import defaultdict
 
-from engine.config import RERANK_MODEL, RRF_K, TOP_K
+from engine.config import HYBRID_POOL_K, RERANK_MODEL, RRF_K, TOP_K
 from engine.embedding import embed_texts
 from engine.index import load_index
 from engine.llm import complete
@@ -26,8 +26,6 @@ from engine.rerank import rerank_scores
 from engine.trace import Metrics, Trace, TraceBuilder
 
 from .base import Architecture
-
-POOL_K = 20
 
 
 def _ranked_payload(results: list[tuple[str, float]]) -> list[dict]:
@@ -81,10 +79,10 @@ class HybridArchitecture(Architecture):
             preview=[float(x) for x in query_vector[:8]],
         )
 
-        dense_results = index.dense.search(query_vector, k=POOL_K)
+        dense_results = index.dense.search(query_vector, k=HYBRID_POOL_K)
         n_dense = builder.node(
             "retrieve_dense",
-            f"Top-{POOL_K} dense retrieval",
+            f"Top-{HYBRID_POOL_K} dense retrieval",
             parents=[n_embed],
             explain=(
                 "Dense retrieval ranks chunks by cosine similarity in "
@@ -94,13 +92,13 @@ class HybridArchitecture(Architecture):
                 "embedding model smooths over."
             ),
             results=_ranked_payload(dense_results),
-            k=POOL_K,
+            k=HYBRID_POOL_K,
         )
 
-        sparse_results = index.sparse.search(question, k=POOL_K)
+        sparse_results = index.sparse.search(question, k=HYBRID_POOL_K)
         n_sparse = builder.node(
             "retrieve_sparse",
-            f"Top-{POOL_K} sparse (BM25) retrieval",
+            f"Top-{HYBRID_POOL_K} sparse (BM25) retrieval",
             parents=[n_embed],
             explain=(
                 "BM25 ranks chunks by exact term overlap and term frequency, "
@@ -113,11 +111,11 @@ class HybridArchitecture(Architecture):
                 "because both retrieval branches fire off the same query."
             ),
             results=_ranked_payload(sparse_results),
-            k=POOL_K,
+            k=HYBRID_POOL_K,
         )
 
         fused = reciprocal_rank_fusion([dense_results, sparse_results], k=RRF_K)
-        fused_pool = fused[:POOL_K]
+        fused_pool = fused[:HYBRID_POOL_K]
         n_fuse = builder.node(
             "fuse",
             "Reciprocal rank fusion",

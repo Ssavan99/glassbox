@@ -28,6 +28,7 @@ CHUNK_OVERLAP_TOKENS = 50
 
 TOP_K = 5
 RRF_K = 60
+HYBRID_POOL_K = 20  # candidate pool size feeding fusion/rerank, before trimming to TOP_K
 
 GRAPH_MAX_HOP_CHUNKS = 40
 AGENTIC_MAX_SUBQUESTIONS = 3

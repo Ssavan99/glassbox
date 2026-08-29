@@ -195,7 +195,7 @@
     - cost-aware-model-routing::0
   gold_answer_points:
     - "OLLAMA_MODEL = \"qwen2.5:7b-instruct\""
-    - "GROQ_MODEL = \"llama-3.3-70b-versatile\""
+    - "GROQ_MODEL = \"openai/gpt-oss-120b\""
 
 - id: q21
   question: "What sampling flag and value should be set when running the golden dataset so evaluation scores stay comparable across runs?"
