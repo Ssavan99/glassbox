@@ -26,16 +26,24 @@ def build_context_block(chunks: list[ChunkRecord]) -> str:
     return "\n\n".join(parts)
 
 
-def build_answer_prompt(question: str, chunks: list[ChunkRecord]) -> str:
+def build_answer_prompt(
+    question: str, chunks: list[ChunkRecord], extra_context: str | None = None
+) -> str:
     """The shared "stuff the retrieved chunks and ask" prompt every
-    architecture's final `generate` node uses."""
+    architecture's final `generate` node uses.
+
+    `extra_context` is optional supplementary context that isn't chunk-backed
+    (e.g. Graph's community summaries) — it isn't citable by chunk id, so it's
+    kept visually separate from the citable chunk context below it.
+    """
     context = build_context_block(chunks)
-    return (
-        f"{SYSTEM_PREAMBLE}\n\n"
-        f"Context:\n{context}\n\n"
-        f"Question: {question}\n\n"
-        "Answer, citing chunk ids as instructed:"
-    )
+    parts = [SYSTEM_PREAMBLE, ""]
+    if extra_context:
+        parts.append(f"Additional context (not individually citable):\n{extra_context}\n")
+    parts.append(f"Context:\n{context}\n")
+    parts.append(f"Question: {question}\n")
+    parts.append("Answer, citing chunk ids as instructed:")
+    return "\n".join(parts)
 
 
 def build_hyde_prompt(question: str) -> str:
