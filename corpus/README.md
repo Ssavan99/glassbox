@@ -82,7 +82,7 @@ semantic search on a query targeting them:
 - `RRF_K = 60` — `reciprocal-rank-fusion-explained.md`
 - `EMBEDDING_DIM = 384`, `all-MiniLM-L6-v2` — `embedding-dimension-and-model-size-tradeoffs.md`
 - `cross-encoder/ms-marco-MiniLM-L-6-v2` — `reranking-with-cross-encoders.md`
-- `OLLAMA_MODEL = "qwen2.5:7b-instruct"`, `GROQ_MODEL = "llama-3.3-70b-versatile"` — `cost-aware-model-routing.md`
+- `OLLAMA_MODEL = "qwen2.5:7b-instruct"`, `GROQ_MODEL = "openai/gpt-oss-120b"` — `cost-aware-model-routing.md`
 - `--temperature 0.0` — `temperature-and-sampling-controls.md`
 - `429 Too Many Requests` — `rate-limits-and-retry-storms.md`
 - `This model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens` — `context-window-overflow-and-truncation.md`
