@@ -202,8 +202,10 @@
   type: keyword
   gold_chunk_ids:
     - temperature-and-sampling-controls::0
+    - temperature-and-sampling-controls::1
   gold_answer_points:
     - "--temperature 0.0"
+    - "fixing temperature at or near zero keeps evaluation runs comparable across changes"
 
 - id: q22
   question: "What is the exact wording of the error this engine raises when a request's token count exceeds the model's maximum context length?"
