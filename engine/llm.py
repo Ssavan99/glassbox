@@ -49,7 +49,7 @@ class LLMJSONError(LLMError):
 
 
 def _cache_key(backend: str, model: str, prompt: str, params: dict[str, Any]) -> str:
-    payload = backend + model + prompt + json.dumps(params, sort_keys=True)
+    payload = "\x1f".join([backend, model, prompt, json.dumps(params, sort_keys=True)])
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
@@ -161,29 +161,43 @@ def _ensure_json(
     backend_used: str,
     prompt: str,
     params: dict[str, Any],
-) -> dict:
+) -> tuple[dict, str]:
+    """Returns (result, backend_that_served_it) — the repair attempt follows the
+    same Groq-then-Ollama fallback as the initial call, so a transient Groq
+    failure during repair doesn't defeat the "stays free forever" guarantee."""
     parsed = _try_parse_json(result["text"])
     if parsed is not None:
-        return {**result, "json": parsed}
+        return {**result, "json": parsed}, backend_used
 
     logger.warning("backend=%s returned invalid JSON, attempting one repair", backend_used)
     repair_prompt = (
         f"{prompt}\n\nThe previous response was not valid JSON:\n{result['text']}\n\n"
         "Fix it. Respond with ONLY valid JSON, no prose and no markdown fences."
     )
-    call = _call_groq if backend_used == "groq" else _call_ollama
-    repaired = call(repair_prompt, params)
+    try:
+        if backend_used != GROQ_BACKEND:
+            raise LLMBackendError("original call did not use groq")
+        repaired = _call_groq(repair_prompt, params)
+        repair_backend = GROQ_BACKEND
+    except Exception as exc:  # noqa: BLE001 - any Groq failure falls back to ollama
+        logger.warning("groq repair unavailable (%s), falling back to ollama", exc)
+        repaired = _call_ollama(repair_prompt, params)
+        repair_backend = OLLAMA_BACKEND
+
     parsed = _try_parse_json(repaired["text"])
     if parsed is None:
         raise LLMJSONError(
-            f"backend={backend_used} failed to produce valid JSON after one repair attempt"
+            f"backend={repair_backend} failed to produce valid JSON after one repair attempt"
         )
-    return {
-        "text": repaired["text"],
-        "json": parsed,
-        "prompt_tokens": result["prompt_tokens"] + repaired["prompt_tokens"],
-        "completion_tokens": result["completion_tokens"] + repaired["completion_tokens"],
-    }
+    return (
+        {
+            "text": repaired["text"],
+            "json": parsed,
+            "prompt_tokens": result["prompt_tokens"] + repaired["prompt_tokens"],
+            "completion_tokens": result["completion_tokens"] + repaired["completion_tokens"],
+        },
+        repair_backend,
+    )
 
 
 # --- public entry point -------------------------------------------------------
@@ -222,7 +236,9 @@ def complete(prompt: str, json_schema: dict | None = None, **params: Any) -> dic
     logger.info("llm request served by backend=%s", backend_used)
 
     if json_schema is not None:
-        result = _ensure_json(result, json_schema, backend_used, effective_prompt, params)
+        result, backend_used = _ensure_json(
+            result, json_schema, backend_used, effective_prompt, params
+        )
 
     model = GROQ_MODEL if backend_used == GROQ_BACKEND else OLLAMA_MODEL
     _write_cache(backend_used, model, effective_prompt, params, result)

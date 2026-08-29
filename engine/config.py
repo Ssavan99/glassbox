@@ -20,7 +20,7 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 EMBEDDING_DIM = 384
 RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 OLLAMA_MODEL = "qwen2.5:7b-instruct"
 
 CHUNK_TARGET_TOKENS = 250

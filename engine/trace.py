@@ -13,6 +13,7 @@ renderer that switches on `kind`.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 
 NODE_KINDS = frozenset(
@@ -245,7 +246,11 @@ class TraceBuilder:
         return spliced
 
     def build(self, answer: str, metrics: Metrics) -> Trace:
-        trace_id = self.trace_id or f"{self.architecture}::{abs(hash(self.question)) % 10**8}"
+        if self.trace_id:
+            trace_id = self.trace_id
+        else:
+            digest = hashlib.sha256(self.question.encode("utf-8")).hexdigest()[:10]
+            trace_id = f"{self.architecture}::{digest}"
         trace = Trace(
             trace_id=trace_id,
             architecture=self.architecture,

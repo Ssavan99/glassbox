@@ -1,3 +1,7 @@
+import subprocess
+import sys
+from pathlib import Path
+
 import pytest
 
 from engine.trace import Metrics, TraceBuilder, TraceValidationError
@@ -7,6 +11,39 @@ def _metrics(**overrides):
     base = dict(latency_ms=100.0, llm_calls=1, prompt_tokens=10, completion_tokens=5)
     base.update(overrides)
     return Metrics(**base)
+
+
+def test_trace_id_is_stable_across_processes():
+    # Python's built-in hash() is randomized per-process (PYTHONHASHSEED) by
+    # default, so trace_id must not be derived from it. Verify by generating
+    # the same trace_id in two fresh interpreter subprocesses.
+    script = (
+        "from engine.trace import TraceBuilder, Metrics\n"
+        "b = TraceBuilder(architecture='naive', question='what is chunking?')\n"
+        "b.node('embed_query', 'Embed', parents=[], explain='e')\n"
+        "t = b.build(answer='a', metrics=Metrics(1.0, 1, 1, 1))\n"
+        "print(t.trace_id)\n"
+    )
+    root = Path(__file__).resolve().parent.parent
+    ids = set()
+    for _ in range(2):
+        result = subprocess.run(
+            [sys.executable, "-c", script], cwd=root, capture_output=True, text=True, check=True
+        )
+        ids.add(result.stdout.strip())
+    assert len(ids) == 1
+
+
+def test_trace_id_differs_for_different_questions():
+    b1 = TraceBuilder(architecture="naive", question="what is chunking?")
+    b1.node("embed_query", "Embed", parents=[], explain="e")
+    t1 = b1.build(answer="a", metrics=_metrics())
+
+    b2 = TraceBuilder(architecture="naive", question="what is reranking?")
+    b2.node("embed_query", "Embed", parents=[], explain="e")
+    t2 = b2.build(answer="a", metrics=_metrics())
+
+    assert t1.trace_id != t2.trace_id
 
 
 def test_linear_trace_builds_and_round_trips():

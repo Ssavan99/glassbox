@@ -6,4 +6,4 @@ node_modules/
 web/dist/
 .llm_cache/
 .env
-data/embeddings.json
+*.egg-info/

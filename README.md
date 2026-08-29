@@ -1,78 +1,55 @@
-# Semantic Search
+# glassbox
 
-A minimal local semantic search system for personal notes.
+**See inside RAG.** Seven retrieval-augmented generation architectures,
+implemented for real in Python, run over one designed corpus, with every
+intermediate step recorded and (eventually) replayed in a web frontend that
+teaches how they differ.
 
-This project demonstrates the core pipeline behind a second brain / retrieval system:
+This repo is under active construction — see `repo-plans/glassbox_PLAN.md`
+(not part of this repo) for the full build plan. The full portfolio-standard
+README with a live demo link, screenshots, and the seven-architecture writeup
+lands in a later phase.
 
-```text
-Notes → Chunk → Embed → Store
-Query → Embed → Search → Return Top Results
-```
+## What's built so far
 
-## Setup
+- **`corpus/`** — 60 hand-edited notes on AI/ML engineering, designed to
+  differentiate seven different RAG architectures (see `corpus/README.md` for
+  the design contract: recurring entities, keyword-specific terms, multi-hop
+  facts, and near-miss decoys planted on purpose).
+- **`evaluation/questions.yaml`** — 27 labeled evaluation questions
+  (factual / multi-hop / keyword / unanswerable) with gold chunk references.
+- **`engine/`** — chunking, embedding (`all-MiniLM-L6-v2`, normalized
+  vectors), dense (numpy) and sparse (BM25) retrieval stores, a dual-backend
+  LLM client (Groq primary, local Ollama automatic fallback so the project
+  stays free forever), and the frozen trace schema (`engine/trace.py`) that
+  every architecture will record its execution against.
+- **`scripts/build_index.py`** — builds `artifacts/chunks.json`,
+  `artifacts/vectors.f32`, and `artifacts/bm25.json` from the corpus.
 
-This project uses Conda for environment management.
+The seven architectures themselves, the evaluation harness, and the frontend
+are not built yet.
 
-Create the Conda environment:
-
-```bash
-conda create -n Personal-notes-RAG-system python=3.11
-
-conda activate Personal-notes-RAG-system
-
-pip install -r requirements.txt
-```
-
-## Running the Project
-
-```bash
-conda activate second-brain-search
-```
-
-### 1. Add notes
-
-Add personal notes as .md or .txt files inside the notes/ folder.
-
-For this first version, the project chunks notes by paragraph, so each paragraph becomes one searchable chunk.
-
-### 2. Generate embeddings
-
-Run the following command whenever new notes are added or existing notes are updated:
+## Local setup
 
 ```bash
-python src/embed_notes.py
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env   # then add your own GROQ_API_KEY (see below)
+python scripts/build_index.py
+pytest
 ```
 
-This script will:
+### LLM backend
 
-Read notes from the notes/ folder
-Split them into paragraph chunks
-Generate local embeddings using sentence-transformers
-Save the chunks and embeddings into data/embeddings.json
+`engine/llm.py` tries [Groq's free API tier](https://console.groq.com) first,
+and falls back automatically to a local [Ollama](https://ollama.com) model
+(`qwen2.5:7b-instruct`) if `GROQ_API_KEY` is unset, invalid, rate-limited, or
+unreachable. The pipeline works with **no API key at all** — it just runs
+entirely on the local fallback. To use Groq, sign up for a free key at
+`console.groq.com`, create an API key, and put it in `.env` as
+`GROQ_API_KEY=gsk_...` (never commit this file — it's gitignored).
 
-The generated file will be stored here:
+## License
 
-```text
-data/embeddings.json
-```
-
-### 3. Search your notes
-
-After generating embeddings, start the search program:
-
-```bash
-python src/search.py
-```
-
-The program will return the top matching chunks from your notes, including:
-
-Similarity score
-Source file name
-Chunk number
-Matching note text
-
-To stop the program, type:
-
-```text
-exit
-```
+MIT — see `LICENSE`.

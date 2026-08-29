@@ -112,3 +112,34 @@ def test_malformed_json_triggers_one_repair_attempt(monkeypatch):
     assert result["json"] == {"answer": "ok"}
     assert result["prompt_tokens"] == 11
     assert result["completion_tokens"] == 8
+
+
+def test_json_repair_falls_back_to_ollama_when_groq_repair_fails(monkeypatch):
+    # Groq serves the initial call but returns malformed JSON; the repair
+    # attempt against Groq then fails too (rate limit, etc) — the repair
+    # itself must fall back to Ollama rather than propagating the exception,
+    # since Ollama fallback is meant to be core correctness, not just for
+    # the first call.
+    monkeypatch.setenv("GROQ_API_KEY", "fake-key-present")
+
+    groq_calls = []
+    ollama_calls = []
+
+    def _groq_side_effect(prompt, params):
+        groq_calls.append(prompt)
+        if len(groq_calls) == 1:
+            return {"text": "not json at all", "prompt_tokens": 5, "completion_tokens": 5}
+        raise RuntimeError("groq rate limited on repair")
+
+    def _ollama_side_effect(prompt, params):
+        ollama_calls.append(prompt)
+        return {"text": '{"answer": "ok"}', "prompt_tokens": 6, "completion_tokens": 3}
+
+    monkeypatch.setattr(llm, "_call_groq", _groq_side_effect)
+    monkeypatch.setattr(llm, "_call_ollama", _ollama_side_effect)
+
+    result = llm.complete("give me json", json_schema={"answer": "string"})
+
+    assert len(groq_calls) == 2  # initial + failed repair attempt
+    assert len(ollama_calls) == 1  # repair fell back here instead of raising
+    assert result["json"] == {"answer": "ok"}
