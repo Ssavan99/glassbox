@@ -1,0 +1,254 @@
+# Top-level structure: a single list of question objects (not a dict with a
+# `questions:` key). Each object has: id, question, type, gold_chunk_ids,
+# gold_answer_points. type is one of: factual | multi_hop | keyword | unanswerable.
+
+- id: q01
+  question: "What does LoRA freeze, and roughly what fraction of a model's parameters does it actually train?"
+  type: factual
+  gold_chunk_ids:
+    - lora-and-parameter-efficient-fine-tuning::0
+  gold_answer_points:
+    - "LoRA freezes the original/base model's weights entirely"
+    - "it trains a pair of small low-rank matrices injected alongside each frozen weight matrix"
+    - "often well under 1% of the base model's parameters"
+
+- id: q02
+  question: "What is a cross-encoder, and how does it differ from the bi-encoder architecture used for initial retrieval?"
+  type: factual
+  gold_chunk_ids:
+    - reranking-with-cross-encoders::0
+  gold_answer_points:
+    - "a bi-encoder encodes query and document into vectors separately and compares them with cosine similarity"
+    - "a cross-encoder takes the query and one candidate document together as a single joint input and produces one relevance score directly"
+
+- id: q03
+  question: "What is the difference between recall@k and MRR as retrieval metrics?"
+  type: factual
+  gold_chunk_ids:
+    - retrieval-metrics-recall-at-k-and-mrr::0
+    - retrieval-metrics-recall-at-k-and-mrr::1
+  gold_answer_points:
+    - "recall@k asks whether the correct chunk is present among the top k retrieved results"
+    - "MRR is more sensitive to ranking quality, penalizing a retriever that finds the right chunk but ranks it low"
+
+- id: q04
+  question: "What is a silent failure, and why is it considered the most expensive category of failure?"
+  type: factual
+  gold_chunk_ids:
+    - silent-failures-and-the-value-of-refusal::0
+  gold_answer_points:
+    - "a silent failure produces output with no signal anything went wrong"
+    - "a confidently phrased answer that is incorrect, incomplete, or based on wrong evidence, indistinguishable in presentation from a correct answer"
+
+- id: q05
+  question: "What are the two distinct causes of hallucination described in this corpus, and how do they differ?"
+  type: factual
+  gold_chunk_ids:
+    - hallucination-from-missing-context::0
+    - hallucination-from-prompt-injection::0
+  gold_answer_points:
+    - "one cause is retrieval failing to surface the needed evidence, so the model falls back on pretrained knowledge or pattern-completes an answer"
+    - "the other cause is prompt injection, where retrieved content itself contains text crafted to hijack the model's instructions even though retrieval worked correctly"
+
+- id: q06
+  question: "Why does deduplication matter differently for fine-tuning data versus a retrieval corpus?"
+  type: factual
+  gold_chunk_ids:
+    - deduplication-in-training-and-corpus-data::0
+  gold_answer_points:
+    - "in fine-tuning data, duplicated examples effectively increase that example's weight during training"
+    - "duplicates are a subtler problem whose harm differs depending on which pipeline stage they show up in"
+
+- id: q07
+  question: "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?"
+  type: factual
+  gold_chunk_ids:
+    - pii-redaction-in-training-data::0
+    - pii-redaction-in-training-data::1
+  gold_answer_points:
+    - "a model can memorize and later reveal sensitive personal information from training data verbatim"
+    - "this is much harder to audit or selectively delete without retraining, unlike a retrieval corpus"
+
+- id: q08
+  question: "What is a planning loop, and what four-step cycle does it repeat?"
+  type: factual
+  gold_chunk_ids:
+    - planning-loops-in-agents::0
+  gold_answer_points:
+    - "observe the current state, reason about the gap to the goal, choose an action, execute it, and repeat"
+    - "it continues until the goal is reached or the loop gives up"
+
+- id: q09
+  question: "What is few-shot prompting, and what tradeoff does it create specifically in a RAG prompt?"
+  type: factual
+  gold_chunk_ids:
+    - few-shot-prompting-for-grounded-answers::0
+    - few-shot-prompting-for-grounded-answers::1
+  gold_answer_points:
+    - "few-shot prompting includes complete example input-output pairs directly in the prompt so the model infers format/behavior from demonstration"
+    - "verbose few-shot examples leave measurably less context window room for retrieved evidence"
+
+- id: q10
+  question: "Why does a golden dataset need to stay fixed rather than being regenerated each time a system is evaluated?"
+  type: factual
+  gold_chunk_ids:
+    - building-a-golden-dataset-for-rag-evaluation::0
+  gold_answer_points:
+    - "a golden dataset is a fixed set of questions with known correct answers and supporting evidence, reused as a stable yardstick"
+    - "if the test set drifts every time, you cannot tell whether a score change is a real improvement or just a different test"
+
+- id: q11
+  question: "LoRA trains under 1% of a model's parameters, cutting GPU memory and letting adapters be swapped per task — given that efficiency, is there ever a real quality reason to still pick full fine-tuning over it, and if so, what is it?"
+  type: multi_hop
+  gold_chunk_ids:
+    - lora-and-parameter-efficient-fine-tuning::0
+    - full-fine-tuning-vs-adapters::0
+  gold_answer_points:
+    - "yes: full fine-tuning has a small but real edge in final task performance"
+    - "the edge is largest for tasks substantially different from anything in the base model's pretraining distribution"
+    - "the edge narrows or disappears for tasks close to what the base model already does well"
+
+- id: q12
+  question: "Cross-encoder reranking is described as more accurate than bi-encoder cosine similarity because it lets query and document attend to each other directly — what does that accuracy improvement actually cost a pipeline in milliseconds when reranking a typical shortlist?"
+  type: multi_hop
+  gold_chunk_ids:
+    - reranking-with-cross-encoders::1
+    - latency-budgets-in-a-rag-pipeline::1
+  gold_answer_points:
+    - "roughly 100 to 300 milliseconds"
+    - "for reranking a shortlist of about 20 to 50 candidates"
+    - "because a cross-encoder needs one full forward pass per query-candidate pair"
+
+- id: q13
+  question: "Hybrid search is described as merging a dense ranking and a sparse bm25 ranking without needing to normalize their raw scores — what specific constant governs how sharply that merge favors top-ranked results, and what value does this engine actually use for it?"
+  type: multi_hop
+  gold_chunk_ids:
+    - hybrid-search-with-bm25-and-dense-vectors::1
+    - reciprocal-rank-fusion-explained::1
+  gold_answer_points:
+    - "the constant is k in the reciprocal rank fusion formula (1 / (k + rank))"
+    - "this engine uses RRF_K = 60"
+    - "a larger k flattens score differences between top and lower ranks"
+
+- id: q14
+  question: "A needle-in-a-haystack test can score perfectly on recall@k while the assembled answer is still wrong — what's the mechanism behind that gap, and where in the pipeline does the actual fix belong?"
+  type: multi_hop
+  gold_chunk_ids:
+    - needle-in-a-haystack-evaluation::1
+    - retrieval-failures-lost-in-the-middle::0
+  gold_answer_points:
+    - "the mechanism is 'lost in the middle': a model uses information less reliably when it sits in the middle of a long context, even if present"
+    - "retrieval metrics like recall@k only check whether the chunk was retrieved, not where it landed in the assembled context, so they would score this as a success"
+    - "the fix belongs in the prompt template's chunk ordering, not in retrieval"
+
+- id: q15
+  question: "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost — given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?"
+  type: multi_hop
+  gold_chunk_ids:
+    - kv-cache-and-why-it-matters-for-serving::1
+    - continuous-batching-and-throughput::1
+  gold_answer_points:
+    - "continuous batching depends on efficient per-request KV cache management"
+    - "each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave"
+    - "a scheduler that has to reshuffle or recompute cache state on every batch change loses most of the latency benefit"
+
+- id: q16
+  question: "This engine's chunking uses a specific target size and a specific overlap size that add up to a 20% overlap ratio — what are the two exact numbers, and why isn't cranking that ratio up simply a free way to guarantee boundary-spanning facts are retrievable?"
+  type: multi_hop
+  gold_chunk_ids:
+    - chunking-strategy-and-chunk-size-tradeoffs::0
+    - chunk-overlap-and-why-it-matters::0
+  gold_answer_points:
+    - "CHUNK_TARGET_TOKENS = 250 and CHUNK_OVERLAP_TOKENS = 50"
+    - "pushing overlap too high duplicates more tokens, bloating the corpus and vector database"
+    - "more near-identical chunks crowd out other genuinely relevant material in ranked results, degrading retrieval quality"
+
+- id: q17
+  question: "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?"
+  type: keyword
+  gold_chunk_ids:
+    - rate-limits-and-retry-storms::0
+  gold_answer_points:
+    - "429 Too Many Requests"
+
+- id: q18
+  question: "What is the exact reranking model identifier this engine uses?"
+  type: keyword
+  gold_chunk_ids:
+    - reranking-with-cross-encoders::0
+  gold_answer_points:
+    - "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+- id: q19
+  question: "What embedding model name and output dimension constant does this engine's config use?"
+  type: keyword
+  gold_chunk_ids:
+    - embedding-dimension-and-model-size-tradeoffs::0
+  gold_answer_points:
+    - "all-MiniLM-L6-v2"
+    - "EMBEDDING_DIM = 384"
+
+- id: q20
+  question: "In this project's cost-aware routing config, what are the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL?"
+  type: keyword
+  gold_chunk_ids:
+    - cost-aware-model-routing::0
+  gold_answer_points:
+    - "OLLAMA_MODEL = \"qwen2.5:7b-instruct\""
+    - "GROQ_MODEL = \"llama-3.3-70b-versatile\""
+
+- id: q21
+  question: "What sampling flag and value should be set when running the golden dataset so evaluation scores stay comparable across runs?"
+  type: keyword
+  gold_chunk_ids:
+    - temperature-and-sampling-controls::0
+  gold_answer_points:
+    - "--temperature 0.0"
+
+- id: q22
+  question: "What is the exact wording of the error this engine raises when a request's token count exceeds the model's maximum context length?"
+  type: keyword
+  gold_chunk_ids:
+    - context-window-overflow-and-truncation::0
+  gold_answer_points:
+    - "This model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens"
+
+- id: q23
+  question: "What two named config constants define this engine's default chunk size and chunk overlap in tokens?"
+  type: keyword
+  gold_chunk_ids:
+    - chunk-overlap-and-why-it-matters::0
+  gold_answer_points:
+    - "CHUNK_TARGET_TOKENS = 250"
+    - "CHUNK_OVERLAP_TOKENS = 50"
+
+- id: q24
+  question: "What HTTP client library and version does this RAG engine use to call the embedding API?"
+  type: unanswerable
+  gold_chunk_ids: []
+  gold_answer_points:
+    - "no supporting chunk exists; correct behavior is to refuse/say not covered"
+
+- id: q25
+  question: "Does fine-tuning a model with LoRA reduce a RAG pipeline's exposure to prompt injection attacks?"
+  type: unanswerable
+  gold_chunk_ids: []
+  gold_answer_points:
+    - "no supporting chunk exists; correct behavior is to refuse/say not covered"
+    - "the corpus never connects fine-tuning method choice to prompt-injection defense"
+
+- id: q26
+  question: "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?"
+  type: unanswerable
+  gold_chunk_ids: []
+  gold_answer_points:
+    - "no supporting chunk exists; correct behavior is to refuse/say not covered"
+    - "the corpus documents metrics conceptually but records no actual evaluation run results"
+
+- id: q27
+  question: "Which cloud provider hosts the vector database this engine uses in production?"
+  type: unanswerable
+  gold_chunk_ids: []
+  gold_answer_points:
+    - "no supporting chunk exists; correct behavior is to refuse/say not covered"
+    - "the corpus discusses vector database index types conceptually but names no hosting provider"
