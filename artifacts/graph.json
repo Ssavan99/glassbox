@@ -1,0 +1,2180 @@
+{
+  "entities": [
+    {
+      "id": "agent",
+      "chunk_ids": [
+        "agent-memory-and-context-management::0",
+        "agent-memory-and-context-management::1",
+        "ai-agents-and-tool-use::0",
+        "ai-agents-and-tool-use::1",
+        "ai-agents-and-tool-use::2",
+        "guardrails-for-autonomous-actions::0",
+        "multi-agent-systems-and-handoffs::0",
+        "multi-agent-systems-and-handoffs::1",
+        "multi-hop-questions-and-why-they-break-retrieval::1",
+        "planning-loops-in-agents::1",
+        "prompt-injection-attacks-explained::1",
+        "rate-limits-and-retry-storms::1"
+      ],
+      "community": 0
+    },
+    {
+      "id": "batching",
+      "chunk_ids": [
+        "continuous-batching-and-throughput::0",
+        "continuous-batching-and-throughput::1",
+        "cost-aware-model-routing::1",
+        "kv-cache-and-why-it-matters-for-serving::1",
+        "reducing-latency-with-batching::0",
+        "reducing-latency-with-batching::1",
+        "reducing-latency-with-quantization::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "bm25",
+      "chunk_ids": [
+        "building-a-golden-dataset-for-rag-evaluation::0",
+        "hybrid-search-with-bm25-and-dense-vectors::0",
+        "hybrid-search-with-bm25-and-dense-vectors::1",
+        "reciprocal-rank-fusion-explained::0",
+        "retrieval-metrics-recall-at-k-and-mrr::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "chain of thought",
+      "chunk_ids": [
+        "chain-of-thought-prompting-and-when-it-helps::0",
+        "chain-of-thought-prompting-and-when-it-helps::1",
+        "few-shot-prompting-for-grounded-answers::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "chunk overlap",
+      "chunk_ids": [
+        "chunk-overlap-and-why-it-matters::0",
+        "chunk-overlap-and-why-it-matters::1",
+        "chunking-strategy-and-chunk-size-tradeoffs::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "chunking",
+      "chunk_ids": [
+        "chunk-overlap-and-why-it-matters::0",
+        "chunk-overlap-and-why-it-matters::1",
+        "chunking-strategy-and-chunk-size-tradeoffs::0",
+        "chunking-strategy-and-chunk-size-tradeoffs::1",
+        "cleaning-noisy-source-documents::1",
+        "context-window-overflow-and-truncation::0",
+        "retrieval-augmented-generation-basics::0"
+      ],
+      "community": 1
+    },
+    {
+      "id": "citation",
+      "chunk_ids": [
+        "ai-evaluation-for-personal-knowledge-bases::1",
+        "citation-quality-as-an-evaluation-signal::0",
+        "citation-quality-as-an-evaluation-signal::1",
+        "data-drift-and-stale-corpora::1",
+        "embeddings-and-semantic-search::0",
+        "fine-tuning-versus-retrieval-augmented-generation::1",
+        "grounding-and-the-citation-contract::0",
+        "grounding-and-the-citation-contract::1",
+        "hallucination-from-missing-context::1",
+        "metadata-and-frontmatter-discipline::1",
+        "prompt-templates-for-retrieval-augmented-answers::0",
+        "prompt-templates-for-retrieval-augmented-answers::1",
+        "when-fine-tuning-is-the-wrong-tool::0"
+      ],
+      "community": 3
+    },
+    {
+      "id": "context window",
+      "chunk_ids": [
+        "agent-memory-and-context-management::0",
+        "agent-memory-and-context-management::1",
+        "chunking-strategy-and-chunk-size-tradeoffs::0",
+        "chunking-strategy-and-chunk-size-tradeoffs::1",
+        "context-window-overflow-and-truncation::0",
+        "few-shot-prompting-for-grounded-answers::0",
+        "few-shot-prompting-for-grounded-answers::1",
+        "fine-tuning-versus-retrieval-augmented-generation::0",
+        "multi-agent-systems-and-handoffs::0",
+        "multi-agent-systems-and-handoffs::1",
+        "needle-in-a-haystack-evaluation::1",
+        "prompt-engineering-as-interface-design::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "cosine similarity",
+      "chunk_ids": [
+        "deduplication-in-training-and-corpus-data::1",
+        "embedding-dimension-and-model-size-tradeoffs::0",
+        "reciprocal-rank-fusion-explained::0",
+        "reranking-with-cross-encoders::0",
+        "reranking-with-cross-encoders::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "cross-encoder",
+      "chunk_ids": [
+        "latency-budgets-in-a-rag-pipeline::1",
+        "latency-budgets-in-a-rag-pipeline::2",
+        "reranking-with-cross-encoders::0",
+        "reranking-with-cross-encoders::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "data quality",
+      "chunk_ids": [
+        "labeling-quality-for-fine-tuning-data::0",
+        "labeling-quality-for-fine-tuning-data::1"
+      ],
+      "community": 2
+    },
+    {
+      "id": "deduplication",
+      "chunk_ids": [
+        "deduplication-in-training-and-corpus-data::1",
+        "pii-redaction-in-training-data::0"
+      ],
+      "community": 4
+    },
+    {
+      "id": "dense retrieval",
+      "chunk_ids": [
+        "building-a-golden-dataset-for-rag-evaluation::0",
+        "embeddings-and-semantic-search::0",
+        "embeddings-and-semantic-search::1",
+        "hybrid-search-with-bm25-and-dense-vectors::0",
+        "latency-budgets-in-a-rag-pipeline::0",
+        "reciprocal-rank-fusion-explained::0",
+        "retrieval-metrics-recall-at-k-and-mrr::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "distillation",
+      "chunk_ids": [
+        "full-fine-tuning-vs-adapters::1",
+        "full-fine-tuning-vs-adapters::2",
+        "knowledge-distillation-for-smaller-models::0",
+        "knowledge-distillation-for-smaller-models::1"
+      ],
+      "community": 2
+    },
+    {
+      "id": "drift",
+      "chunk_ids": [
+        "agent-memory-and-context-management::1",
+        "building-a-golden-dataset-for-rag-evaluation::0",
+        "catastrophic-forgetting-during-fine-tuning::0",
+        "catastrophic-forgetting-during-fine-tuning::1",
+        "data-drift-and-stale-corpora::1"
+      ],
+      "community": 2
+    },
+    {
+      "id": "embedding dimension",
+      "chunk_ids": [
+        "embedding-dimension-and-model-size-tradeoffs::0",
+        "embedding-dimension-and-model-size-tradeoffs::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "embedding model",
+      "chunk_ids": [
+        "embedding-dimension-and-model-size-tradeoffs::0",
+        "embedding-dimension-and-model-size-tradeoffs::1",
+        "embeddings-and-semantic-search::0",
+        "latency-budgets-in-a-rag-pipeline::0",
+        "reranking-with-cross-encoders::0",
+        "retrieval-augmented-generation-basics::0"
+      ],
+      "community": 4
+    },
+    {
+      "id": "evaluation harness",
+      "chunk_ids": [
+        "ai-evaluation-for-personal-knowledge-bases::0",
+        "ai-evaluation-for-personal-knowledge-bases::1",
+        "citation-quality-as-an-evaluation-signal::1",
+        "data-drift-and-stale-corpora::1",
+        "embeddings-and-semantic-search::0",
+        "grounding-and-the-citation-contract::0",
+        "grounding-and-the-citation-contract::1"
+      ],
+      "community": 3
+    },
+    {
+      "id": "few-shot prompting",
+      "chunk_ids": [
+        "few-shot-prompting-for-grounded-answers::0",
+        "few-shot-prompting-for-grounded-answers::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "fine-tuning",
+      "chunk_ids": [
+        "catastrophic-forgetting-during-fine-tuning::0",
+        "catastrophic-forgetting-during-fine-tuning::1",
+        "fine-tuning-versus-retrieval-augmented-generation::0",
+        "fine-tuning-versus-retrieval-augmented-generation::1",
+        "full-fine-tuning-vs-adapters::0",
+        "full-fine-tuning-vs-adapters::1",
+        "full-fine-tuning-vs-adapters::2",
+        "instruction-tuning-basics::0",
+        "instruction-tuning-basics::1",
+        "knowledge-distillation-for-smaller-models::0",
+        "knowledge-distillation-for-smaller-models::1",
+        "labeling-quality-for-fine-tuning-data::0",
+        "labeling-quality-for-fine-tuning-data::1",
+        "lora-and-parameter-efficient-fine-tuning::0",
+        "when-fine-tuning-is-the-wrong-tool::0",
+        "when-fine-tuning-is-the-wrong-tool::1"
+      ],
+      "community": 2
+    },
+    {
+      "id": "function calling",
+      "chunk_ids": [
+        "ai-agents-and-tool-use::0",
+        "tool-use-and-function-calling::1"
+      ],
+      "community": 0
+    },
+    {
+      "id": "golden dataset",
+      "chunk_ids": [
+        "ai-evaluation-for-personal-knowledge-bases::0",
+        "building-a-golden-dataset-for-rag-evaluation::0",
+        "citation-quality-as-an-evaluation-signal::1",
+        "data-drift-and-stale-corpora::1",
+        "knowledge-distillation-for-smaller-models::1",
+        "prompt-templates-for-retrieval-augmented-answers::0",
+        "prompt-templates-for-retrieval-augmented-answers::1",
+        "retrieval-metrics-recall-at-k-and-mrr::0",
+        "when-fine-tuning-is-the-wrong-tool::0"
+      ],
+      "community": 3
+    },
+    {
+      "id": "grounding",
+      "chunk_ids": [
+        "citation-quality-as-an-evaluation-signal::0",
+        "grounding-and-the-citation-contract::0",
+        "grounding-and-the-citation-contract::1",
+        "hallucination-from-prompt-injection::0",
+        "prompt-engineering-as-interface-design::0",
+        "prompt-engineering-as-interface-design::1",
+        "prompt-templates-for-retrieval-augmented-answers::1",
+        "retrieval-augmented-generation-basics::1"
+      ],
+      "community": 3
+    },
+    {
+      "id": "guardrails",
+      "chunk_ids": [
+        "ai-agents-and-tool-use::2",
+        "guardrails-for-autonomous-actions::0",
+        "guardrails-for-autonomous-actions::1",
+        "hallucination-from-prompt-injection::1",
+        "pii-redaction-in-training-data::1"
+      ],
+      "community": 3
+    },
+    {
+      "id": "hallucination",
+      "chunk_ids": [
+        "citation-quality-as-an-evaluation-signal::0",
+        "context-window-overflow-and-truncation::1",
+        "fine-tuning-versus-retrieval-augmented-generation::1",
+        "grounding-and-the-citation-contract::0",
+        "grounding-and-the-citation-contract::1",
+        "hallucination-from-missing-context::1",
+        "hallucination-from-prompt-injection::0",
+        "hallucination-from-prompt-injection::1",
+        "prompt-engineering-as-interface-design::1",
+        "retrieval-augmented-generation-basics::1",
+        "when-fine-tuning-is-the-wrong-tool::0"
+      ],
+      "community": 3
+    },
+    {
+      "id": "hybrid search",
+      "chunk_ids": [
+        "embeddings-and-semantic-search::1",
+        "hybrid-search-with-bm25-and-dense-vectors::0",
+        "hybrid-search-with-bm25-and-dense-vectors::1",
+        "reciprocal-rank-fusion-explained::0",
+        "reciprocal-rank-fusion-explained::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "instruction tuning",
+      "chunk_ids": [
+        "instruction-tuning-basics::0",
+        "instruction-tuning-basics::1",
+        "labeling-quality-for-fine-tuning-data::0"
+      ],
+      "community": 2
+    },
+    {
+      "id": "kv cache",
+      "chunk_ids": [
+        "continuous-batching-and-throughput::1",
+        "kv-cache-and-why-it-matters-for-serving::0",
+        "kv-cache-and-why-it-matters-for-serving::1",
+        "latency-budgets-in-a-rag-pipeline::2"
+      ],
+      "community": 5
+    },
+    {
+      "id": "latency",
+      "chunk_ids": [
+        "ai-evaluation-for-personal-knowledge-bases::1",
+        "chain-of-thought-prompting-and-when-it-helps::0",
+        "chain-of-thought-prompting-and-when-it-helps::1",
+        "continuous-batching-and-throughput::0",
+        "continuous-batching-and-throughput::1",
+        "embedding-dimension-and-model-size-tradeoffs::1",
+        "knowledge-distillation-for-smaller-models::0",
+        "kv-cache-and-why-it-matters-for-serving::0",
+        "latency-budgets-in-a-rag-pipeline::0",
+        "latency-budgets-in-a-rag-pipeline::1",
+        "latency-budgets-in-a-rag-pipeline::2",
+        "reducing-latency-with-batching::0",
+        "reducing-latency-with-batching::1",
+        "reducing-latency-with-quantization::0",
+        "reducing-latency-with-quantization::1",
+        "reranking-with-cross-encoders::1",
+        "trace-logging-for-agent-debugging::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "lora",
+      "chunk_ids": [
+        "catastrophic-forgetting-during-fine-tuning::0",
+        "catastrophic-forgetting-during-fine-tuning::1",
+        "full-fine-tuning-vs-adapters::0",
+        "full-fine-tuning-vs-adapters::1",
+        "full-fine-tuning-vs-adapters::2",
+        "lora-and-parameter-efficient-fine-tuning::0",
+        "lora-and-parameter-efficient-fine-tuning::1"
+      ],
+      "community": 2
+    },
+    {
+      "id": "memory",
+      "chunk_ids": [
+        "agent-memory-and-context-management::0",
+        "agent-memory-and-context-management::1",
+        "ai-agents-and-tool-use::0",
+        "ai-agents-and-tool-use::1",
+        "ai-agents-and-tool-use::2",
+        "full-fine-tuning-vs-adapters::0",
+        "full-fine-tuning-vs-adapters::1",
+        "full-fine-tuning-vs-adapters::2",
+        "kv-cache-and-why-it-matters-for-serving::0",
+        "kv-cache-and-why-it-matters-for-serving::1",
+        "lora-and-parameter-efficient-fine-tuning::0",
+        "lora-and-parameter-efficient-fine-tuning::1",
+        "multi-agent-systems-and-handoffs::0",
+        "planning-loops-in-agents::1",
+        "reducing-latency-with-quantization::0",
+        "reducing-latency-with-quantization::1"
+      ],
+      "community": 0
+    },
+    {
+      "id": "multi-hop question",
+      "chunk_ids": [
+        "chain-of-thought-prompting-and-when-it-helps::0",
+        "chain-of-thought-prompting-and-when-it-helps::1",
+        "knowledge-distillation-for-smaller-models::1",
+        "multi-hop-questions-and-why-they-break-retrieval::1",
+        "planning-loops-in-agents::0"
+      ],
+      "community": 1
+    },
+    {
+      "id": "needle in a haystack",
+      "chunk_ids": [
+        "needle-in-a-haystack-evaluation::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "pii redaction",
+      "chunk_ids": [
+        "pii-redaction-in-training-data::0",
+        "pii-redaction-in-training-data::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "planning loop",
+      "chunk_ids": [
+        "agent-memory-and-context-management::0",
+        "agent-memory-and-context-management::1",
+        "ai-agents-and-tool-use::0",
+        "ai-agents-and-tool-use::1",
+        "multi-agent-systems-and-handoffs::0",
+        "multi-hop-questions-and-why-they-break-retrieval::1",
+        "planning-loops-in-agents::0",
+        "planning-loops-in-agents::1",
+        "rate-limits-and-retry-storms::1"
+      ],
+      "community": 0
+    },
+    {
+      "id": "prompt injection",
+      "chunk_ids": [
+        "guardrails-for-autonomous-actions::0",
+        "hallucination-from-prompt-injection::0",
+        "hallucination-from-prompt-injection::1",
+        "prompt-injection-attacks-explained::0",
+        "prompt-injection-attacks-explained::1"
+      ],
+      "community": 3
+    },
+    {
+      "id": "prompt template",
+      "chunk_ids": [
+        "agent-memory-and-context-management::1",
+        "context-window-overflow-and-truncation::2",
+        "grounding-and-the-citation-contract::1",
+        "hallucination-from-missing-context::1",
+        "hallucination-from-prompt-injection::1",
+        "instruction-tuning-basics::0",
+        "prompt-engineering-as-interface-design::0",
+        "prompt-templates-for-retrieval-augmented-answers::0",
+        "prompt-templates-for-retrieval-augmented-answers::1",
+        "when-fine-tuning-is-the-wrong-tool::0"
+      ],
+      "community": 3
+    },
+    {
+      "id": "quantization",
+      "chunk_ids": [
+        "cost-aware-model-routing::1",
+        "embedding-dimension-and-model-size-tradeoffs::1",
+        "kv-cache-and-why-it-matters-for-serving::1",
+        "latency-budgets-in-a-rag-pipeline::2",
+        "lora-and-parameter-efficient-fine-tuning::1",
+        "reducing-latency-with-quantization::0",
+        "reducing-latency-with-quantization::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "reciprocal rank fusion",
+      "chunk_ids": [
+        "hybrid-search-with-bm25-and-dense-vectors::1",
+        "reciprocal-rank-fusion-explained::0",
+        "reciprocal-rank-fusion-explained::1"
+      ],
+      "community": 4
+    },
+    {
+      "id": "refusal",
+      "chunk_ids": [
+        "ai-evaluation-for-personal-knowledge-bases::1",
+        "fine-tuning-versus-retrieval-augmented-generation::1",
+        "grounding-and-the-citation-contract::1",
+        "guardrails-for-autonomous-actions::1",
+        "hallucination-from-missing-context::1",
+        "hallucination-from-prompt-injection::0",
+        "hallucination-from-prompt-injection::1",
+        "instruction-tuning-basics::0",
+        "prompt-templates-for-retrieval-augmented-answers::1"
+      ],
+      "community": 3
+    },
+    {
+      "id": "reranking",
+      "chunk_ids": [
+        "latency-budgets-in-a-rag-pipeline::0",
+        "latency-budgets-in-a-rag-pipeline::1",
+        "latency-budgets-in-a-rag-pipeline::2",
+        "reranking-with-cross-encoders::0",
+        "reranking-with-cross-encoders::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "retrieval metrics",
+      "chunk_ids": [
+        "retrieval-metrics-recall-at-k-and-mrr::0"
+      ],
+      "community": 3
+    },
+    {
+      "id": "retrieval-augmented generation",
+      "chunk_ids": [
+        "building-a-golden-dataset-for-rag-evaluation::0",
+        "chunk-overlap-and-why-it-matters::1",
+        "chunking-strategy-and-chunk-size-tradeoffs::0",
+        "few-shot-prompting-for-grounded-answers::0",
+        "fine-tuning-versus-retrieval-augmented-generation::0",
+        "fine-tuning-versus-retrieval-augmented-generation::1",
+        "multi-hop-questions-and-why-they-break-retrieval::1",
+        "prompt-templates-for-retrieval-augmented-answers::0",
+        "retrieval-augmented-generation-basics::0",
+        "when-fine-tuning-is-the-wrong-tool::0",
+        "when-fine-tuning-is-the-wrong-tool::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "semantic search",
+      "chunk_ids": [
+        "embedding-dimension-and-model-size-tradeoffs::0",
+        "embeddings-and-semantic-search::0"
+      ],
+      "community": 4
+    },
+    {
+      "id": "sparse retrieval",
+      "chunk_ids": [
+        "embeddings-and-semantic-search::0",
+        "embeddings-and-semantic-search::1",
+        "hybrid-search-with-bm25-and-dense-vectors::0",
+        "latency-budgets-in-a-rag-pipeline::0"
+      ],
+      "community": 4
+    },
+    {
+      "id": "structured output",
+      "chunk_ids": [
+        "instruction-tuning-basics::0",
+        "instruction-tuning-basics::1"
+      ],
+      "community": 2
+    },
+    {
+      "id": "system prompt",
+      "chunk_ids": [
+        "context-window-overflow-and-truncation::0",
+        "few-shot-prompting-for-grounded-answers::1",
+        "grounding-and-the-citation-contract::1",
+        "instruction-tuning-basics::0",
+        "prompt-engineering-as-interface-design::0",
+        "prompt-injection-attacks-explained::0",
+        "prompt-templates-for-retrieval-augmented-answers::0",
+        "prompt-templates-for-retrieval-augmented-answers::1"
+      ],
+      "community": 3
+    },
+    {
+      "id": "throughput",
+      "chunk_ids": [
+        "continuous-batching-and-throughput::0",
+        "continuous-batching-and-throughput::1",
+        "cost-aware-model-routing::1",
+        "knowledge-distillation-for-smaller-models::0",
+        "reducing-latency-with-batching::0",
+        "reducing-latency-with-batching::1",
+        "reducing-latency-with-quantization::0",
+        "reducing-latency-with-quantization::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "token budget",
+      "chunk_ids": [
+        "agent-memory-and-context-management::1",
+        "chain-of-thought-prompting-and-when-it-helps::1",
+        "chunking-strategy-and-chunk-size-tradeoffs::0",
+        "chunking-strategy-and-chunk-size-tradeoffs::1",
+        "cleaning-noisy-source-documents::1",
+        "context-window-overflow-and-truncation::0",
+        "context-window-overflow-and-truncation::1",
+        "context-window-overflow-and-truncation::2",
+        "few-shot-prompting-for-grounded-answers::0",
+        "multi-agent-systems-and-handoffs::1",
+        "prompt-engineering-as-interface-design::1",
+        "prompt-templates-for-retrieval-augmented-answers::1"
+      ],
+      "community": 1
+    },
+    {
+      "id": "tool use",
+      "chunk_ids": [
+        "ai-agents-and-tool-use::0",
+        "ai-agents-and-tool-use::2",
+        "guardrails-for-autonomous-actions::0",
+        "prompt-injection-attacks-explained::1",
+        "tool-use-and-function-calling::1"
+      ],
+      "community": 0
+    },
+    {
+      "id": "trace",
+      "chunk_ids": [
+        "ai-agents-and-tool-use::2",
+        "trace-logging-for-agent-debugging::1"
+      ],
+      "community": 5
+    },
+    {
+      "id": "vector database",
+      "chunk_ids": [
+        "chunk-overlap-and-why-it-matters::0",
+        "embedding-dimension-and-model-size-tradeoffs::0",
+        "metadata-and-frontmatter-discipline::1",
+        "retrieval-augmented-generation-basics::0"
+      ],
+      "community": 1
+    }
+  ],
+  "edges": [
+    {
+      "src": "memory",
+      "rel": "persists across",
+      "dst": "planning loop",
+      "chunk_id": "agent-memory-and-context-management::0"
+    },
+    {
+      "src": "memory",
+      "rel": "limited by",
+      "dst": "context window",
+      "chunk_id": "agent-memory-and-context-management::0"
+    },
+    {
+      "src": "agent",
+      "rel": "needs",
+      "dst": "memory",
+      "chunk_id": "agent-memory-and-context-management::0"
+    },
+    {
+      "src": "memory",
+      "rel": "outlives",
+      "dst": "context window",
+      "chunk_id": "agent-memory-and-context-management::0"
+    },
+    {
+      "src": "memory",
+      "rel": "drifts",
+      "dst": "drift",
+      "chunk_id": "agent-memory-and-context-management::1"
+    },
+    {
+      "src": "memory",
+      "rel": "is separate from",
+      "dst": "planning loop",
+      "chunk_id": "agent-memory-and-context-management::1"
+    },
+    {
+      "src": "agent",
+      "rel": "remembers",
+      "dst": "memory",
+      "chunk_id": "agent-memory-and-context-management::1"
+    },
+    {
+      "src": "context window",
+      "rel": "constrained by",
+      "dst": "token budget",
+      "chunk_id": "agent-memory-and-context-management::1"
+    },
+    {
+      "src": "token budget",
+      "rel": "governs",
+      "dst": "prompt template",
+      "chunk_id": "agent-memory-and-context-management::1"
+    },
+    {
+      "src": "agent",
+      "rel": "exceeds",
+      "dst": "context window",
+      "chunk_id": "agent-memory-and-context-management::1"
+    },
+    {
+      "src": "agent",
+      "rel": "uses",
+      "dst": "memory",
+      "chunk_id": "ai-agents-and-tool-use::0"
+    },
+    {
+      "src": "agent",
+      "rel": "uses",
+      "dst": "planning loop",
+      "chunk_id": "ai-agents-and-tool-use::0"
+    },
+    {
+      "src": "function calling",
+      "rel": "is also known as",
+      "dst": "tool use",
+      "chunk_id": "ai-agents-and-tool-use::0"
+    },
+    {
+      "src": "agent",
+      "rel": "caps",
+      "dst": "planning loop",
+      "chunk_id": "ai-agents-and-tool-use::1"
+    },
+    {
+      "src": "memory",
+      "rel": "separate from",
+      "dst": "planning loop",
+      "chunk_id": "ai-agents-and-tool-use::1"
+    },
+    {
+      "src": "agent",
+      "rel": "has",
+      "dst": "memory",
+      "chunk_id": "ai-agents-and-tool-use::1"
+    },
+    {
+      "src": "agent",
+      "rel": "requires",
+      "dst": "guardrails",
+      "chunk_id": "ai-agents-and-tool-use::2"
+    },
+    {
+      "src": "agent",
+      "rel": "generates",
+      "dst": "trace",
+      "chunk_id": "ai-agents-and-tool-use::2"
+    },
+    {
+      "src": "agent",
+      "rel": "uses",
+      "dst": "tool use",
+      "chunk_id": "ai-agents-and-tool-use::2"
+    },
+    {
+      "src": "agent",
+      "rel": "affected by",
+      "dst": "memory",
+      "chunk_id": "ai-agents-and-tool-use::2"
+    },
+    {
+      "src": "golden dataset",
+      "rel": "supports",
+      "dst": "evaluation harness",
+      "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "tracks",
+      "dst": "latency",
+      "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "tracks",
+      "dst": "citation",
+      "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "tracks",
+      "dst": "refusal",
+      "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1"
+    },
+    {
+      "src": "golden dataset",
+      "rel": "used as yardstick for",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0"
+    },
+    {
+      "src": "golden dataset",
+      "rel": "prevents",
+      "dst": "drift",
+      "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0"
+    },
+    {
+      "src": "golden dataset",
+      "rel": "benefits",
+      "dst": "bm25",
+      "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0"
+    },
+    {
+      "src": "golden dataset",
+      "rel": "benefits",
+      "dst": "dense retrieval",
+      "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "causes",
+      "dst": "drift",
+      "chunk_id": "catastrophic-forgetting-during-fine-tuning::0"
+    },
+    {
+      "src": "lora",
+      "rel": "reduces",
+      "dst": "drift",
+      "chunk_id": "catastrophic-forgetting-during-fine-tuning::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "causes",
+      "dst": "drift",
+      "chunk_id": "catastrophic-forgetting-during-fine-tuning::1"
+    },
+    {
+      "src": "lora",
+      "rel": "mitigates",
+      "dst": "drift",
+      "chunk_id": "catastrophic-forgetting-during-fine-tuning::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "is more prone than",
+      "dst": "lora",
+      "chunk_id": "catastrophic-forgetting-during-fine-tuning::1"
+    },
+    {
+      "src": "chain of thought",
+      "rel": "helps",
+      "dst": "multi-hop question",
+      "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0"
+    },
+    {
+      "src": "chain of thought",
+      "rel": "increases",
+      "dst": "latency",
+      "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0"
+    },
+    {
+      "src": "chain of thought",
+      "rel": "adds to",
+      "dst": "token budget",
+      "chunk_id": "chain-of-thought-prompting-and-when-it-helps::1"
+    },
+    {
+      "src": "chain of thought",
+      "rel": "adds to",
+      "dst": "latency",
+      "chunk_id": "chain-of-thought-prompting-and-when-it-helps::1"
+    },
+    {
+      "src": "chain of thought",
+      "rel": "helps",
+      "dst": "multi-hop question",
+      "chunk_id": "chain-of-thought-prompting-and-when-it-helps::1"
+    },
+    {
+      "src": "chunking",
+      "rel": "uses",
+      "dst": "chunk overlap",
+      "chunk_id": "chunk-overlap-and-why-it-matters::0"
+    },
+    {
+      "src": "chunk overlap",
+      "rel": "increases",
+      "dst": "vector database",
+      "chunk_id": "chunk-overlap-and-why-it-matters::0"
+    },
+    {
+      "src": "chunk overlap",
+      "rel": "does not compensate for",
+      "dst": "chunking",
+      "chunk_id": "chunk-overlap-and-why-it-matters::1"
+    },
+    {
+      "src": "chunk overlap",
+      "rel": "impacts",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "chunk-overlap-and-why-it-matters::1"
+    },
+    {
+      "src": "chunking",
+      "rel": "influences",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0"
+    },
+    {
+      "src": "chunking",
+      "rel": "conserves",
+      "dst": "token budget",
+      "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0"
+    },
+    {
+      "src": "chunking",
+      "rel": "consumes",
+      "dst": "context window",
+      "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0"
+    },
+    {
+      "src": "chunking",
+      "rel": "interacts with",
+      "dst": "chunk overlap",
+      "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1"
+    },
+    {
+      "src": "chunking",
+      "rel": "consumes",
+      "dst": "context window",
+      "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1"
+    },
+    {
+      "src": "chunking",
+      "rel": "uses",
+      "dst": "token budget",
+      "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1"
+    },
+    {
+      "src": "citation",
+      "rel": "is a",
+      "dst": "hallucination",
+      "chunk_id": "citation-quality-as-an-evaluation-signal::0"
+    },
+    {
+      "src": "citation",
+      "rel": "results in",
+      "dst": "grounding",
+      "chunk_id": "citation-quality-as-an-evaluation-signal::0"
+    },
+    {
+      "src": "citation",
+      "rel": "requires",
+      "dst": "golden dataset",
+      "chunk_id": "citation-quality-as-an-evaluation-signal::1"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "checks",
+      "dst": "citation",
+      "chunk_id": "citation-quality-as-an-evaluation-signal::1"
+    },
+    {
+      "src": "chunking",
+      "rel": "wastes",
+      "dst": "token budget",
+      "chunk_id": "cleaning-noisy-source-documents::1"
+    },
+    {
+      "src": "system prompt",
+      "rel": "counts toward",
+      "dst": "context window",
+      "chunk_id": "context-window-overflow-and-truncation::0"
+    },
+    {
+      "src": "chunking",
+      "rel": "counts toward",
+      "dst": "context window",
+      "chunk_id": "context-window-overflow-and-truncation::0"
+    },
+    {
+      "src": "token budget",
+      "rel": "exceeds",
+      "dst": "context window",
+      "chunk_id": "context-window-overflow-and-truncation::0"
+    },
+    {
+      "src": "token budget",
+      "rel": "causes",
+      "dst": "hallucination",
+      "chunk_id": "context-window-overflow-and-truncation::1"
+    },
+    {
+      "src": "prompt template",
+      "rel": "enforces",
+      "dst": "token budget",
+      "chunk_id": "context-window-overflow-and-truncation::2"
+    },
+    {
+      "src": "batching",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "continuous-batching-and-throughput::0"
+    },
+    {
+      "src": "batching",
+      "rel": "improves",
+      "dst": "throughput",
+      "chunk_id": "continuous-batching-and-throughput::0"
+    },
+    {
+      "src": "batching",
+      "rel": "approaches",
+      "dst": "throughput",
+      "chunk_id": "continuous-batching-and-throughput::1"
+    },
+    {
+      "src": "batching",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "continuous-batching-and-throughput::1"
+    },
+    {
+      "src": "batching",
+      "rel": "requires",
+      "dst": "kv cache",
+      "chunk_id": "continuous-batching-and-throughput::1"
+    },
+    {
+      "src": "kv cache",
+      "rel": "affects",
+      "dst": "latency",
+      "chunk_id": "continuous-batching-and-throughput::1"
+    },
+    {
+      "src": "throughput",
+      "rel": "improved by",
+      "dst": "batching",
+      "chunk_id": "cost-aware-model-routing::1"
+    },
+    {
+      "src": "throughput",
+      "rel": "improved by",
+      "dst": "quantization",
+      "chunk_id": "cost-aware-model-routing::1"
+    },
+    {
+      "src": "citation",
+      "rel": "fails to catch",
+      "dst": "drift",
+      "chunk_id": "data-drift-and-stale-corpora::1"
+    },
+    {
+      "src": "golden dataset",
+      "rel": "suffers",
+      "dst": "drift",
+      "chunk_id": "data-drift-and-stale-corpora::1"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "uses",
+      "dst": "golden dataset",
+      "chunk_id": "data-drift-and-stale-corpora::1"
+    },
+    {
+      "src": "deduplication",
+      "rel": "uses",
+      "dst": "cosine similarity",
+      "chunk_id": "deduplication-in-training-and-corpus-data::1"
+    },
+    {
+      "src": "embedding dimension",
+      "rel": "is length of",
+      "dst": "embedding model",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0"
+    },
+    {
+      "src": "embedding dimension",
+      "rel": "sets storage of",
+      "dst": "vector database",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0"
+    },
+    {
+      "src": "embedding dimension",
+      "rel": "sets compute cost of",
+      "dst": "cosine similarity",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0"
+    },
+    {
+      "src": "embedding dimension",
+      "rel": "used by",
+      "dst": "semantic search",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0"
+    },
+    {
+      "src": "embedding dimension",
+      "rel": "is distinct from",
+      "dst": "quantization",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1"
+    },
+    {
+      "src": "embedding dimension",
+      "rel": "increases",
+      "dst": "latency",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1"
+    },
+    {
+      "src": "embedding model",
+      "rel": "has dimension",
+      "dst": "embedding dimension",
+      "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1"
+    },
+    {
+      "src": "embedding model",
+      "rel": "enables",
+      "dst": "semantic search",
+      "chunk_id": "embeddings-and-semantic-search::0"
+    },
+    {
+      "src": "semantic search",
+      "rel": "retrieves",
+      "dst": "citation",
+      "chunk_id": "embeddings-and-semantic-search::0"
+    },
+    {
+      "src": "semantic search",
+      "rel": "retrieves",
+      "dst": "evaluation harness",
+      "chunk_id": "embeddings-and-semantic-search::0"
+    },
+    {
+      "src": "dense retrieval",
+      "rel": "contrasts with",
+      "dst": "sparse retrieval",
+      "chunk_id": "embeddings-and-semantic-search::0"
+    },
+    {
+      "src": "dense retrieval",
+      "rel": "is a form of",
+      "dst": "semantic search",
+      "chunk_id": "embeddings-and-semantic-search::0"
+    },
+    {
+      "src": "hybrid search",
+      "rel": "outperforms",
+      "dst": "dense retrieval",
+      "chunk_id": "embeddings-and-semantic-search::1"
+    },
+    {
+      "src": "hybrid search",
+      "rel": "outperforms",
+      "dst": "sparse retrieval",
+      "chunk_id": "embeddings-and-semantic-search::1"
+    },
+    {
+      "src": "few-shot prompting",
+      "rel": "cost is",
+      "dst": "token budget",
+      "chunk_id": "few-shot-prompting-for-grounded-answers::0"
+    },
+    {
+      "src": "few-shot prompting",
+      "rel": "consumes",
+      "dst": "context window",
+      "chunk_id": "few-shot-prompting-for-grounded-answers::0"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "has tradeoff with",
+      "dst": "token budget",
+      "chunk_id": "few-shot-prompting-for-grounded-answers::0"
+    },
+    {
+      "src": "few-shot prompting",
+      "rel": "consumes",
+      "dst": "context window",
+      "chunk_id": "few-shot-prompting-for-grounded-answers::1"
+    },
+    {
+      "src": "few-shot prompting",
+      "rel": "differs from",
+      "dst": "chain of thought",
+      "chunk_id": "few-shot-prompting-for-grounded-answers::1"
+    },
+    {
+      "src": "system prompt",
+      "rel": "alternative to",
+      "dst": "few-shot prompting",
+      "chunk_id": "few-shot-prompting-for-grounded-answers::1"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "depends on",
+      "dst": "context window",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "contrasts with",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "enables",
+      "dst": "citation",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "enables",
+      "dst": "refusal",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "complements",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "reduces",
+      "dst": "hallucination",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "increases risk of",
+      "dst": "hallucination",
+      "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "is alternative to",
+      "dst": "lora",
+      "chunk_id": "full-fine-tuning-vs-adapters::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "requires",
+      "dst": "memory",
+      "chunk_id": "full-fine-tuning-vs-adapters::0"
+    },
+    {
+      "src": "lora",
+      "rel": "requires less memory",
+      "dst": "memory",
+      "chunk_id": "full-fine-tuning-vs-adapters::0"
+    },
+    {
+      "src": "lora",
+      "rel": "needs",
+      "dst": "memory",
+      "chunk_id": "full-fine-tuning-vs-adapters::1"
+    },
+    {
+      "src": "distillation",
+      "rel": "is an alternative to",
+      "dst": "fine-tuning",
+      "chunk_id": "full-fine-tuning-vs-adapters::1"
+    },
+    {
+      "src": "lora",
+      "rel": "has quality gap with",
+      "dst": "fine-tuning",
+      "chunk_id": "full-fine-tuning-vs-adapters::1"
+    },
+    {
+      "src": "lora",
+      "rel": "used before",
+      "dst": "fine-tuning",
+      "chunk_id": "full-fine-tuning-vs-adapters::2"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "incurs",
+      "dst": "memory",
+      "chunk_id": "full-fine-tuning-vs-adapters::2"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "precedes",
+      "dst": "distillation",
+      "chunk_id": "full-fine-tuning-vs-adapters::2"
+    },
+    {
+      "src": "grounding",
+      "rel": "requires",
+      "dst": "citation",
+      "chunk_id": "grounding-and-the-citation-contract::0"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "tests",
+      "dst": "grounding",
+      "chunk_id": "grounding-and-the-citation-contract::0"
+    },
+    {
+      "src": "hallucination",
+      "rel": "contrasts with",
+      "dst": "grounding",
+      "chunk_id": "grounding-and-the-citation-contract::0"
+    },
+    {
+      "src": "prompt template",
+      "rel": "requires",
+      "dst": "citation",
+      "chunk_id": "grounding-and-the-citation-contract::1"
+    },
+    {
+      "src": "system prompt",
+      "rel": "requires",
+      "dst": "citation",
+      "chunk_id": "grounding-and-the-citation-contract::1"
+    },
+    {
+      "src": "evaluation harness",
+      "rel": "tests",
+      "dst": "grounding",
+      "chunk_id": "grounding-and-the-citation-contract::1"
+    },
+    {
+      "src": "hallucination",
+      "rel": "results from",
+      "dst": "citation",
+      "chunk_id": "grounding-and-the-citation-contract::1"
+    },
+    {
+      "src": "refusal",
+      "rel": "permitted by",
+      "dst": "prompt template",
+      "chunk_id": "grounding-and-the-citation-contract::1"
+    },
+    {
+      "src": "guardrails",
+      "rel": "constrain",
+      "dst": "agent",
+      "chunk_id": "guardrails-for-autonomous-actions::0"
+    },
+    {
+      "src": "guardrails",
+      "rel": "mitigates",
+      "dst": "prompt injection",
+      "chunk_id": "guardrails-for-autonomous-actions::0"
+    },
+    {
+      "src": "agent",
+      "rel": "uses",
+      "dst": "tool use",
+      "chunk_id": "guardrails-for-autonomous-actions::0"
+    },
+    {
+      "src": "refusal",
+      "rel": "is a",
+      "dst": "guardrails",
+      "chunk_id": "guardrails-for-autonomous-actions::1"
+    },
+    {
+      "src": "prompt template",
+      "rel": "enforces",
+      "dst": "citation",
+      "chunk_id": "hallucination-from-missing-context::1"
+    },
+    {
+      "src": "citation",
+      "rel": "requires",
+      "dst": "refusal",
+      "chunk_id": "hallucination-from-missing-context::1"
+    },
+    {
+      "src": "hallucination",
+      "rel": "involves",
+      "dst": "refusal",
+      "chunk_id": "hallucination-from-missing-context::1"
+    },
+    {
+      "src": "prompt injection",
+      "rel": "causes",
+      "dst": "hallucination",
+      "chunk_id": "hallucination-from-prompt-injection::0"
+    },
+    {
+      "src": "prompt injection",
+      "rel": "ignores",
+      "dst": "grounding",
+      "chunk_id": "hallucination-from-prompt-injection::0"
+    },
+    {
+      "src": "hallucination",
+      "rel": "contrasts with",
+      "dst": "refusal",
+      "chunk_id": "hallucination-from-prompt-injection::0"
+    },
+    {
+      "src": "hallucination",
+      "rel": "fixed by",
+      "dst": "refusal",
+      "chunk_id": "hallucination-from-prompt-injection::1"
+    },
+    {
+      "src": "hallucination",
+      "rel": "fixed by",
+      "dst": "guardrails",
+      "chunk_id": "hallucination-from-prompt-injection::1"
+    },
+    {
+      "src": "prompt injection",
+      "rel": "causes",
+      "dst": "hallucination",
+      "chunk_id": "hallucination-from-prompt-injection::1"
+    },
+    {
+      "src": "guardrails",
+      "rel": "prevent",
+      "dst": "prompt injection",
+      "chunk_id": "hallucination-from-prompt-injection::1"
+    },
+    {
+      "src": "refusal",
+      "rel": "enforced in",
+      "dst": "prompt template",
+      "chunk_id": "hallucination-from-prompt-injection::1"
+    },
+    {
+      "src": "hybrid search",
+      "rel": "combines",
+      "dst": "dense retrieval",
+      "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0"
+    },
+    {
+      "src": "hybrid search",
+      "rel": "combines",
+      "dst": "sparse retrieval",
+      "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0"
+    },
+    {
+      "src": "dense retrieval",
+      "rel": "complements",
+      "dst": "bm25",
+      "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0"
+    },
+    {
+      "src": "sparse retrieval",
+      "rel": "implemented with",
+      "dst": "bm25",
+      "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0"
+    },
+    {
+      "src": "hybrid search",
+      "rel": "uses",
+      "dst": "reciprocal rank fusion",
+      "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1"
+    },
+    {
+      "src": "hybrid search",
+      "rel": "combines",
+      "dst": "bm25",
+      "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1"
+    },
+    {
+      "src": "instruction tuning",
+      "rel": "is a stage of",
+      "dst": "fine-tuning",
+      "chunk_id": "instruction-tuning-basics::0"
+    },
+    {
+      "src": "instruction tuning",
+      "rel": "enables",
+      "dst": "system prompt",
+      "chunk_id": "instruction-tuning-basics::0"
+    },
+    {
+      "src": "instruction tuning",
+      "rel": "enables",
+      "dst": "prompt template",
+      "chunk_id": "instruction-tuning-basics::0"
+    },
+    {
+      "src": "instruction tuning",
+      "rel": "improves",
+      "dst": "structured output",
+      "chunk_id": "instruction-tuning-basics::0"
+    },
+    {
+      "src": "instruction tuning",
+      "rel": "includes",
+      "dst": "refusal",
+      "chunk_id": "instruction-tuning-basics::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "inherits from",
+      "dst": "instruction tuning",
+      "chunk_id": "instruction-tuning-basics::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "needs less data than",
+      "dst": "instruction tuning",
+      "chunk_id": "instruction-tuning-basics::1"
+    },
+    {
+      "src": "structured output",
+      "rel": "more effective with",
+      "dst": "instruction tuning",
+      "chunk_id": "instruction-tuning-basics::1"
+    },
+    {
+      "src": "distillation",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "knowledge-distillation-for-smaller-models::0"
+    },
+    {
+      "src": "distillation",
+      "rel": "improves",
+      "dst": "throughput",
+      "chunk_id": "knowledge-distillation-for-smaller-models::0"
+    },
+    {
+      "src": "distillation",
+      "rel": "contrasts with",
+      "dst": "fine-tuning",
+      "chunk_id": "knowledge-distillation-for-smaller-models::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "complements",
+      "dst": "distillation",
+      "chunk_id": "knowledge-distillation-for-smaller-models::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "precedes",
+      "dst": "distillation",
+      "chunk_id": "knowledge-distillation-for-smaller-models::1"
+    },
+    {
+      "src": "distillation",
+      "rel": "requires evaluation on",
+      "dst": "golden dataset",
+      "chunk_id": "knowledge-distillation-for-smaller-models::1"
+    },
+    {
+      "src": "distillation",
+      "rel": "impacts performance on",
+      "dst": "multi-hop question",
+      "chunk_id": "knowledge-distillation-for-smaller-models::1"
+    },
+    {
+      "src": "kv cache",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "kv-cache-and-why-it-matters-for-serving::0"
+    },
+    {
+      "src": "kv cache",
+      "rel": "requires",
+      "dst": "memory",
+      "chunk_id": "kv-cache-and-why-it-matters-for-serving::0"
+    },
+    {
+      "src": "batching",
+      "rel": "needs",
+      "dst": "kv cache",
+      "chunk_id": "kv-cache-and-why-it-matters-for-serving::1"
+    },
+    {
+      "src": "quantization",
+      "rel": "improves",
+      "dst": "memory",
+      "chunk_id": "kv-cache-and-why-it-matters-for-serving::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "depends on",
+      "dst": "data quality",
+      "chunk_id": "labeling-quality-for-fine-tuning-data::0"
+    },
+    {
+      "src": "instruction tuning",
+      "rel": "requires",
+      "dst": "data quality",
+      "chunk_id": "labeling-quality-for-fine-tuning-data::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "requires",
+      "dst": "data quality",
+      "chunk_id": "labeling-quality-for-fine-tuning-data::1"
+    },
+    {
+      "src": "embedding model",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::0"
+    },
+    {
+      "src": "dense retrieval",
+      "rel": "contributes to",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::0"
+    },
+    {
+      "src": "sparse retrieval",
+      "rel": "contributes to",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::0"
+    },
+    {
+      "src": "reranking",
+      "rel": "contributes to",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::0"
+    },
+    {
+      "src": "reranking",
+      "rel": "breaks",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::1"
+    },
+    {
+      "src": "cross-encoder",
+      "rel": "used for",
+      "dst": "reranking",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::1"
+    },
+    {
+      "src": "reranking",
+      "rel": "uses",
+      "dst": "cross-encoder",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::2"
+    },
+    {
+      "src": "quantization",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::2"
+    },
+    {
+      "src": "kv cache",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "latency-budgets-in-a-rag-pipeline::2"
+    },
+    {
+      "src": "lora",
+      "rel": "is a",
+      "dst": "fine-tuning",
+      "chunk_id": "lora-and-parameter-efficient-fine-tuning::0"
+    },
+    {
+      "src": "lora",
+      "rel": "requires less",
+      "dst": "memory",
+      "chunk_id": "lora-and-parameter-efficient-fine-tuning::0"
+    },
+    {
+      "src": "lora",
+      "rel": "combined with",
+      "dst": "quantization",
+      "chunk_id": "lora-and-parameter-efficient-fine-tuning::1"
+    },
+    {
+      "src": "lora",
+      "rel": "reduces",
+      "dst": "memory",
+      "chunk_id": "lora-and-parameter-efficient-fine-tuning::1"
+    },
+    {
+      "src": "citation",
+      "rel": "stored in",
+      "dst": "vector database",
+      "chunk_id": "metadata-and-frontmatter-discipline::1"
+    },
+    {
+      "src": "agent",
+      "rel": "operates within",
+      "dst": "planning loop",
+      "chunk_id": "multi-agent-systems-and-handoffs::0"
+    },
+    {
+      "src": "agent",
+      "rel": "hands off to",
+      "dst": "agent",
+      "chunk_id": "multi-agent-systems-and-handoffs::0"
+    },
+    {
+      "src": "memory",
+      "rel": "is dumped into",
+      "dst": "context window",
+      "chunk_id": "multi-agent-systems-and-handoffs::0"
+    },
+    {
+      "src": "agent",
+      "rel": "exceeds",
+      "dst": "token budget",
+      "chunk_id": "multi-agent-systems-and-handoffs::1"
+    },
+    {
+      "src": "agent",
+      "rel": "uses",
+      "dst": "context window",
+      "chunk_id": "multi-agent-systems-and-handoffs::1"
+    },
+    {
+      "src": "multi-hop question",
+      "rel": "is a stress test for",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "handles",
+      "dst": "multi-hop question",
+      "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1"
+    },
+    {
+      "src": "agent",
+      "rel": "resembles",
+      "dst": "planning loop",
+      "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1"
+    },
+    {
+      "src": "context window",
+      "rel": "affects",
+      "dst": "needle in a haystack",
+      "chunk_id": "needle-in-a-haystack-evaluation::1"
+    },
+    {
+      "src": "pii redaction",
+      "rel": "contrasts with",
+      "dst": "deduplication",
+      "chunk_id": "pii-redaction-in-training-data::0"
+    },
+    {
+      "src": "pii redaction",
+      "rel": "is",
+      "dst": "guardrails",
+      "chunk_id": "pii-redaction-in-training-data::1"
+    },
+    {
+      "src": "planning loop",
+      "rel": "relevant to",
+      "dst": "multi-hop question",
+      "chunk_id": "planning-loops-in-agents::0"
+    },
+    {
+      "src": "planning loop",
+      "rel": "part of",
+      "dst": "agent",
+      "chunk_id": "planning-loops-in-agents::1"
+    },
+    {
+      "src": "planning loop",
+      "rel": "related to",
+      "dst": "memory",
+      "chunk_id": "planning-loops-in-agents::1"
+    },
+    {
+      "src": "prompt template",
+      "rel": "includes",
+      "dst": "system prompt",
+      "chunk_id": "prompt-engineering-as-interface-design::0"
+    },
+    {
+      "src": "system prompt",
+      "rel": "provides",
+      "dst": "grounding",
+      "chunk_id": "prompt-engineering-as-interface-design::0"
+    },
+    {
+      "src": "hallucination",
+      "rel": "lacks",
+      "dst": "grounding",
+      "chunk_id": "prompt-engineering-as-interface-design::1"
+    },
+    {
+      "src": "context window",
+      "rel": "degrades",
+      "dst": "grounding",
+      "chunk_id": "prompt-engineering-as-interface-design::1"
+    },
+    {
+      "src": "context window",
+      "rel": "constrains",
+      "dst": "token budget",
+      "chunk_id": "prompt-engineering-as-interface-design::1"
+    },
+    {
+      "src": "prompt injection",
+      "rel": "can reveal",
+      "dst": "system prompt",
+      "chunk_id": "prompt-injection-attacks-explained::0"
+    },
+    {
+      "src": "agent",
+      "rel": "has",
+      "dst": "tool use",
+      "chunk_id": "prompt-injection-attacks-explained::1"
+    },
+    {
+      "src": "prompt injection",
+      "rel": "targets",
+      "dst": "agent",
+      "chunk_id": "prompt-injection-attacks-explained::1"
+    },
+    {
+      "src": "prompt template",
+      "rel": "includes",
+      "dst": "system prompt",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0"
+    },
+    {
+      "src": "prompt template",
+      "rel": "enables",
+      "dst": "citation",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0"
+    },
+    {
+      "src": "prompt template",
+      "rel": "evaluated against",
+      "dst": "golden dataset",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0"
+    },
+    {
+      "src": "prompt template",
+      "rel": "used in",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0"
+    },
+    {
+      "src": "token budget",
+      "rel": "is part of",
+      "dst": "prompt template",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1"
+    },
+    {
+      "src": "token budget",
+      "rel": "allocates space for",
+      "dst": "system prompt",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1"
+    },
+    {
+      "src": "prompt template",
+      "rel": "touches",
+      "dst": "grounding",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1"
+    },
+    {
+      "src": "prompt template",
+      "rel": "touches",
+      "dst": "citation",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1"
+    },
+    {
+      "src": "citation",
+      "rel": "evaluated against",
+      "dst": "golden dataset",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1"
+    },
+    {
+      "src": "refusal",
+      "rel": "evaluated against",
+      "dst": "golden dataset",
+      "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1"
+    },
+    {
+      "src": "agent",
+      "rel": "has",
+      "dst": "planning loop",
+      "chunk_id": "rate-limits-and-retry-storms::1"
+    },
+    {
+      "src": "reciprocal rank fusion",
+      "rel": "merges",
+      "dst": "dense retrieval",
+      "chunk_id": "reciprocal-rank-fusion-explained::0"
+    },
+    {
+      "src": "reciprocal rank fusion",
+      "rel": "merges",
+      "dst": "bm25",
+      "chunk_id": "reciprocal-rank-fusion-explained::0"
+    },
+    {
+      "src": "reciprocal rank fusion",
+      "rel": "enables",
+      "dst": "hybrid search",
+      "chunk_id": "reciprocal-rank-fusion-explained::0"
+    },
+    {
+      "src": "cosine similarity",
+      "rel": "not comparable to",
+      "dst": "bm25",
+      "chunk_id": "reciprocal-rank-fusion-explained::0"
+    },
+    {
+      "src": "reciprocal rank fusion",
+      "rel": "is default approach in",
+      "dst": "hybrid search",
+      "chunk_id": "reciprocal-rank-fusion-explained::1"
+    },
+    {
+      "src": "batching",
+      "rel": "improves",
+      "dst": "throughput",
+      "chunk_id": "reducing-latency-with-batching::0"
+    },
+    {
+      "src": "batching",
+      "rel": "does not improve",
+      "dst": "latency",
+      "chunk_id": "reducing-latency-with-batching::0"
+    },
+    {
+      "src": "batching",
+      "rel": "increases",
+      "dst": "throughput",
+      "chunk_id": "reducing-latency-with-batching::1"
+    },
+    {
+      "src": "batching",
+      "rel": "increases",
+      "dst": "latency",
+      "chunk_id": "reducing-latency-with-batching::1"
+    },
+    {
+      "src": "latency",
+      "rel": "contrasts with",
+      "dst": "throughput",
+      "chunk_id": "reducing-latency-with-batching::1"
+    },
+    {
+      "src": "quantization",
+      "rel": "reduces",
+      "dst": "memory",
+      "chunk_id": "reducing-latency-with-quantization::0"
+    },
+    {
+      "src": "quantization",
+      "rel": "reduces",
+      "dst": "latency",
+      "chunk_id": "reducing-latency-with-quantization::0"
+    },
+    {
+      "src": "quantization",
+      "rel": "improves",
+      "dst": "throughput",
+      "chunk_id": "reducing-latency-with-quantization::0"
+    },
+    {
+      "src": "batching",
+      "rel": "improves",
+      "dst": "throughput",
+      "chunk_id": "reducing-latency-with-quantization::1"
+    },
+    {
+      "src": "quantization",
+      "rel": "improves",
+      "dst": "latency",
+      "chunk_id": "reducing-latency-with-quantization::1"
+    },
+    {
+      "src": "quantization",
+      "rel": "improves",
+      "dst": "memory",
+      "chunk_id": "reducing-latency-with-quantization::1"
+    },
+    {
+      "src": "batching",
+      "rel": "complements",
+      "dst": "quantization",
+      "chunk_id": "reducing-latency-with-quantization::1"
+    },
+    {
+      "src": "reranking",
+      "rel": "uses",
+      "dst": "cross-encoder",
+      "chunk_id": "reranking-with-cross-encoders::0"
+    },
+    {
+      "src": "embedding model",
+      "rel": "uses",
+      "dst": "cosine similarity",
+      "chunk_id": "reranking-with-cross-encoders::0"
+    },
+    {
+      "src": "cross-encoder",
+      "rel": "more accurate than",
+      "dst": "cosine similarity",
+      "chunk_id": "reranking-with-cross-encoders::1"
+    },
+    {
+      "src": "cross-encoder",
+      "rel": "used for",
+      "dst": "reranking",
+      "chunk_id": "reranking-with-cross-encoders::1"
+    },
+    {
+      "src": "cross-encoder",
+      "rel": "adds",
+      "dst": "latency",
+      "chunk_id": "reranking-with-cross-encoders::1"
+    },
+    {
+      "src": "reranking",
+      "rel": "consumes",
+      "dst": "latency",
+      "chunk_id": "reranking-with-cross-encoders::1"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "uses",
+      "dst": "embedding model",
+      "chunk_id": "retrieval-augmented-generation-basics::0"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "stores vectors in",
+      "dst": "vector database",
+      "chunk_id": "retrieval-augmented-generation-basics::0"
+    },
+    {
+      "src": "retrieval-augmented generation",
+      "rel": "retrieves",
+      "dst": "chunking",
+      "chunk_id": "retrieval-augmented-generation-basics::0"
+    },
+    {
+      "src": "hallucination",
+      "rel": "lacks",
+      "dst": "grounding",
+      "chunk_id": "retrieval-augmented-generation-basics::1"
+    },
+    {
+      "src": "retrieval metrics",
+      "rel": "averaged across",
+      "dst": "golden dataset",
+      "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0"
+    },
+    {
+      "src": "dense retrieval",
+      "rel": "is an alternative to",
+      "dst": "bm25",
+      "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1"
+    },
+    {
+      "src": "function calling",
+      "rel": "is a mechanism for",
+      "dst": "tool use",
+      "chunk_id": "tool-use-and-function-calling::1"
+    },
+    {
+      "src": "trace",
+      "rel": "measured by",
+      "dst": "latency",
+      "chunk_id": "trace-logging-for-agent-debugging::1"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "is more expensive than",
+      "dst": "prompt template",
+      "chunk_id": "when-fine-tuning-is-the-wrong-tool::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "is less suitable than",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "when-fine-tuning-is-the-wrong-tool::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "causes",
+      "dst": "hallucination",
+      "chunk_id": "when-fine-tuning-is-the-wrong-tool::0"
+    },
+    {
+      "src": "prompt template",
+      "rel": "improves",
+      "dst": "citation",
+      "chunk_id": "when-fine-tuning-is-the-wrong-tool::0"
+    },
+    {
+      "src": "prompt template",
+      "rel": "tested with",
+      "dst": "golden dataset",
+      "chunk_id": "when-fine-tuning-is-the-wrong-tool::0"
+    },
+    {
+      "src": "fine-tuning",
+      "rel": "is an alternative to",
+      "dst": "retrieval-augmented generation",
+      "chunk_id": "when-fine-tuning-is-the-wrong-tool::1"
+    }
+  ],
+  "communities": [
+    {
+      "id": 0,
+      "entity_ids": [
+        "agent",
+        "function calling",
+        "memory",
+        "planning loop",
+        "tool use"
+      ],
+      "summary": "This community focuses on key aspects of AI/ML agent operations, particularly memory management and tool use within a planning loop. Agents rely on persistent memory to retain context across steps or sessions, which is essential for effective reasoning and decision-making. The community also highlights the integration of tools as part of an AI agent\u2019s capabilities, emphasizing the importance of well-defined interfaces and guardrails to ensure safe and reliable execution."
+    },
+    {
+      "id": 1,
+      "entity_ids": [
+        "chain of thought",
+        "chunk overlap",
+        "chunking",
+        "context window",
+        "few-shot prompting",
+        "multi-hop question",
+        "needle in a haystack",
+        "retrieval-augmented generation",
+        "token budget",
+        "vector database"
+      ],
+      "summary": "This community of entities focuses on the intricacies of managing and utilizing chunks and context within AI/ML engineering, particularly in retrieval-augmented generation (RAG) systems. Relationships like chunk overlap affecting vector database quality and chunking influencing token budget highlight how these elements interplay to optimize model performance, while chain of thought prompting is seen as a tool that can enhance or detract from question answering depending on the complexity and nature of the query."
+    },
+    {
+      "id": 2,
+      "entity_ids": [
+        "data quality",
+        "distillation",
+        "drift",
+        "fine-tuning",
+        "instruction tuning",
+        "lora",
+        "structured output"
+      ],
+      "summary": "This community focuses on various techniques for adapting machine learning models, particularly in the context of fine-tuning, with an emphasis on methods like instruction tuning and LoRA that mitigate issues such as catastrophic forgetting and require less computational resources. The summary highlights how these methods trade off between flexibility, quality, and resource usage, often involving a sequence where more comprehensive fine-tuning precedes or is supplemented by adapter methods like LoRA to achieve structured outputs with improved performance."
+    },
+    {
+      "id": 3,
+      "entity_ids": [
+        "citation",
+        "evaluation harness",
+        "golden dataset",
+        "grounding",
+        "guardrails",
+        "hallucination",
+        "prompt injection",
+        "prompt template",
+        "refusal",
+        "retrieval metrics",
+        "system prompt"
+      ],
+      "summary": "This community of entities focuses on the evaluation and testing of AI/ML systems, particularly regarding their reliability and accuracy. Key aspects include using a golden dataset to ensure measurable claims through an evaluation harness that tracks various performance metrics such as citation quality and refusal. Grounding is central, ensuring that models' assertions are supported by correct evidence rather than memorized information or hallucinations, with guardrails like prompt templates and system prompts designed to prevent issues like prompt injection."
+    },
+    {
+      "id": 4,
+      "entity_ids": [
+        "bm25",
+        "cosine similarity",
+        "deduplication",
+        "dense retrieval",
+        "embedding dimension",
+        "embedding model",
+        "hybrid search",
+        "pii redaction",
+        "reciprocal rank fusion",
+        "semantic search",
+        "sparse retrieval"
+      ],
+      "summary": "This community focuses on various retrieval methods and techniques used in AI/ML engineering, particularly in semantic search. The relationships highlight how hybrid search combines dense and sparse retrieval methods to improve overall performance, with dense retrieval using embeddings for similarity searches and sparse retrieval like BM25 focusing on keyword overlaps. Excerpts discuss the trade-offs between embedding dimensions, their impact on storage and computational costs, and how these factors influence the effectiveness of semantic search techniques in handling diverse textual data."
+    },
+    {
+      "id": 5,
+      "entity_ids": [
+        "batching",
+        "cross-encoder",
+        "kv cache",
+        "latency",
+        "quantization",
+        "reranking",
+        "throughput",
+        "trace"
+      ],
+      "summary": "This community focuses on optimizing various aspects of AI/ML model serving, particularly through techniques like batching and kv cache management to reduce latency and improve throughput. The interactions between these elements highlight how continuous batching keeps GPU utilization high by dynamically managing request groups, while kv cache significantly reduces computational overhead by storing intermediate results, thus directly impacting system performance metrics such as latency and throughput."
+    }
+  ]
+}
