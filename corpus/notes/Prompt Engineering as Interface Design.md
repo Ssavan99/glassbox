@@ -1,3 +1,0 @@
-Prompt engineering is less about magic wording and more about interface design. A good prompt tells the model what role to play, what information matters, what output format is expected, and what constraints must be followed. For personal knowledge systems, prompts should encourage grounded answers that quote or cite retrieved notes rather than inventing details.
-
-Useful prompt patterns include asking the model to separate “answer,” “evidence,” and “uncertainty.” Another helpful pattern is instructing the model to say when the retrieved context is insufficient. This makes the assistant feel less like an oracle and more like a careful librarian with a flashlight.

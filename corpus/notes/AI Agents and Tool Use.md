@@ -1,3 +1,0 @@
-AI agents are systems that combine language models with tools, memory, and planning loops. Unlike a basic chatbot, an agent can decide when to search, calculate, call APIs, read files, or ask for clarification. The core pattern is: observe the user’s goal, reason about next steps, act through a tool, inspect the result, then continue until the task is complete.
-
-Good agent design depends on tight tool boundaries. Each tool should have a clear purpose, predictable inputs, and safe failure behavior. The model should not pretend a tool succeeded when it did not. In production, agents benefit from logging, permission checks, rate limits, and human approval for risky actions such as sending emails, moving money, or deleting data.
