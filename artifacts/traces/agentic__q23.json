@@ -1,0 +1,639 @@
+{
+  "trace_id": "agentic::q23",
+  "architecture": "agentic",
+  "question": "What two named config constants define this engine's default chunk size and chunk overlap in tokens?",
+  "answer": "The two named config constants defining this engine's default chunk size and chunk overlap in tokens are `CHUNK_TARGET_TOKENS` and `CHUNK_OVERLAP_TOKENS`. These values are set to 250 tokens for the target chunk size and 50 tokens for the overlap, respectively. This is mentioned in [chunk-overlap-and-why-it-matters::0].",
+  "metrics": {
+    "latency_ms": 7.7214590019138996,
+    "llm_calls": 6,
+    "prompt_tokens": 5152,
+    "completion_tokens": 259
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (2 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.11462500333436765,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What are the names of the config constants defining the default chunk size?",
+          "What is the name of the config constant defining the chunk overlap in tokens?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15470799917238764,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 5.416125000920147,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.04772547259926796,
+          0.018799778074026108,
+          -0.06797920912504196,
+          -0.02125680260360241,
+          -0.01686510071158409,
+          -0.06893574446439743,
+          -0.058855533599853516,
+          0.0878712460398674
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.022542000806424767,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.4682597815990448,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.39525970816612244,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.35769397020339966,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.3453742265701294,
+            "rank": 4
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.34024301171302795,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.1605830002517905,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not mention any specific config constants related to the default chunk size.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0013750031939707696,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.305499997921288,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 12.509433295192744,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 12.124106863042392,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 11.877580702049384,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 11.611656202240935,
+            "rank": 4
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 11.252865805560068,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.12758299999404699,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not contain any information about config constants or their names related to default chunk size.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15808399984962307,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.1444590016035363,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "chunk overlap"
+        ]
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.04066600013175048,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1",
+          "lora-and-parameter-efficient-fine-tuning::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "retrieval-augmented-generation-basics::0",
+          "ai-evaluation-for-personal-knowledge-bases::0",
+          "retrieval-metrics-recall-at-k-and-mrr::0",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::1",
+          "context-window-overflow-and-truncation::0",
+          "few-shot-prompting-for-grounded-answers::1"
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.28545799796120264,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not mention any config constant for defining chunk overlap in tokens.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n12"
+      ],
+      "duration_ms": 0.0013749995559919626,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.28324999948381446,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 19.31858300473055,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 19.313247436434715,
+            "rank": 2
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 18.263859591201175,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 17.61988687297129,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 15.781815545960068,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.2295420017617289,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not contain any information about a config constant defining chunk overlap in tokens.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n15"
+      ],
+      "duration_ms": 0.2204590018664021,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The two named config constants defining this engine's default chunk size and chunk overlap in tokens are `CHUNK_TARGET_TOKENS` and `CHUNK_OVERLAP_TOKENS`. These values are set to 250 tokens for the target chunk size and 50 tokens for the overlap, respectively. This is mentioned in [chunk-overlap-and-why-it-matters::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1691
+      }
+    }
+  ]
+}

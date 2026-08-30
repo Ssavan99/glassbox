@@ -1,0 +1,535 @@
+{
+  "trace_id": "agentic::q07",
+  "architecture": "agentic",
+  "question": "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?",
+  "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a model exposed to unredacted personal data during training can memorize it and later reproduce it verbatim when prompted, even for a user who has no legitimate reason to see that information.\" [pii-redaction-in-training-data::0]",
+  "metrics": {
+    "latency_ms": 51.879041999200126,
+    "llm_calls": 8,
+    "prompt_tokens": 5151,
+    "completion_tokens": 702
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.32545799695071764,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What does PII stand for?",
+          "What are the potential privacy risks associated with PII in a fine-tuned model?",
+          "How does redaction of PII address these risks?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.13012500130571425,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.11825000183307566,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 7.038804812275362,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 6.060474569763135,
+            "rank": 2
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 1.3072007150773843,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 1.2709024216377414,
+            "rank": 4
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 1.2591417679127972,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.31762500293552876,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain the definition or acronym expansion for PII.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0009590003173798323,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 30.141875002300367,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08489186316728592,
+          0.0667094737291336,
+          -0.04751518741250038,
+          -0.030203454196453094,
+          -0.07358170300722122,
+          -0.006879799067974091,
+          0.05452413484454155,
+          -0.02550181932747364
+        ]
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.02495800072210841,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.4116596579551697,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.3829348087310791,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.1544133722782135,
+            "rank": 3
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.1368314027786255,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.1223130002617836,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.457333997474052,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain the definition of PII.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.17533400023239665,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.31991699870559387,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 19.43866314955882,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 14.963970786211863,
+            "rank": 2
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1",
+            "score": 13.765767334672942,
+            "rank": 3
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 12.033586387855614,
+            "rank": 4
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 8.878213475296292,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.1687500007392373,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly address potential privacy risks associated with PII in a fine-tuned model.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 2)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.001624997821636498,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n12"
+      ],
+      "duration_ms": 5.49541600048542,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.07170937955379486,
+          0.009662805125117302,
+          -0.039318881928920746,
+          -0.0293741375207901,
+          -0.005236510187387466,
+          0.01768871210515499,
+          -0.026541322469711304,
+          0.015231736935675144
+        ]
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.019499999325489625,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.548221230506897,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.4335959553718567,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.3058202266693115,
+            "rank": 3
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.2930825650691986,
+            "rank": 4
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.2912296950817108,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.34941700141644105,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not address privacy risks associated with PII in a fine-tuned model. It discusses topics such as redaction methods, full fine-tuning vs adapters, cost-aware routing, and guardrails for autonomous actions, which are not directly related to the sub-question.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.14570799976354465,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 0.21329099763534032,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 17.875083605599702,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 12.533476545855407,
+            "rank": 2
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 9.03212278430869,
+            "rank": 3
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 4.918666939240743,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 4.718644076503527,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.4627919988706708,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address how redaction of PII addresses risks. It discusses related topics like training data issues and hallucination but lacks specific information on the risk mitigation benefits of PII redaction.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 2)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.0013329990906640887,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n19"
+      ],
+      "duration_ms": 12.253834000148345,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.101910300552845,
+          0.09332087635993958,
+          -0.02775188721716404,
+          -0.00464674923568964,
+          0.0017817497719079256,
+          0.06778530031442642,
+          0.05269288644194603,
+          0.01171367522329092
+        ]
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n20"
+      ],
+      "duration_ms": 0.0262079993262887,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.6577701568603516,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.5824891328811646,
+            "rank": 2
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "score": 0.29730677604675293,
+            "rank": 3
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.29562416672706604,
+            "rank": 4
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::0",
+            "score": 0.29091840982437134,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n21"
+      ],
+      "duration_ms": 0.334707998263184,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The excerpts only describe what PII redaction does or mention challenges of non\u2011redacted data, but they do not explicitly explain how redaction mitigates the privacy and leakage risks associated with PII in model training or inference.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n15",
+        "n22"
+      ],
+      "duration_ms": 0.30662500284961425,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a model exposed to unredacted personal data during training can memorize it and later reproduce it verbatim when prompted, even for a user who has no legitimate reason to see that information.\" [pii-redaction-in-training-data::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2767
+      }
+    }
+  ]
+}

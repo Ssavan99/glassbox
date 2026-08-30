@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q13",
+  "architecture": "hyde",
+  "question": "Hybrid search is described as merging a dense ranking and a sparse bm25 ranking without needing to normalize their raw scores \u2014 what specific constant governs how sharply that merge favors top-ranked results, and what value does this engine actually use for it?",
+  "answer": "The specific constant that governs how sharply the merge favors top-ranked results is `k` in the reciprocal rank fusion formula. This engine uses `RRF_K = 60`, which is a widely used default value from the original literature on reciprocal rank fusion.\n\n[reciprocal-rank-fusion-explained::1]",
+  "metrics": {
+    "latency_ms": 23.8441250003234,
+    "llm_calls": 2,
+    "prompt_tokens": 1602,
+    "completion_tokens": 157
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "In the implementation of hybrid search within this system, the merging factor \\( \\alpha \\) is used to balance the dense ranking and sparse BM25 scores. This constant directly influences how much weight is given to top-ranked results from each method. For this particular engine, the value of \\( \\alpha \\) is set at 0.7, effectively favoring higher ranked items while still considering the broader relevance provided by BM25.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 235
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.011554704047739506,
+          -0.045014381408691406,
+          -0.07230474799871445,
+          -0.032754119485616684,
+          0.0006738582160323858,
+          0.027017012238502502,
+          0.03394142538309097,
+          0.017268620431423187
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.6398999691009521,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.6016768217086792,
+            "rank": 2
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.5895134210586548,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.5341601967811584,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.5328150987625122,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The specific constant that governs how sharply the merge favors top-ranked results is `k` in the reciprocal rank fusion formula. This engine uses `RRF_K = 60`, which is a widely used default value from the original literature on reciprocal rank fusion.\n\n[reciprocal-rank-fusion-explained::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1524
+      }
+    }
+  ]
+}

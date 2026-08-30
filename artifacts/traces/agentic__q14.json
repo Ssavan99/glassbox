@@ -1,0 +1,384 @@
+{
+  "trace_id": "agentic::q14",
+  "architecture": "agentic",
+  "question": "A needle-in-a-haystack test can score perfectly on recall@k while the assembled answer is still wrong \u2014 what's the mechanism behind that gap, and where in the pipeline does the actual fix belong?",
+  "answer": "The mechanism behind this gap is that a model might retrieve the correct information (hence scoring well on recall@k), but fail to use it correctly due to its position within the context. This failure happens \"stage later\" [retrieval-failures-lost-in-the-middle::0], in how the prompt template orders retrieved evidence before handing it to the model. The actual fix belongs in the prompt template, not in retrieval itself. Specifically, ordering chunks by relevance rather than just their initial retrieval order, and deliberately placing high-confidence chunks near the start or end of the context can help ensure they influence the answer [retrieval-failures-lost-in-the-middle::1].",
+  "metrics": {
+    "latency_ms": 2.1334999983082525,
+    "llm_calls": 4,
+    "prompt_tokens": 4324,
+    "completion_tokens": 326
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (1 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.20333299835328944,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "A needle-in-a-haystack test can score perfectly on recall@k while the assembled answer is still wrong \u2014 what's the mechanism behind that gap, and where in the pipeline does the actual fix belong?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.2136250004696194,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.20824999955948442,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "needle in a haystack"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.03195799945387989,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "cost is",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "system prompt",
+            "rel": "alternative to",
+            "dst": "few-shot prompting"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "context window",
+            "rel": "affects",
+            "dst": "needle in a haystack"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          }
+        ],
+        "chunk_ids": [
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "retrieval-augmented-generation-basics::0",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0",
+          "ai-agents-and-tool-use::1",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "multi-agent-systems-and-handoffs::0",
+          "multi-agent-systems-and-handoffs::1",
+          "planning-loops-in-agents::1",
+          "prompt-injection-attacks-explained::1",
+          "rate-limits-and-retry-storms::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::1",
+          "context-window-overflow-and-truncation::0",
+          "few-shot-prompting-for-grounded-answers::1",
+          "needle-in-a-haystack-evaluation::1",
+          "prompt-engineering-as-interface-design::1",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "cleaning-noisy-source-documents::1",
+          "context-window-overflow-and-truncation::1",
+          "context-window-overflow-and-truncation::2",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "kv-cache-and-why-it-matters-for-serving::1",
+          "lora-and-parameter-efficient-fine-tuning::0",
+          "lora-and-parameter-efficient-fine-tuning::1",
+          "reducing-latency-with-quantization::0"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.30624999999417923,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly address the specific mechanism behind a needle-in-a-haystack test scoring perfectly on recall@k while the answer is still wrong, nor does it provide guidance on where the fix should be applied.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.00112499765236862,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.5778749982709996,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 33.260812513494585,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 31.70512158783626,
+            "rank": 2
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 29.826743022600652,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 28.28511142332713,
+            "rank": 4
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 28.09994827193195,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.23679100195295177,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address the mechanism behind the gap between perfect recall@k and a wrong answer in an A needle-in-a-haystack test. It lacks specific information about the pipeline steps where the actual fix might be needed.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.22433400226873346,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The mechanism behind this gap is that a model might retrieve the correct information (hence scoring well on recall@k), but fail to use it correctly due to its position within the context. This failure happens \"stage later\" [retrieval-failures-lost-in-the-middle::0], in how the prompt template orders retrieved evidence before handing it to the model. The actual fix belongs in the prompt template, not in retrieval itself. Specifically, ordering chunks by relevance rather than just their initial retrieval order, and deliberately placing high-confidence chunks near the start or end of the context can help ensure they influence the answer [retrieval-failures-lost-in-the-middle::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1610
+      }
+    }
+  ]
+}

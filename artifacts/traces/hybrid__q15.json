@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q15",
+  "architecture": "hybrid",
+  "question": "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost \u2014 given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?",
+  "answer": "Continuous\u2011batching is not just a \u201cplug\u2011in\u201d scheduler; it must constantly add new requests to a running batch and drop finished ones.\u202fEach request carries its own KV\u2011cache state (the keys and values for all tokens it has already generated), and that state has to be allocated when the request starts, kept for the whole time it is in the batch, and freed as soon as the request finishes.\u202fIf the batching system ignored this, it would either have to recompute the cache (undoing the linear\u2011cost benefit) or would run out of memory because the cache for many concurrent requests would pile up unchecked.\u202fThus, continuous batching \u201cdepends heavily on efficient per\u2011request KV\u2011cache management\u201d\u202f\u2014\u202fthe scheduler must track and free each request\u2019s cache independently, and any reshuffling or recomputation of cache state would erase the latency gains that continuous batching is meant to provide\u202f[continuous-batching-and-throughput::1].\n\nIn addition, the KV cache is a major source of memory pressure: \u201cdoubling how many retrieved chunks get included in a prompt \u2026 doubles the KV cache memory that request consumes \u2026 directly limiting how many concurrent requests a fixed amount of GPU memory can serve\u201d\u202f[kv-cache-and-why-it-matters-for-serving::1]. Because continuous batching changes the set of active requests on the fly, the serving system must manage this memory carefully; treating batching as independent of cache management would lead to memory exhaustion or forced cache eviction, again destroying the linear\u2011cost advantage.\n\nTherefore, a serving system cannot treat continuous batching as a completely independent optimization; it must tightly couple the batching logic with KV\u2011cache allocation, tracking, and freeing to preserve both the latency benefits of dynamic batching and the memory efficiency of the KV cache.",
+  "metrics": {
+    "latency_ms": 83.21254199836403,
+    "llm_calls": 1,
+    "prompt_tokens": 1333,
+    "completion_tokens": 564
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.028044944629073143,
+          0.045588117092847824,
+          -0.015548923052847385,
+          0.03590899333357811,
+          -0.06443866342306137,
+          -0.003807778237387538,
+          -0.06403370201587677,
+          0.009320821613073349
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.7388319969177246,
+            "rank": 1
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.6317634582519531,
+            "rank": 2
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.5515794157981873,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.5514694452285767,
+            "rank": 4
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.5498610734939575,
+            "rank": 5
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.5428822040557861,
+            "rank": 6
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.512932538986206,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.44113680720329285,
+            "rank": 8
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 0.3870741128921509,
+            "rank": 9
+          },
+          {
+            "chunk_id": "caching-retrieval-results::2",
+            "score": 0.37531307339668274,
+            "rank": 10
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.37427040934562683,
+            "rank": 11
+          },
+          {
+            "chunk_id": "caching-retrieval-results::0",
+            "score": 0.3691710829734802,
+            "rank": 12
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.351252943277359,
+            "rank": 13
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.3493916392326355,
+            "rank": 14
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.33553546667099,
+            "rank": 15
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.3283821940422058,
+            "rank": 16
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.3122408986091614,
+            "rank": 17
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.311123788356781,
+            "rank": 18
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.31001436710357666,
+            "rank": 19
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.30905359983444214,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 64.17311748159989,
+            "rank": 1
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 46.21932966408422,
+            "rank": 2
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 45.417238049268015,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 40.27665114879235,
+            "rank": 4
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 35.922830111933926,
+            "rank": 5
+          },
+          {
+            "chunk_id": "caching-retrieval-results::2",
+            "score": 35.32034177732463,
+            "rank": 6
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 34.234692353323354,
+            "rank": 7
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 32.27197086986416,
+            "rank": 8
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 31.81519524833667,
+            "rank": 9
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 30.481454774465043,
+            "rank": 10
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 28.485833201922414,
+            "rank": 11
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 28.196795944808834,
+            "rank": 12
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 27.702414054101485,
+            "rank": 13
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 27.3323262078868,
+            "rank": 14
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 26.83134799918894,
+            "rank": 15
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 26.703451294734705,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 26.30481550838451,
+            "rank": 17
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 26.265596752870827,
+            "rank": 18
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 26.149988655441383,
+            "rank": 19
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "score": 25.936667170087127,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.03252247488101534,
+            "rank": 2
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.03125763125763126,
+            "rank": 3
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.03125763125763126,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.03125,
+            "rank": 5
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.03007688828584351,
+            "rank": 6
+          },
+          {
+            "chunk_id": "caching-retrieval-results::2",
+            "score": 0.029437229437229435,
+            "rank": 7
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 0.028985507246376812,
+            "rank": 8
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.02821939586645469,
+            "rank": 9
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.028169014084507043,
+            "rank": 10
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.027912386121341344,
+            "rank": 11
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.014285714285714285,
+            "rank": 13
+          },
+          {
+            "chunk_id": "caching-retrieval-results::0",
+            "score": 0.013888888888888888,
+            "rank": 14
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 0.013888888888888888,
+            "rank": 15
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.0136986301369863,
+            "rank": 16
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.0136986301369863,
+            "rank": 17
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.013513513513513514,
+            "rank": 18
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.013333333333333334,
+            "rank": 19
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 0.013333333333333334,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.03252247488101534,
+            "rank": 2
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.03125763125763126,
+            "rank": 3
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.03125763125763126,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.03125,
+            "rank": 5
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.03007688828584351,
+            "rank": 6
+          },
+          {
+            "chunk_id": "caching-retrieval-results::2",
+            "score": 0.029437229437229435,
+            "rank": 7
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 0.028985507246376812,
+            "rank": 8
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.02821939586645469,
+            "rank": 9
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.028169014084507043,
+            "rank": 10
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.027912386121341344,
+            "rank": 11
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.014285714285714285,
+            "rank": 13
+          },
+          {
+            "chunk_id": "caching-retrieval-results::0",
+            "score": 0.013888888888888888,
+            "rank": 14
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 0.013888888888888888,
+            "rank": 15
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.0136986301369863,
+            "rank": 16
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.0136986301369863,
+            "rank": 17
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.013513513513513514,
+            "rank": 18
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.013333333333333334,
+            "rank": 19
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 0.013333333333333334,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 2.6620254516601562,
+            "rank": 1
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.9530093669891357,
+            "rank": 2
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.5145931243896484,
+            "rank": 3
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": -1.611480474472046,
+            "rank": 4
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": -7.040746688842773,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "Continuous\u2011batching is not just a \u201cplug\u2011in\u201d scheduler; it must constantly add new requests to a running batch and drop finished ones.\u202fEach request carries its own KV\u2011cache state (the keys and values for all tokens it has already generated), and that state has to be allocated when the request starts, kept for the whole time it is in the batch, and freed as soon as the request finishes.\u202fIf the batching system ignored this, it would either have to recompute the cache (undoing the linear\u2011cost benefit) or would run out of memory because the cache for many concurrent requests would pile up unchecked.\u202fThus, continuous batching \u201cdepends heavily on efficient per\u2011request KV\u2011cache management\u201d\u202f\u2014\u202fthe scheduler must track and free each request\u2019s cache independently, and any reshuffling or recomputation of cache state would erase the latency gains that continuous batching is meant to provide\u202f[continuous-batching-and-throughput::1].\n\nIn addition, the KV cache is a major source of memory pressure: \u201cdoubling how many retrieved chunks get included in a prompt \u2026 doubles the KV cache memory that request consumes \u2026 directly limiting how many concurrent requests a fixed amount of GPU memory can serve\u201d\u202f[kv-cache-and-why-it-matters-for-serving::1]. Because continuous batching changes the set of active requests on the fly, the serving system must manage this memory carefully; treating batching as independent of cache management would lead to memory exhaustion or forced cache eviction, again destroying the linear\u2011cost advantage.\n\nTherefore, a serving system cannot treat continuous batching as a completely independent optimization; it must tightly couple the batching logic with KV\u2011cache allocation, tracking, and freeing to preserve both the latency benefits of dynamic batching and the memory efficiency of the KV cache.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1897
+      }
+    }
+  ]
+}

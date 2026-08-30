@@ -1,0 +1,112 @@
+{
+  "trace_id": "adaptive::q08",
+  "architecture": "adaptive",
+  "question": "What is a planning loop, and what four-step cycle does it repeat?",
+  "answer": "A planning loop is the reasoning structure that decides what an agent does next. It repeats a four-step cycle:\n1. Observe the current state.\n2. Reason about the remaining gap between that state and the goal.\n3. Choose an action.\n4. Execute it.\n\nThis cycle is repeated until the goal is reached or the loop gives up. [planning-loops-in-agents::0]",
+  "metrics": {
+    "latency_ms": 5.232708001130959,
+    "llm_calls": 2,
+    "prompt_tokens": 1969,
+    "completion_tokens": 376
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "route",
+      "label": "Route question to naive",
+      "parent_ids": [],
+      "duration_ms": 0.6353330027195625,
+      "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
+      "payload": {
+        "chosen": "naive",
+        "scores": {
+          "naive": 0.85,
+          "hybrid": 0.1,
+          "hyde": 0.05,
+          "corrective": 0.08,
+          "graph": 0.04,
+          "agentic": 0.03
+        },
+        "reason": "The question asks for a definition and a list of four steps\u2014a straightforward factual answer. No exact string retrieval, complex reasoning, graph traversal, or multi\u2011step decomposition is needed, making a simple dense\u2011retrieval (naive) approach most appropriate."
+      }
+    },
+    {
+      "id": "naive::n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.002986201085150242,
+          0.036855392158031464,
+          -0.04274217039346695,
+          0.0028365333564579487,
+          -0.026944532990455627,
+          0.019024215638637543,
+          -0.0700116902589798,
+          -0.03317961096763611
+        ]
+      }
+    },
+    {
+      "id": "naive::n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "naive::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.7005970478057861,
+            "rank": 1
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.5933675765991211,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.445375919342041,
+            "rank": 3
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.4365803003311157,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.3509066104888916,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "naive::n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "naive::n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "A planning loop is the reasoning structure that decides what an agent does next. It repeats a four-step cycle:\n1. Observe the current state.\n2. Reason about the remaining gap between that state and the goal.\n3. Choose an action.\n4. Execute it.\n\nThis cycle is repeated until the goal is reached or the loop gives up. [planning-loops-in-agents::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1438
+      }
+    }
+  ]
+}

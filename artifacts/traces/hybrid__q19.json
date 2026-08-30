@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q19",
+  "architecture": "hybrid",
+  "question": "What embedding model name and output dimension constant does this engine's config use?",
+  "answer": "The engine is configured to use the **`all-MiniLM-L6-v2`** embedding model, and its output dimension is defined by the constant **`EMBEDDING_DIM = 384`**.\u202f[embedding-dimension-and-model-size-tradeoffs::0]",
+  "metrics": {
+    "latency_ms": 92.88924999782466,
+    "llm_calls": 1,
+    "prompt_tokens": 1450,
+    "completion_tokens": 167
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06250693649053574,
+          -0.061503294855356216,
+          -0.06843674927949905,
+          0.00416679447516799,
+          -0.007943890057504177,
+          0.04781608656048775,
+          -0.08921502530574799,
+          0.04871678352355957
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.4545544385910034,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.3481726050376892,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.2683526575565338,
+            "rank": 3
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.22963768243789673,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.2195320427417755,
+            "rank": 5
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.21312958002090454,
+            "rank": 6
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.21082580089569092,
+            "rank": 7
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.21072272956371307,
+            "rank": 8
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.2075529545545578,
+            "rank": 9
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.20134446024894714,
+            "rank": 10
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.20130780339241028,
+            "rank": 11
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.1973155438899994,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.19044600427150726,
+            "rank": 13
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.18942983448505402,
+            "rank": 14
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.18627044558525085,
+            "rank": 15
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.18252596259117126,
+            "rank": 16
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.17697042226791382,
+            "rank": 17
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.1749921590089798,
+            "rank": 18
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.17257210612297058,
+            "rank": 19
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.16470158100128174,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 14.401595644637956,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 13.616728809173233,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 11.852356695048979,
+            "rank": 3
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 11.236616887170776,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 10.680456930959338,
+            "rank": 5
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 10.145329217637428,
+            "rank": 6
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 9.857825223867497,
+            "rank": 7
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 9.580694913618185,
+            "rank": 8
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 9.478126532987817,
+            "rank": 9
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 8.387297265728494,
+            "rank": 10
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 7.924127018277837,
+            "rank": 11
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 7.8771344649728805,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 7.73196979833974,
+            "rank": 13
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 7.625900527659628,
+            "rank": 14
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 7.077313849894756,
+            "rank": 15
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 7.026773533731601,
+            "rank": 16
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 6.969621416156675,
+            "rank": 17
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 6.731568773791374,
+            "rank": 18
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 6.487370340387384,
+            "rank": 19
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 6.428507068842115,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.032266458495966696,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.03200204813108039,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.02871794871794872,
+            "rank": 4
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.027443609022556388,
+            "rank": 5
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.0273972602739726,
+            "rank": 6
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.015625,
+            "rank": 7
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 0.015625,
+            "rank": 8
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.015151515151515152,
+            "rank": 10
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.014084507042253521,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.032266458495966696,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.03200204813108039,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.02871794871794872,
+            "rank": 4
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.027443609022556388,
+            "rank": 5
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.0273972602739726,
+            "rank": 6
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.015625,
+            "rank": 7
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 0.015625,
+            "rank": 8
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.015151515151515152,
+            "rank": 10
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.014084507042253521,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 4.779287338256836,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": -1.4541847705841064,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": -2.849928140640259,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": -3.058140993118286,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": -3.2055344581604004,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "The engine is configured to use the **`all-MiniLM-L6-v2`** embedding model, and its output dimension is defined by the constant **`EMBEDDING_DIM = 384`**.\u202f[embedding-dimension-and-model-size-tradeoffs::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1617
+      }
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q02",
+  "architecture": "hyde",
+  "question": "What is a cross-encoder, and how does it differ from the bi-encoder architecture used for initial retrieval?",
+  "answer": "A **cross\u2011encoder** is a model that scores relevance by feeding the query **and** a single candidate document together as one combined input. It runs a full forward pass over this joint text and outputs a single relevance score, allowing the model to directly compare specific words and phrases in the query and the document (e.g., handling negation, exact entity matches, or whether the passage truly answers the sub\u2011question)\u202f\u3010reranking-with-cross-encoders::0\u3011.  \n\nIn contrast, the **bi\u2011encoder** architecture used for the initial retrieval step encodes the query and each document **independently** into separate dense vectors. Those vectors are then compared with a cheap similarity measure such as cosine similarity\u202f\u3010reranking-with-cross-encoders::0\u3011. This approach is fast and scales to large corpora, but because the query and document never attend to each other during encoding, it can miss fine\u2011grained relevance signals that a cross\u2011encoder captures\u202f\u3010reranking-with-cross-encoders::1\u3011.",
+  "metrics": {
+    "latency_ms": 26.98887500082492,
+    "llm_calls": 2,
+    "prompt_tokens": 1594,
+    "completion_tokens": 679
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "A cross\u2011encoder jointly encodes a query and a candidate document by concatenating them and passing the combined text through a single transformer, allowing the model to attend to interactions between the two sequences before producing a relevance score. In contrast, a bi\u2011encoder assigns separate embeddings to the query and each document using two independent encoders, enabling fast nearest\u2011neighbor search via vector similarity but lacking fine\u2011grained cross\u2011attention; the cross\u2011encoder is therefore typically employed as a re\u2011ranking step after the bi\u2011encoder retrieves a smaller candidate set.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 425
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.058167096227407455,
+          -0.07118582725524902,
+          -0.01888454705476761,
+          -0.002251250669360161,
+          0.03986457735300064,
+          0.07906607538461685,
+          -0.08775042742490768,
+          0.05644122138619423
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.8195969462394714,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.7527818083763123,
+            "rank": 2
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.7136080861091614,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.5441240668296814,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.540395975112915,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "A **cross\u2011encoder** is a model that scores relevance by feeding the query **and** a single candidate document together as one combined input. It runs a full forward pass over this joint text and outputs a single relevance score, allowing the model to directly compare specific words and phrases in the query and the document (e.g., handling negation, exact entity matches, or whether the passage truly answers the sub\u2011question)\u202f\u3010reranking-with-cross-encoders::0\u3011.  \n\nIn contrast, the **bi\u2011encoder** architecture used for the initial retrieval step encodes the query and each document **independently** into separate dense vectors. Those vectors are then compared with a cheap similarity measure such as cosine similarity\u202f\u3010reranking-with-cross-encoders::0\u3011. This approach is fast and scales to large corpora, but because the query and document never attend to each other during encoding, it can miss fine\u2011grained relevance signals that a cross\u2011encoder captures\u202f\u3010reranking-with-cross-encoders::1\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1848
+      }
+    }
+  ]
+}

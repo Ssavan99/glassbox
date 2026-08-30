@@ -1,0 +1,535 @@
+{
+  "trace_id": "agentic::q20",
+  "architecture": "agentic",
+  "question": "In this project's cost-aware routing config, what are the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL?",
+  "answer": "In this project's cost-aware routing config, the exact local and hosted model identifier strings assigned are:\n\n- `OLLAMA_MODEL = \"qwen2.5:7b-instruct\"`\n- `GROQ_MODEL = \"openai/gpt-oss-120b\"`\n\nThis information is cited from [cost-aware-model-routing::0] and [cost-aware-model-routing::1].",
+  "metrics": {
+    "latency_ms": 16.451499999675434,
+    "llm_calls": 8,
+    "prompt_tokens": 5101,
+    "completion_tokens": 517
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.09633299850975163,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "Where is the cost-aware routing configuration defined in the project?",
+          "What exact string is assigned to OLLAMA_MODEL in that configuration?",
+          "What exact string is assigned to GROQ_MODEL in that configuration?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15379199976450764,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 5.929625000135275,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.01798539236187935,
+          -0.03816061466932297,
+          -0.07633262127637863,
+          0.055797528475522995,
+          0.0037757328245788813,
+          0.0027967416681349277,
+          -0.005389786791056395,
+          0.04712213948369026
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.024000000848900527,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.42118406295776367,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.3424453139305115,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.29871970415115356,
+            "rank": 3
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::0",
+            "score": 0.25811201333999634,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.23461365699768066,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.18141700275009498,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address where the cost-aware routing configuration is defined in the project.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0010839976312126964,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.2377500022703316,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 18.37464205061204,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 18.331711015331862,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 13.349680705768531,
+            "rank": 3
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 12.212982064289875,
+            "rank": 4
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 11.662336296215845,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.1474170021538157,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided excerpts do not mention where the cost-aware routing configuration is defined in the project.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15445900135091506,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 4.020959000627045,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.028392303735017776,
+          0.04269891604781151,
+          -0.0696750059723854,
+          0.012696103192865849,
+          -0.06654377281665802,
+          -0.020054522901773453,
+          0.002736203372478485,
+          0.03911122307181358
+        ]
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.022207997972145677,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.3089134693145752,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.2907952070236206,
+            "rank": 2
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.24655240774154663,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.18315695226192474,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.16404666006565094,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.15587499729008414,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided excerpts do not contain any information about the exact string assigned to OLLAMA_MODEL in the configuration.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n12"
+      ],
+      "duration_ms": 0.0012079981388524175,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.23916699865367264,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "metadata-and-frontmatter-discipline::1",
+            "score": 10.173174904275463,
+            "rank": 1
+          },
+          {
+            "chunk_id": "metadata-and-frontmatter-discipline::0",
+            "score": 10.088657285036811,
+            "rank": 2
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 9.675960209877996,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 9.528852517608613,
+            "rank": 4
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 9.437696252911822,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.1512080016254913,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any information related to OLLAMA_MODEL or its assignment in a configuration.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.149125000461936,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 3.9055000015650876,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.01681034080684185,
+          -8.643133332952857e-05,
+          -0.045463383197784424,
+          -0.007145777810364962,
+          -0.059554435312747955,
+          0.02896980568766594,
+          0.09149295836687088,
+          0.013957281596958637
+        ]
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.017416001355741173,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.2912334203720093,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.2828827202320099,
+            "rank": 2
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.26723459362983704,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.1925814300775528,
+            "rank": 4
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.18935778737068176,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.14879199807182886,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any information regarding the specific string assigned to GROQ_MODEL in a configuration.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n19"
+      ],
+      "duration_ms": 0.0010000003385357559,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n20"
+      ],
+      "duration_ms": 0.20066699653398246,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "metadata-and-frontmatter-discipline::1",
+            "score": 10.173174904275463,
+            "rank": 1
+          },
+          {
+            "chunk_id": "metadata-and-frontmatter-discipline::0",
+            "score": 10.088657285036811,
+            "rank": 2
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 9.675960209877996,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 9.528852517608613,
+            "rank": 4
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 9.437696252911822,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n21"
+      ],
+      "duration_ms": 0.1361659997201059,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any specific information about GROQ_MODEL or its assignment.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n15",
+        "n22"
+      ],
+      "duration_ms": 0.2936249984486494,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "In this project's cost-aware routing config, the exact local and hosted model identifier strings assigned are:\n\n- `OLLAMA_MODEL = \"qwen2.5:7b-instruct\"`\n- `GROQ_MODEL = \"openai/gpt-oss-120b\"`\n\nThis information is cited from [cost-aware-model-routing::0] and [cost-aware-model-routing::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2728
+      }
+    }
+  ]
+}

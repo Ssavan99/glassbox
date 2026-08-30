@@ -1,0 +1,289 @@
+{
+  "trace_id": "agentic::q03",
+  "architecture": "agentic",
+  "question": "What is the difference between recall@k and MRR as retrieval metrics?",
+  "answer": "Recall@k and Mean Reciprocal Rank (MRR) are two important retrieval metrics used to evaluate the performance of a retrieval system, but they measure different aspects of its ability to find relevant documents.\n\n- **Recall@k**: This metric measures the proportion of times that the ground truth document is among the top k ranked documents. For example, if you set k=10 and your model ranks the correct document as 7th out of 10 results, it counts as a success for Recall@10 but not for Recall@5. It's particularly useful when you want to ensure that relevant documents are within the top-k results, which is critical for many applications where missing the first few ranked items could have significant consequences.\n\n- **MRR (Mean Reciprocal Rank)**: This metric rewards a document more harshly if it appears lower in the ranking. It calculates the reciprocal of the rank at which the correct document first appears and then averages this value across all queries. So, even if a relevant document is ranked quite low for some queries, its presence will reduce MRR significantly. For instance, if your model ranks the correct answer as 3rd out of 10 results for one query and 7th for another, the MRR would be \\(\\frac{1/3 + 1/7}{2} = 0.34\\). This makes MRR more sensitive to low-rank hits compared to Recall@k.\n\nBoth metrics are important: `Recall@k` helps ensure that relevant documents are present in the top-k results, while `MRR` provides a measure of how quickly and consistently those relevant documents appear in the ranking. They should be tracked separately for dense retrieval and bm25 before any fusion step to get a comprehensive understanding of the system's performance across different types of queries.",
+  "metrics": {
+    "latency_ms": 1.3415409994195215,
+    "llm_calls": 3,
+    "prompt_tokens": 4414,
+    "completion_tokens": 450
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (1 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.22841700047138147,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What is the difference between recall@k and MRR as retrieval metrics?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.14645799819845706,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.13862500054528937,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "retrieval metrics"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.03116699735983275,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "benefits",
+            "dst": "bm25"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "benefits",
+            "dst": "dense retrieval"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "complements",
+            "dst": "bm25"
+          },
+          {
+            "src": "distillation",
+            "rel": "requires evaluation on",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "retrieval metrics",
+            "rel": "averaged across",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "is an alternative to",
+            "dst": "bm25"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "retrieval-augmented-generation-basics::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "ai-evaluation-for-personal-knowledge-bases::0",
+          "knowledge-distillation-for-smaller-models::1",
+          "retrieval-metrics-recall-at-k-and-mrr::0",
+          "agent-memory-and-context-management::1",
+          "context-window-overflow-and-truncation::2",
+          "hallucination-from-prompt-injection::1",
+          "instruction-tuning-basics::0",
+          "prompt-engineering-as-interface-design::0",
+          "guardrails-for-autonomous-actions::1",
+          "hallucination-from-prompt-injection::0",
+          "embeddings-and-semantic-search::1",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "hybrid-search-with-bm25-and-dense-vectors::1",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "knowledge-distillation-for-smaller-models::0"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.2831250021699816,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": true,
+        "reason": "The evidence directly discusses recall@k and MRR as retrieval metrics.",
+        "next_action": "proceed"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.4882499997620471,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "Recall@k and Mean Reciprocal Rank (MRR) are two important retrieval metrics used to evaluate the performance of a retrieval system, but they measure different aspects of its ability to find relevant documents.\n\n- **Recall@k**: This metric measures the proportion of times that the ground truth document is among the top k ranked documents. For example, if you set k=10 and your model ranks the correct document as 7th out of 10 results, it counts as a success for Recall@10 but not for Recall@5. It's particularly useful when you want to ensure that relevant documents are within the top-k results, which is critical for many applications where missing the first few ranked items could have significant consequences.\n\n- **MRR (Mean Reciprocal Rank)**: This metric rewards a document more harshly if it appears lower in the ranking. It calculates the reciprocal of the rank at which the correct document first appears and then averages this value across all queries. So, even if a relevant document is ranked quite low for some queries, its presence will reduce MRR significantly. For instance, if your model ranks the correct answer as 3rd out of 10 results for one query and 7th for another, the MRR would be \\(\\frac{1/3 + 1/7}{2} = 0.34\\). This makes MRR more sensitive to low-rank hits compared to Recall@k.\n\nBoth metrics are important: `Recall@k` helps ensure that relevant documents are present in the top-k results, while `MRR` provides a measure of how quickly and consistently those relevant documents appear in the ranking. They should be tracked separately for dense retrieval and bm25 before any fusion step to get a comprehensive understanding of the system's performance across different types of queries.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2428
+      }
+    }
+  ]
+}

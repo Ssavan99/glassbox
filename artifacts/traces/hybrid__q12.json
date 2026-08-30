@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q12",
+  "architecture": "hybrid",
+  "question": "Cross-encoder reranking is described as more accurate than bi-encoder cosine similarity because it lets query and document attend to each other directly \u2014 what does that accuracy improvement actually cost a pipeline in milliseconds when reranking a typical shortlist?",
+  "answer": "Cross\u2011encoder reranking adds a noticeable latency penalty: when you rerank a typical shortlist of\u202f\u2248\u202f20\u202f\u2013\u202f50 candidates, the extra forward\u2011passes required by the cross\u2011encoder usually cost on the order of **100\u202fto\u202f300\u202fms** of additional latency\u3010latency-budgets-in-a-rag-pipeline::1\u3011. This is the concrete price of the accuracy gain that comes from letting the query and document attend to each other directly\u3010reranking-with-cross-encoders::1\u3011.",
+  "metrics": {
+    "latency_ms": 110.63120900143986,
+    "llm_calls": 1,
+    "prompt_tokens": 1472,
+    "completion_tokens": 294
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06901261955499649,
+          -0.08663848787546158,
+          0.016370221972465515,
+          -0.01620289497077465,
+          0.03345533460378647,
+          0.023322805762290955,
+          -0.08914793282747269,
+          0.023189323022961617
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.816789984703064,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.73970627784729,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.7208617329597473,
+            "rank": 3
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.6285294890403748,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.5470784902572632,
+            "rank": 5
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.5034586191177368,
+            "rank": 6
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.47172796726226807,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.459958553314209,
+            "rank": 8
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.4595869481563568,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.45526936650276184,
+            "rank": 10
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.4518963098526001,
+            "rank": 11
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.44835156202316284,
+            "rank": 12
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.4455486834049225,
+            "rank": 13
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.44303056597709656,
+            "rank": 14
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 0.4309869110584259,
+            "rank": 15
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.4278578460216522,
+            "rank": 16
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.41848888993263245,
+            "rank": 17
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.39522913098335266,
+            "rank": 18
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.3915431499481201,
+            "rank": 19
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.38825950026512146,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 57.650324051139414,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 55.458308433173535,
+            "rank": 2
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 33.83799597353197,
+            "rank": 3
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 33.436777216715825,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 32.11273680927747,
+            "rank": 5
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 31.951549654665893,
+            "rank": 6
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 31.705705664780382,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 28.727132792229735,
+            "rank": 8
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 28.04013516650649,
+            "rank": 9
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 27.352776857183787,
+            "rank": 10
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 26.27191187745302,
+            "rank": 11
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 26.11950465508848,
+            "rank": 12
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 26.030263293537615,
+            "rank": 13
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 25.9890713431668,
+            "rank": 14
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 25.89087551676849,
+            "rank": 15
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 25.655245260819914,
+            "rank": 16
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 24.68967772233248,
+            "rank": 17
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 24.41068629007299,
+            "rank": 18
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 24.36384794584631,
+            "rank": 19
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 24.24338086015215,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.032266458495966696,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.03225806451612903,
+            "rank": 2
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.032018442622950824,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.03076923076923077,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.03055037313432836,
+            "rank": 5
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.028991596638655463,
+            "rank": 6
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.028850145288501453,
+            "rank": 7
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.027242401779095628,
+            "rank": 8
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.026992753623188405,
+            "rank": 9
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.02684684684684685,
+            "rank": 10
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.026709401709401708,
+            "rank": 11
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.025657894736842105,
+            "rank": 12
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.015873015873015872,
+            "rank": 13
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.015151515151515152,
+            "rank": 14
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.014925373134328358,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.032266458495966696,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.03225806451612903,
+            "rank": 2
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.032018442622950824,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.03076923076923077,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.03055037313432836,
+            "rank": 5
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.028991596638655463,
+            "rank": 6
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.028850145288501453,
+            "rank": 7
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.027242401779095628,
+            "rank": 8
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.026992753623188405,
+            "rank": 9
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.02684684684684685,
+            "rank": 10
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.026709401709401708,
+            "rank": 11
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.025657894736842105,
+            "rank": 12
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.015873015873015872,
+            "rank": 13
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.015151515151515152,
+            "rank": 14
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.014925373134328358,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 6.331552505493164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 3.6646728515625,
+            "rank": 2
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 2.1595795154571533,
+            "rank": 3
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 2.1558520793914795,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": -0.37037014961242676,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "Cross\u2011encoder reranking adds a noticeable latency penalty: when you rerank a typical shortlist of\u202f\u2248\u202f20\u202f\u2013\u202f50 candidates, the extra forward\u2011passes required by the cross\u2011encoder usually cost on the order of **100\u202fto\u202f300\u202fms** of additional latency\u3010latency-budgets-in-a-rag-pipeline::1\u3011. This is the concrete price of the accuracy gain that comes from letting the query and document attend to each other directly\u3010reranking-with-cross-encoders::1\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1766
+      }
+    }
+  ]
+}

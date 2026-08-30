@@ -1,0 +1,579 @@
+{
+  "trace_id": "agentic::q08",
+  "architecture": "agentic",
+  "question": "What is a planning loop, and what four-step cycle does it repeat?",
+  "answer": "A planning loop in an AI agent context involves observing the goal, reasoning about the next step, acting through a tool (or performing some action), inspecting the result, and then continuing this process until the task is completed or the agent decides to stop. This four-step cycle is:\n\n1. Observe the goal.\n2. Reason about the next step.\n3. Act through a tool or perform an action.\n4. Inspect the result.\n\nThis cycle repeats iteratively as necessary to achieve the overall task [planning-loops-in-agents::1].",
+  "metrics": {
+    "latency_ms": 1.5866250032559037,
+    "llm_calls": 4,
+    "prompt_tokens": 4009,
+    "completion_tokens": 211
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (1 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.12191699715913273,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What is a planning loop, and what four-step cycle does it repeat?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15495900152018294,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.13779200162389316,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "planning loop"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.04637500023818575,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "persists across",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "memory",
+            "rel": "drifts",
+            "dst": "drift"
+          },
+          {
+            "src": "memory",
+            "rel": "is separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "caps",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "agent",
+            "rel": "generates",
+            "dst": "trace"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "tool use"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "mitigates",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more prone than",
+            "dst": "lora"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "token budget"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is alternative to",
+            "dst": "lora"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less memory",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "distillation",
+            "rel": "is an alternative to",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "has quality gap with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "used before",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "incurs",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "tool use"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "distillation",
+            "rel": "contrasts with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "distillation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "distillation",
+            "rel": "impacts performance on",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "kv cache",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "is a",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "combined with",
+            "dst": "quantization"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "operates within",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "agent",
+            "rel": "resembles",
+            "dst": "planning loop"
+          },
+          {
+            "src": "planning loop",
+            "rel": "relevant to",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "planning loop",
+            "rel": "part of",
+            "dst": "agent"
+          },
+          {
+            "src": "planning loop",
+            "rel": "related to",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "tool use"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "planning loop"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1",
+          "lora-and-parameter-efficient-fine-tuning::0",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "retrieval-augmented-generation-basics::0",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0",
+          "ai-agents-and-tool-use::1",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "multi-agent-systems-and-handoffs::0",
+          "multi-agent-systems-and-handoffs::1",
+          "planning-loops-in-agents::1",
+          "prompt-injection-attacks-explained::1",
+          "rate-limits-and-retry-storms::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::1",
+          "context-window-overflow-and-truncation::0",
+          "few-shot-prompting-for-grounded-answers::1",
+          "needle-in-a-haystack-evaluation::1",
+          "prompt-engineering-as-interface-design::1",
+          "chain-of-thought-prompting-and-when-it-helps::1"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.3027500024472829,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain information about a planning loop or the four-step cycle it repeats.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0014159995771478862,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.2905410001403652,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": 14.112748754829193,
+            "rank": 1
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 13.384696211933631,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 13.282900404572862,
+            "rank": 3
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 12.61851788981938,
+            "rank": 4
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 12.01925274484516,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.24345799829461612,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not explicitly describe the four-step cycle of a planning loop.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.2512499995646067,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "A planning loop in an AI agent context involves observing the goal, reasoning about the next step, acting through a tool (or performing some action), inspecting the result, and then continuing this process until the task is completed or the agent decides to stop. This four-step cycle is:\n\n1. Observe the goal.\n2. Reason about the next step.\n3. Act through a tool or perform an action.\n4. Inspect the result.\n\nThis cycle repeats iteratively as necessary to achieve the overall task [planning-loops-in-agents::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1419
+      }
+    }
+  ]
+}

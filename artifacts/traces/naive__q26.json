@@ -1,0 +1,90 @@
+{
+  "trace_id": "naive::q26",
+  "architecture": "naive",
+  "question": "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?",
+  "answer": "The context provided does not contain a specific recall@10 score for the engine's evaluation on its own golden dataset. [chunk-id::0] and [chunk-id::1] discuss the nature of recall@k and MRR metrics but do not provide numerical scores from an actual evaluation. [chunk-id::2], [chunk-id::3], and [chunk-id::4] elaborate on best practices for using a golden dataset and metrics like recall@k and MRR, but no specific score is given in the text provided.",
+  "metrics": {
+    "latency_ms": 21.935374999884516,
+    "llm_calls": 1,
+    "prompt_tokens": 1467,
+    "completion_tokens": 109
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.09213951975107193,
+          0.0009580478654243052,
+          -0.0812871977686882,
+          0.050075873732566833,
+          0.011431589722633362,
+          0.07444421947002411,
+          0.010985721834003925,
+          0.07599067687988281
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.43973153829574585,
+            "rank": 1
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.437418669462204,
+            "rank": 2
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.43457165360450745,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.3974769711494446,
+            "rank": 4
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.36479607224464417,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "The context provided does not contain a specific recall@10 score for the engine's evaluation on its own golden dataset. [chunk-id::0] and [chunk-id::1] discuss the nature of recall@k and MRR metrics but do not provide numerical scores from an actual evaluation. [chunk-id::2], [chunk-id::3], and [chunk-id::4] elaborate on best practices for using a golden dataset and metrics like recall@k and MRR, but no specific score is given in the text provided.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1576
+      }
+    }
+  ]
+}

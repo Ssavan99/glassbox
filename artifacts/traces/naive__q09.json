@@ -1,0 +1,90 @@
+{
+  "trace_id": "naive::q09",
+  "architecture": "naive",
+  "question": "What is few-shot prompting, and what tradeoff does it create specifically in a RAG prompt?",
+  "answer": "Few\u2011shot prompting is the technique of putting a handful of complete input\u2011output demonstrations directly into the prompt so the model can \u201clearn\u201d the desired format and behavior from those examples rather than from a purely verbal instruction\u202f[ few-shot-prompting-for-grounded-answers::0 ].  \n\nIn a retrieval\u2011augmented generation (RAG) setting this creates a concrete trade\u2011off: every demonstration consumes tokens that could otherwise be used for the retrieved chunks (and the final answer). Because the context window must hold the system instructions, the retrieved evidence, and the model\u2019s response, adding several verbose few\u2011shot examples reduces the space left for the evidence the model needs to cite\u202f[ few-shot-prompting-for-grounded-answers::0 ].",
+  "metrics": {
+    "latency_ms": 22.478124999906868,
+    "llm_calls": 1,
+    "prompt_tokens": 1330,
+    "completion_tokens": 452
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.0627501904964447,
+          0.07947903871536255,
+          0.059222474694252014,
+          -0.017419517040252686,
+          0.041675008833408356,
+          0.036111265420913696,
+          0.07274550199508667,
+          0.07628323137760162
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 0.7288016676902771,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.6659945845603943,
+            "rank": 2
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.4077821373939514,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "score": 0.40488746762275696,
+            "rank": 4
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.404279887676239,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "Few\u2011shot prompting is the technique of putting a handful of complete input\u2011output demonstrations directly into the prompt so the model can \u201clearn\u201d the desired format and behavior from those examples rather than from a purely verbal instruction\u202f[ few-shot-prompting-for-grounded-answers::0 ].  \n\nIn a retrieval\u2011augmented generation (RAG) setting this creates a concrete trade\u2011off: every demonstration consumes tokens that could otherwise be used for the retrieved chunks (and the final answer). Because the context window must hold the system instructions, the retrieved evidence, and the model\u2019s response, adding several verbose few\u2011shot examples reduces the space left for the evidence the model needs to cite\u202f[ few-shot-prompting-for-grounded-answers::0 ].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1782
+      }
+    }
+  ]
+}

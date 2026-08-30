@@ -1,0 +1,90 @@
+{
+  "trace_id": "naive::q27",
+  "architecture": "naive",
+  "question": "Which cloud provider hosts the vector database this engine uses in production?",
+  "answer": "The provided context does not contain any information about which cloud provider hosts the vector database used in production. Therefore, I cannot answer the question from the given material.",
+  "metrics": {
+    "latency_ms": 27.07620900037,
+    "llm_calls": 1,
+    "prompt_tokens": 1406,
+    "completion_tokens": 121
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.015153004787862301,
+          -0.052164070308208466,
+          -0.03867470845580101,
+          -0.017306163907051086,
+          0.034075845032930374,
+          -0.03763560578227043,
+          -0.03781991824507713,
+          -0.04897310212254524
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.3324347734451294,
+            "rank": 1
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 0.2953835129737854,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.20506927371025085,
+            "rank": 3
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.204635351896286,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.18740682303905487,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "The provided context does not contain any information about which cloud provider hosts the vector database used in production. Therefore, I cannot answer the question from the given material.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1527
+      }
+    }
+  ]
+}

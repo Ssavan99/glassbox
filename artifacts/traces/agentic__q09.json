@@ -1,0 +1,2093 @@
+{
+  "trace_id": "agentic::q09",
+  "architecture": "agentic",
+  "question": "What is few-shot prompting, and what tradeoff does it create specifically in a RAG prompt?",
+  "answer": "Few-shot prompting involves providing the language model with one or more examples of how tasks should be completed. These examples are typically concise and serve to illustrate the desired behavior. In the context of Retrieval-Augmented Generation (RAG), few-shot examples can be especially valuable for behaviors that are difficult to specify through plain instructions.\n\nIn a RAG prompt, there is a specific tradeoff related to few-shot prompting: context window space competition. The context window in a model's input has limited capacity, and this space is shared among multiple components of the prompt. When using few-shot examples, you need to consider how much space these examples will take up, as they may reduce the available room for retrieved chunks or the final answer.\n\nHere\u2019s an excerpt from the provided chunk that explains this tradeoff in detail:\n\n> \"A prompt with three verbose few-shot examples has measurably less room for retrieved evidence than one with a single tight example or none at all.\"\n\nThis means that while few-shot prompting can be very effective, especially for complex behaviors, it comes at the cost of potentially limiting the amount of relevant context or evidence that can be included in the prompt. Therefore, when deciding whether to use few-shot examples, you should carefully weigh the benefits they provide against the reduced space available for other critical components like retrieved chunks or the final answer.\n\nIn summary, few-shot prompting in RAG helps specify complex behaviors but may reduce the amount of context window space available for retrieved evidence and answers.",
+  "metrics": {
+    "latency_ms": 3.87350000164588,
+    "llm_calls": 7,
+    "prompt_tokens": 9712,
+    "completion_tokens": 732
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.17620799917494878,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What is few-shot prompting and how does it work?",
+          "How is few-shot prompting applied within Retrieval-Augmented Generation (RAG) prompts?",
+          "What specific tradeoff does few-shot prompting introduce in a RAG prompt?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.13404199853539467,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.12570800026878715,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "few-shot prompting"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.03825000021606684,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "token budget"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "cost is",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "differs from",
+            "dst": "chain of thought"
+          },
+          {
+            "src": "system prompt",
+            "rel": "alternative to",
+            "dst": "few-shot prompting"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "ignores",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "system prompt"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "context window",
+            "rel": "affects",
+            "dst": "needle in a haystack"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "can reveal",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "retrieval-augmented-generation-basics::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.38545799907296896,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": true,
+        "reason": "The evidence includes a direct definition of few-shot prompting and explains how it works by providing context on including example input-output pairs in the prompt.",
+        "next_action": "proceed"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.16274999870802276,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "graph_seed",
+      "label": "Seed entities (2 matched)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.1498749988968484,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "retrieval-augmented generation",
+          "few-shot prompting"
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.05816700286231935,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "persists across",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "memory",
+            "rel": "drifts",
+            "dst": "drift"
+          },
+          {
+            "src": "memory",
+            "rel": "is separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "caps",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "benefits",
+            "dst": "bm25"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "benefits",
+            "dst": "dense retrieval"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "mitigates",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more prone than",
+            "dst": "lora"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "token budget"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "used by",
+            "dst": "semantic search"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "embedding model",
+            "rel": "enables",
+            "dst": "semantic search"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "citation"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "is a form of",
+            "dst": "semantic search"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "cost is",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "differs from",
+            "dst": "chain of thought"
+          },
+          {
+            "src": "system prompt",
+            "rel": "alternative to",
+            "dst": "few-shot prompting"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is alternative to",
+            "dst": "lora"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less memory",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "distillation",
+            "rel": "is an alternative to",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "has quality gap with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "used before",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "incurs",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "is a",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "ignores",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "complements",
+            "dst": "bm25"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "is a stage of",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "system prompt"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "includes",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "inherits from",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "needs less data than",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "contrasts with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "distillation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "distillation",
+            "rel": "requires evaluation on",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "distillation",
+            "rel": "impacts performance on",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "depends on",
+            "dst": "data quality"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "lora",
+            "rel": "is a",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "agent",
+            "rel": "operates within",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "agent",
+            "rel": "resembles",
+            "dst": "planning loop"
+          },
+          {
+            "src": "context window",
+            "rel": "affects",
+            "dst": "needle in a haystack"
+          },
+          {
+            "src": "planning loop",
+            "rel": "relevant to",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "planning loop",
+            "rel": "part of",
+            "dst": "agent"
+          },
+          {
+            "src": "planning loop",
+            "rel": "related to",
+            "dst": "memory"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "can reveal",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "planning loop"
+          },
+          {
+            "src": "cosine similarity",
+            "rel": "not comparable to",
+            "dst": "bm25"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "retrieval metrics",
+            "rel": "averaged across",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "is an alternative to",
+            "dst": "bm25"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1"
+        ]
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.3133749996777624,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain information specifically about how few-shot prompting is applied within Retrieval-Augmented Generation (RAG) prompts.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0012499986041802913,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.22033399727661163,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 13.476370751365591,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 13.202590812110202,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 10.050158334902168,
+            "rank": 3
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 10.001237756583778,
+            "rank": 4
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 8.562055298683571,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.20233299801475368,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly explain how few-shot prompting is applied within the context of RAG prompts. It only discusses few-shot prompting in general and fine-tuning.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15350000103353523,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.14208300126483664,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "few-shot prompting"
+        ]
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.041125000279862434,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "token budget"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "cost is",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "differs from",
+            "dst": "chain of thought"
+          },
+          {
+            "src": "system prompt",
+            "rel": "alternative to",
+            "dst": "few-shot prompting"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "ignores",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "system prompt"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "context window",
+            "rel": "affects",
+            "dst": "needle in a haystack"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "can reveal",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "retrieval-augmented-generation-basics::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0"
+        ]
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n15"
+      ],
+      "duration_ms": 0.30745799813303165,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly address the tradeoff introduced by few-shot prompting in RAG prompts.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 0.0011669981176964939,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.22870800239616074,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 18.75581803480624,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 18.077010168667247,
+            "rank": 2
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 9.384428000744036,
+            "rank": 3
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 8.940779127677201,
+            "rank": 4
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 8.798869069638961,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.22616700152866542,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": true,
+        "reason": "The evidence directly addresses the tradeoff introduced by few-shot prompting in a RAG prompt, mentioning context window space contention.",
+        "next_action": "proceed"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5",
+        "n12",
+        "n19"
+      ],
+      "duration_ms": 0.5455829996208195,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "Few-shot prompting involves providing the language model with one or more examples of how tasks should be completed. These examples are typically concise and serve to illustrate the desired behavior. In the context of Retrieval-Augmented Generation (RAG), few-shot examples can be especially valuable for behaviors that are difficult to specify through plain instructions.\n\nIn a RAG prompt, there is a specific tradeoff related to few-shot prompting: context window space competition. The context window in a model's input has limited capacity, and this space is shared among multiple components of the prompt. When using few-shot examples, you need to consider how much space these examples will take up, as they may reduce the available room for retrieved chunks or the final answer.\n\nHere\u2019s an excerpt from the provided chunk that explains this tradeoff in detail:\n\n> \"A prompt with three verbose few-shot examples has measurably less room for retrieved evidence than one with a single tight example or none at all.\"\n\nThis means that while few-shot prompting can be very effective, especially for complex behaviors, it comes at the cost of potentially limiting the amount of relevant context or evidence that can be included in the prompt. Therefore, when deciding whether to use few-shot examples, you should carefully weigh the benefits they provide against the reduced space available for other critical components like retrieved chunks or the final answer.\n\nIn summary, few-shot prompting in RAG helps specify complex behaviors but may reduce the amount of context window space available for retrieved evidence and answers.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2348
+      }
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q08",
+  "architecture": "hyde",
+  "question": "What is a planning loop, and what four-step cycle does it repeat?",
+  "answer": "A planning loop is the reasoning structure that decides what an agent does next. It repeats a four-step cycle:\n1. Observe the current state.\n2. Reason about the remaining gap between that state and the goal.\n3. Choose an action.\n4. Execute it.\n\nThis cycle is repeated until the goal is reached or the loop gives up. [planning-loops-in-agents::0]",
+  "metrics": {
+    "latency_ms": 4.974040999513818,
+    "llm_calls": 2,
+    "prompt_tokens": 1468,
+    "completion_tokens": 138
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "A planning loop is a systematic process used in project management and operations planning. It consists of four repeating steps: Plan (formulate strategies and tactics), Do (implement the plan), Check (evaluate the outcomes against expectations), and Act (adjust future plans based on the results).",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 168
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.004093376453965902,
+          0.04725879430770874,
+          -0.0353316031396389,
+          -0.02240171656012535,
+          -0.030701089650392532,
+          0.002623528242111206,
+          0.0015797046944499016,
+          0.020993825048208237
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.8160799741744995,
+            "rank": 1
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.6169092655181885,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.5133443474769592,
+            "rank": 3
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.4259752035140991,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.386461079120636,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "A planning loop is the reasoning structure that decides what an agent does next. It repeats a four-step cycle:\n1. Observe the current state.\n2. Reason about the remaining gap between that state and the goal.\n3. Choose an action.\n4. Execute it.\n\nThis cycle is repeated until the goal is reached or the loop gives up. [planning-loops-in-agents::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1438
+      }
+    }
+  ]
+}

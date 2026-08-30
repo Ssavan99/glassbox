@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q25",
+  "architecture": "hyde",
+  "question": "Does fine-tuning a model with LoRA reduce a RAG pipeline's exposure to prompt injection attacks?",
+  "answer": "The provided context does not contain information directly addressing whether fine-tuning a model with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The chunks discuss LoRA, full fine-tuning, and retrieval-augmented generation but do not provide details on security aspects like susceptibility to prompt injection attacks in these methods. Therefore, I cannot make a claim about this specific issue based solely on the given context. [chunk-id::0][chunk-id::1][chunk-id::2]",
+  "metrics": {
+    "latency_ms": 26.361958000052255,
+    "llm_calls": 2,
+    "prompt_tokens": 1530,
+    "completion_tokens": 181
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "Fine-tuning a model with Low-Rank Adaptation (LoRA) can help mitigate some forms of vulnerability by focusing on specific aspects of the model, potentially reducing the risk of prompt injection attacks in a Retrieval-Augmented Generation (RAG) pipeline. However, it is crucial to ensure that overall security practices are maintained, including regular updates and thorough testing, to fully protect against such attacks.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 199
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.07352405041456223,
+          -0.00151334167458117,
+          -0.004231638740748167,
+          0.02596011385321617,
+          -0.02808738686144352,
+          0.004551745485514402,
+          -0.031249048188328743,
+          -0.016620226204395294
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.5599558353424072,
+            "rank": 1
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.5427062511444092,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.49513012170791626,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.47582948207855225,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.47042280435562134,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The provided context does not contain information directly addressing whether fine-tuning a model with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The chunks discuss LoRA, full fine-tuning, and retrieval-augmented generation but do not provide details on security aspects like susceptibility to prompt injection attacks in these methods. Therefore, I cannot make a claim about this specific issue based solely on the given context. [chunk-id::0][chunk-id::1][chunk-id::2]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1512
+      }
+    }
+  ]
+}

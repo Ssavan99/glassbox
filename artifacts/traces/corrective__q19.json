@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q19",
+  "architecture": "corrective",
+  "question": "What embedding model name and output dimension constant does this engine's config use?",
+  "answer": "The engine uses the `all-MiniLM-L6-v2` model with an `EMBEDDING_DIM` of 384. This information is cited from [embedding-dimension-and-model-size-tradeoffs::0].",
+  "metrics": {
+    "latency_ms": 6.292250000115018,
+    "llm_calls": 2,
+    "prompt_tokens": 2475,
+    "completion_tokens": 280
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06250693649053574,
+          -0.061503294855356216,
+          -0.06843674927949905,
+          0.00416679447516799,
+          -0.007943890057504177,
+          0.04781608656048775,
+          -0.08921502530574799,
+          0.04871678352355957
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.4545544385910034,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.3481726050376892,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.2683526575565338,
+            "rank": 3
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.22963768243789673,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.2195320427417755,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "verdict": "correct",
+            "reason": "Directly states the model name and embedding dimension used by this engine."
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "verdict": "correct",
+            "reason": "Further clarifies that a 384-dimensional model is used, which complements the first chunk's information."
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "verdict": "ambiguous",
+            "reason": "Discusses general concepts but does not specify the exact model or dimensions used by this engine."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "verdict": "incorrect",
+            "reason": "Discusses latency concerns unrelated to the embedding model name and dimensions."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "verdict": "incorrect",
+            "reason": "Talks about cost-efficient routing but does not mention the specific embedding model or its dimension used by this engine."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The engine uses the `all-MiniLM-L6-v2` model with an `EMBEDDING_DIM` of 384. This information is cited from [embedding-dimension-and-model-size-tradeoffs::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1008
+      }
+    }
+  ]
+}

@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q14",
+  "architecture": "hybrid",
+  "question": "A needle-in-a-haystack test can score perfectly on recall@k while the assembled answer is still wrong \u2014 what's the mechanism behind that gap, and where in the pipeline does the actual fix belong?",
+  "answer": "A needle\u2011in\u2011the\u2011haystack evaluation can report 100\u202f%\u202fRecall@k because the **right chunk is indeed present among the top\u202fk retrieved pieces** \u2013 Recall@k only asks \u201cis the correct evidence anywhere in the set?\u201d and does not care *where* it ends up in the list\u202f\u3010retrieval-metrics-recall-at-k-and-mrr::0\u3011.  \n\nWhen the retrieved chunks are then assembled into a prompt, the model may still produce a wrong answer if the correct chunk is placed in an unfavourable position (e.g., in the middle of a long context). This \u201clost\u2011in\u2011the\u2011middle\u201d effect means the information is technically available but the model fails to attend to it, so the answer is incorrect even though retrieval succeeded\u202f\u3010retrieval-failures-lost-in-the-middle::0\u3011.  \n\nThe fix therefore does **not** belong in the retriever itself but in the **prompt\u2011template / ordering stage**: rank chunks by relevance (or confidence) and deliberately put the highest\u2011confidence chunk near the start or end of the context so the model can use it reliably\u202f\u3010retrieval-failures-lost-in-the-middle::1\u3011. In short, the gap arises from a downstream \u201cposition\u2011bias\u201d failure, and the remedy is to adjust how retrieved evidence is ordered before it is fed to the model.",
+  "metrics": {
+    "latency_ms": 107.72862500016345,
+    "llm_calls": 1,
+    "prompt_tokens": 1441,
+    "completion_tokens": 501
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.062128882855176926,
+          -0.0030615522991865873,
+          -0.01880607195198536,
+          0.041802771389484406,
+          -0.0016491899732500315,
+          -0.025777097791433334,
+          -0.04973564296960831,
+          0.014018172398209572
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.6243909597396851,
+            "rank": 1
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.5642087459564209,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.5220253467559814,
+            "rank": 3
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::1",
+            "score": 0.5046225786209106,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.47957414388656616,
+            "rank": 5
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.47773507237434387,
+            "rank": 6
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.44352224469184875,
+            "rank": 7
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.43528032302856445,
+            "rank": 8
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.41414135694503784,
+            "rank": 9
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.3962933421134949,
+            "rank": 10
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.3925988972187042,
+            "rank": 11
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 0.3844529390335083,
+            "rank": 12
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1",
+            "score": 0.38032835721969604,
+            "rank": 13
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::0",
+            "score": 0.37383002042770386,
+            "rank": 14
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.3697878122329712,
+            "rank": 15
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.36907365918159485,
+            "rank": 16
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.3690444231033325,
+            "rank": 17
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.3654642701148987,
+            "rank": 18
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.3651605546474457,
+            "rank": 19
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.3638274669647217,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 33.260812513494585,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 31.70512158783626,
+            "rank": 2
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 29.826743022600652,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 28.28511142332713,
+            "rank": 4
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 28.09994827193195,
+            "rank": 5
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::1",
+            "score": 28.07105013423841,
+            "rank": 6
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 27.922735057368183,
+            "rank": 7
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::1",
+            "score": 27.903694382715347,
+            "rank": 8
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 27.838934859376067,
+            "rank": 9
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 27.762627390739752,
+            "rank": 10
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 27.292509023410876,
+            "rank": 11
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 26.968737901995745,
+            "rank": 12
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 26.442232646400694,
+            "rank": 13
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 26.354067768104667,
+            "rank": 14
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 26.32608327633008,
+            "rank": 15
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 26.29054317798152,
+            "rank": 16
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 26.2824430628266,
+            "rank": 17
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 26.274854303966006,
+            "rank": 18
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 26.083542044949684,
+            "rank": 19
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 25.887266904957617,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.03200204813108039,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.031544957774465976,
+            "rank": 2
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::1",
+            "score": 0.030776515151515152,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.02946912242686891,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.02928692699490662,
+            "rank": 5
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.026992753623188405,
+            "rank": 6
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.026742734890354787,
+            "rank": 7
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 0.026709401709401708,
+            "rank": 8
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.01639344262295082,
+            "rank": 9
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 0.015873015873015872,
+            "rank": 10
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.015625,
+            "rank": 11
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 0.015384615384615385,
+            "rank": 12
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.014925373134328358,
+            "rank": 14
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::1",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 0.014285714285714285,
+            "rank": 19
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.03200204813108039,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.031544957774465976,
+            "rank": 2
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::1",
+            "score": 0.030776515151515152,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.02946912242686891,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.02928692699490662,
+            "rank": 5
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.026992753623188405,
+            "rank": 6
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.026742734890354787,
+            "rank": 7
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 0.026709401709401708,
+            "rank": 8
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.01639344262295082,
+            "rank": 9
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 0.015873015873015872,
+            "rank": 10
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.015625,
+            "rank": 11
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 0.015384615384615385,
+            "rank": 12
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.014925373134328358,
+            "rank": 14
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::1",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 0.014285714285714285,
+            "rank": 19
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 1.7347500324249268,
+            "rank": 1
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 1.5165116786956787,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": -1.3252933025360107,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": -1.475192666053772,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": -2.8889946937561035,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "A needle\u2011in\u2011the\u2011haystack evaluation can report 100\u202f%\u202fRecall@k because the **right chunk is indeed present among the top\u202fk retrieved pieces** \u2013 Recall@k only asks \u201cis the correct evidence anywhere in the set?\u201d and does not care *where* it ends up in the list\u202f\u3010retrieval-metrics-recall-at-k-and-mrr::0\u3011.  \n\nWhen the retrieved chunks are then assembled into a prompt, the model may still produce a wrong answer if the correct chunk is placed in an unfavourable position (e.g., in the middle of a long context). This \u201clost\u2011in\u2011the\u2011middle\u201d effect means the information is technically available but the model fails to attend to it, so the answer is incorrect even though retrieval succeeded\u202f\u3010retrieval-failures-lost-in-the-middle::0\u3011.  \n\nThe fix therefore does **not** belong in the retriever itself but in the **prompt\u2011template / ordering stage**: rank chunks by relevance (or confidence) and deliberately put the highest\u2011confidence chunk near the start or end of the context so the model can use it reliably\u202f\u3010retrieval-failures-lost-in-the-middle::1\u3011. In short, the gap arises from a downstream \u201cposition\u2011bias\u201d failure, and the remedy is to adjust how retrieved evidence is ordered before it is fed to the model.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1942
+      }
+    }
+  ]
+}

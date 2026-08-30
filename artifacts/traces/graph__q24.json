@@ -1,0 +1,55 @@
+{
+  "trace_id": "graph::q24",
+  "architecture": "graph",
+  "question": "What HTTP client library and version does this RAG engine use to call the embedding API?",
+  "answer": "The provided context does not contain any information about the specific HTTP client library or version used by the RAG engine to call the embedding API. [chunk-id::0]",
+  "metrics": {
+    "latency_ms": 0.40050000097835436,
+    "llm_calls": 1,
+    "prompt_tokens": 114,
+    "completion_tokens": 35
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "graph_seed",
+      "label": "Seed entities (0 matched)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "Graph RAG finds a completely different entry point than embedding-based retrieval: instead of measuring semantic similarity between a query vector and chunk vectors, it matches literal entity mentions in the question against the pre-built knowledge graph's vocabulary to jump straight to a set of graph nodes. This is a pure string-matching heuristic with no LLM call \u2014 the corpus was already mined for entities and relations offline when the graph was built.",
+      "payload": {
+        "entities": []
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (0 chunks)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Two-hop traversal from the seed entities can surface facts connected to the question's topic that never share a chunk with it at all \u2014 a fact only reachable by walking src -> rel -> dst -> rel -> dst through the graph. This is the opposite failure mode from embedding-based retrieval, which can only find chunks that are textually or semantically close to the query itself, not ones connected to it only through an intermediate entity.",
+      "payload": {
+        "hops": 2,
+        "edges": [],
+        "chunk_ids": []
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The chunks gathered from graph expansion, plus the community summaries for any communities the touched entities belong to, are stuffed into a single prompt and handed to the LLM in one shot \u2014 the only LLM call this architecture makes online, since seeding and expansion are both pure graph traversal.",
+      "payload": {
+        "output": "The provided context does not contain any information about the specific HTTP client library or version used by the RAG engine to call the embedding API. [chunk-id::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 149
+      }
+    }
+  ]
+}

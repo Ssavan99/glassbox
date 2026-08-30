@@ -1,0 +1,464 @@
+{
+  "trace_id": "graph::q08",
+  "architecture": "graph",
+  "question": "What is a planning loop, and what four-step cycle does it repeat?",
+  "answer": "It seems there was no specific mention of a \"planning loop\" in the provided notes. However, I can infer based on the context that we might be discussing how an agent or system iterates to achieve its goals, possibly within a RAG (Retrieval-Augmented Generation) framework.\n\nA planning loop typically involves repeating four main steps:\n\n1. **Plan**: The agent formulates a plan of action based on its current understanding and available resources.\n2. **Act**: The agent executes the planned actions using tools or methods at its disposal.\n3. **Observe**: The agent observes the outcomes of its actions, noting any changes in state or new information.\n4. **Reflect**: The agent reflects on the results and adjusts its plan for future iterations.\n\nThese steps are repeated iteratively until a goal is achieved or no further progress can be made. This cycle allows the system to adapt to changing conditions and refine its strategies over time.\n\nHere's an example of how this might look in code, though I'll use placeholders since specific chunk IDs weren't provided:\n\n```python\ndef planning_loop(chunk_id):\n    while True:\n        # Plan: Formulate a plan based on current state and resources.\n        plan = formulate_plan(current_state, available_resources)\n\n        if plan is None:\n            break  # No more actions can be taken.\n\n        # Act: Execute the planned actions using tools or methods.\n        result = execute_plan(plan)\n        \n        # Observe: Update state based on observed outcomes.\n        current_state.update(result)\n        \n        # Reflect: Adjust the plan for future iterations.\n        plan = refine_plan(current_state, observations)\n\n        if success criteria met:\n            break  # Goal achieved.\n\n    return final_state\n```\n\nThis pseudocode represents a simple planning loop that iterates through planning, acting, observing, and reflecting until a goal is reached. The `chunk_id` could be used to reference specific parts of the system state or retrieved information within this loop.",
+  "metrics": {
+    "latency_ms": 0.7339999974647071,
+    "llm_calls": 1,
+    "prompt_tokens": 2050,
+    "completion_tokens": 402
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "Graph RAG finds a completely different entry point than embedding-based retrieval: instead of measuring semantic similarity between a query vector and chunk vectors, it matches literal entity mentions in the question against the pre-built knowledge graph's vocabulary to jump straight to a set of graph nodes. This is a pure string-matching heuristic with no LLM call \u2014 the corpus was already mined for entities and relations offline when the graph was built.",
+      "payload": {
+        "entities": [
+          "planning loop"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Two-hop traversal from the seed entities can surface facts connected to the question's topic that never share a chunk with it at all \u2014 a fact only reachable by walking src -> rel -> dst -> rel -> dst through the graph. This is the opposite failure mode from embedding-based retrieval, which can only find chunks that are textually or semantically close to the query itself, not ones connected to it only through an intermediate entity.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "persists across",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "memory",
+            "rel": "drifts",
+            "dst": "drift"
+          },
+          {
+            "src": "memory",
+            "rel": "is separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "caps",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "agent",
+            "rel": "generates",
+            "dst": "trace"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "tool use"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "mitigates",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more prone than",
+            "dst": "lora"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "token budget"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "helps",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is alternative to",
+            "dst": "lora"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less memory",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "distillation",
+            "rel": "is an alternative to",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "has quality gap with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "used before",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "incurs",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "tool use"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "distillation",
+            "rel": "contrasts with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "distillation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "distillation",
+            "rel": "impacts performance on",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "kv cache",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "is a",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "combined with",
+            "dst": "quantization"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "operates within",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "agent",
+            "rel": "resembles",
+            "dst": "planning loop"
+          },
+          {
+            "src": "planning loop",
+            "rel": "relevant to",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "planning loop",
+            "rel": "part of",
+            "dst": "agent"
+          },
+          {
+            "src": "planning loop",
+            "rel": "related to",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "tool use"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "planning loop"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1",
+          "lora-and-parameter-efficient-fine-tuning::0",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "retrieval-augmented-generation-basics::0",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0",
+          "ai-agents-and-tool-use::1",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "multi-agent-systems-and-handoffs::0",
+          "multi-agent-systems-and-handoffs::1",
+          "planning-loops-in-agents::1",
+          "prompt-injection-attacks-explained::1",
+          "rate-limits-and-retry-storms::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::1",
+          "context-window-overflow-and-truncation::0",
+          "few-shot-prompting-for-grounded-answers::1",
+          "needle-in-a-haystack-evaluation::1",
+          "prompt-engineering-as-interface-design::1",
+          "chain-of-thought-prompting-and-when-it-helps::1"
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The chunks gathered from graph expansion, plus the community summaries for any communities the touched entities belong to, are stuffed into a single prompt and handed to the LLM in one shot \u2014 the only LLM call this architecture makes online, since seeding and expansion are both pure graph traversal.",
+      "payload": {
+        "output": "It seems there was no specific mention of a \"planning loop\" in the provided notes. However, I can infer based on the context that we might be discussing how an agent or system iterates to achieve its goals, possibly within a RAG (Retrieval-Augmented Generation) framework.\n\nA planning loop typically involves repeating four main steps:\n\n1. **Plan**: The agent formulates a plan of action based on its current understanding and available resources.\n2. **Act**: The agent executes the planned actions using tools or methods at its disposal.\n3. **Observe**: The agent observes the outcomes of its actions, noting any changes in state or new information.\n4. **Reflect**: The agent reflects on the results and adjusts its plan for future iterations.\n\nThese steps are repeated iteratively until a goal is achieved or no further progress can be made. This cycle allows the system to adapt to changing conditions and refine its strategies over time.\n\nHere's an example of how this might look in code, though I'll use placeholders since specific chunk IDs weren't provided:\n\n```python\ndef planning_loop(chunk_id):\n    while True:\n        # Plan: Formulate a plan based on current state and resources.\n        plan = formulate_plan(current_state, available_resources)\n\n        if plan is None:\n            break  # No more actions can be taken.\n\n        # Act: Execute the planned actions using tools or methods.\n        result = execute_plan(plan)\n        \n        # Observe: Update state based on observed outcomes.\n        current_state.update(result)\n        \n        # Reflect: Adjust the plan for future iterations.\n        plan = refine_plan(current_state, observations)\n\n        if success criteria met:\n            break  # Goal achieved.\n\n    return final_state\n```\n\nThis pseudocode represents a simple planning loop that iterates through planning, acting, observing, and reflecting until a goal is reached. The `chunk_id` could be used to reference specific parts of the system state or retrieved information within this loop.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2452
+      }
+    }
+  ]
+}

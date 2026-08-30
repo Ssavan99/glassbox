@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q12",
+  "architecture": "hyde",
+  "question": "Cross-encoder reranking is described as more accurate than bi-encoder cosine similarity because it lets query and document attend to each other directly \u2014 what does that accuracy improvement actually cost a pipeline in milliseconds when reranking a typical shortlist?",
+  "answer": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup used for initial retrieval. Specifically, reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on [chunk-id::latency-budgets-in-a-rag-pipeline::1].",
+  "metrics": {
+    "latency_ms": 23.41383400198538,
+    "llm_calls": 2,
+    "prompt_tokens": 1515,
+    "completion_tokens": 391
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "Cross\u2011encoders typically consume\u202f~2\u20134\u202fms per query\u2011document pair on a modern GPU (\u224810\u201320\u202fms on a single\u2011core CPU), so reranking a 100\u2011item shortlist adds roughly\u202f200\u2013400\u202fms of latency to the pipeline (\u22481\u202fs in the worst\u2011case CPU\u2011only scenario). The extra time comes from running the full Transformer forward pass for each candidate rather than a single vector\u2011dot\u2011product, which is why the accuracy gain is traded off against a measurable latency penalty.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 482
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06393163651227951,
+          -0.04011308401823044,
+          -0.030954981222748756,
+          0.01339862309396267,
+          0.047245677560567856,
+          -0.018865831196308136,
+          -0.0939774215221405,
+          0.022051427513360977
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.7994739413261414,
+            "rank": 1
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.6578303575515747,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.5606803894042969,
+            "rank": 3
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.5408799648284912,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.5106145143508911,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup used for initial retrieval. Specifically, reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on [chunk-id::latency-budgets-in-a-rag-pipeline::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1424
+      }
+    }
+  ]
+}

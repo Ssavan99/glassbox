@@ -1,0 +1,205 @@
+{
+  "trace_id": "agentic::q17",
+  "architecture": "agentic",
+  "question": "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?",
+  "answer": "The engine's rate-limit handling needs to recognize the `429 Too Many Requests` HTTP status code on sight. This information is cited from [rate-limits-and-retry-storms::0].",
+  "metrics": {
+    "latency_ms": 8.2565840020834,
+    "llm_calls": 4,
+    "prompt_tokens": 2299,
+    "completion_tokens": 153
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (1 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.18774999989545904,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.1637919995118864,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.3048329999728594,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 18.136768032340292,
+            "rank": 1
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 12.06536382199246,
+            "rank": 2
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 11.528147981801567,
+            "rank": 3
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 10.193907422258771,
+            "rank": 4
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 10.0186061764447,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.20604199744411744,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not provide the exact HTTP status code and phrase needed for rate-limit handling.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0010000003385357559,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 6.710749999911059,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08318151533603668,
+          0.01745142787694931,
+          -0.06680643558502197,
+          0.0009295037016272545,
+          0.04198012873530388,
+          -0.06736277043819427,
+          -0.030523106455802917,
+          -0.05719131603837013
+        ]
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.024625001969980076,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.4992207884788513,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.3865494728088379,
+            "rank": 2
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.3361126184463501,
+            "rank": 3
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.33356210589408875,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.3088449537754059,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.3986670017184224,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not specify the exact HTTP status code and phrase needed for rate-limit handling.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.22995900144451298,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The engine's rate-limit handling needs to recognize the `429 Too Many Requests` HTTP status code on sight. This information is cited from [rate-limits-and-retry-storms::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1418
+      }
+    }
+  ]
+}

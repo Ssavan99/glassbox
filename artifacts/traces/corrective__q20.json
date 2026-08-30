@@ -1,0 +1,363 @@
+{
+  "trace_id": "corrective::q20",
+  "architecture": "corrective",
+  "question": "In this project's cost-aware routing config, what are the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL?",
+  "answer": "In this project's cost-aware routing config, the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL are:\n\n- `OLLAMA_MODEL = \"qwen2.5:7b-instruct\"` [chunk-id::0]\n- `GROQ_MODEL = \"openai/gpt-oss-120b\"` [chunk-id::0]",
+  "metrics": {
+    "latency_ms": 37.734208002802916,
+    "llm_calls": 6,
+    "prompt_tokens": 5005,
+    "completion_tokens": 1103
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.004093409050256014,
+          -0.01442834921181202,
+          -0.07615047693252563,
+          0.06287116557359695,
+          -0.0056204781867563725,
+          -0.012668305076658726,
+          0.011717308312654495,
+          0.009621161967515945
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.5201095342636108,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.486167848110199,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.260315477848053,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.250786155462265,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.22647768259048462,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "verdict": "correct",
+            "reason": "This chunk directly provides the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "ambiguous",
+            "reason": "While this chunk references the models, it does not provide the specific identifiers for OLLAMA_MODEL and GROQ_MODEL."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "verdict": "incorrect",
+            "reason": "This chunk discusses serving efficiency but does not contain relevant information about the model identifiers."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "verdict": "incorrect",
+            "reason": "This chunk discusses distillation and fine-tuning methods but does not mention OLLAMA_MODEL or GROQ_MODEL identifiers."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "verdict": "incorrect",
+            "reason": "This chunk compares full fine-tuning with adapter methods like LoRA but does not provide the model identifier strings for OLLAMA_MODEL and GROQ_MODEL."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "In this project's cost-aware routing config, what are the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL?",
+        "to": "\"cost-aware routing\" OLLAMA_MODEL GROQ_MODEL identifier string site:config OR filetype:env OR filetype:yaml",
+        "reason": "The revised query explicitly includes the terms \"cost-aware routing\" and the variable names OLLAMA_MODEL and GROQ_MODEL, and adds keywords like \"identifier\" and \"string\" to focus on exact values. It also restricts results to configuration files (e.g., .env, .yaml) where such assignments are typically defined, increasing the chance of retrieving the specific model identifier strings."
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.008847222663462162,
+          -0.013710852712392807,
+          -0.07081999629735947,
+          0.0749531015753746,
+          -0.006383710540831089,
+          -0.06335939466953278,
+          0.02159815840423107,
+          0.027086131274700165
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.553893506526947,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.5089539289474487,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.30597174167633057,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.2511252760887146,
+            "rank": 4
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.22320491075515747,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 2)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "verdict": "correct",
+            "reason": "Directly provides the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "ambiguous",
+            "reason": "Reiterates information already provided but does not add new relevant details about the specific model identifiers."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "verdict": "incorrect",
+            "reason": "Does not contain any relevant information about the OLLAMA_MODEL or GROQ_MODEL identifiers."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "verdict": "incorrect",
+            "reason": "Discusses distillation and adapter methods but does not provide details on the specific model identifiers mentioned in the question."
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "verdict": "incorrect",
+            "reason": "Focuses on tool use and function calling mechanisms, unrelated to the specific model identifiers asked about."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "\"cost-aware routing\" OLLAMA_MODEL GROQ_MODEL identifier string site:config OR filetype:env OR filetype:yaml",
+        "to": "cost-aware routing OLLAMA_MODEL GROQ_MODEL identifier details config env yaml",
+        "reason": "The rewritten query directly includes the specific identifiers (OLLAMA_MODEL and GROQ_MODEL) and requests details related to them, increasing the likelihood of finding relevant information in the configuration files or settings where these models are typically referenced."
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 3)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.005312530789524317,
+          -0.011990646831691265,
+          -0.04619140923023224,
+          0.0629299208521843,
+          -0.006193464621901512,
+          -0.04367595165967941,
+          0.02228744514286518,
+          0.008665984496474266
+        ]
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 3)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.6121827363967896,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.5597689747810364,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.3227032423019409,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.28547459840774536,
+            "rank": 4
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.2625090479850769,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 3)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "verdict": "correct",
+            "reason": "Directly provides the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "correct",
+            "reason": "Repeats the information provided in chunk 0, directly supporting the answer."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "verdict": "ambiguous",
+            "reason": "While related to model routing, does not provide specific identifiers for OLLAMA_MODEL and GROQ_MODEL."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "verdict": "incorrect",
+            "reason": "Not relevant to the specific models asked about in the question."
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "verdict": "incorrect",
+            "reason": "Does not contain any information related to OLLAMA_MODEL or GROQ_MODEL."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "In this project's cost-aware routing config, the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL are:\n\n- `OLLAMA_MODEL = \"qwen2.5:7b-instruct\"` [chunk-id::0]\n- `GROQ_MODEL = \"openai/gpt-oss-120b\"` [chunk-id::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 870
+      }
+    }
+  ]
+}

@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q21",
+  "architecture": "hybrid",
+  "question": "What sampling flag and value should be set when running the golden dataset so evaluation scores stay comparable across runs?",
+  "answer": "Set the sampling temperature flag (e.g.,\u202f`--temperature`) to a near\u2011zero value\u2014typically `0.0`. Running the evaluation with temperature fixed at zero keeps the scores reproducible across runs. \u3010temperature-and-sampling-controls::1\u3011",
+  "metrics": {
+    "latency_ms": 76.9437500021013,
+    "llm_calls": 1,
+    "prompt_tokens": 1494,
+    "completion_tokens": 207
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.051682740449905396,
+          0.009771880693733692,
+          -0.0827416181564331,
+          -0.040354229509830475,
+          0.030590064823627472,
+          0.03063780628144741,
+          0.01489268708974123,
+          0.027512768283486366
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.5033402442932129,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.4269351363182068,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.4026752710342407,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.3832356035709381,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.3734508454799652,
+            "rank": 5
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.37041208148002625,
+            "rank": 6
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 0.36384329199790955,
+            "rank": 7
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.34429091215133667,
+            "rank": 8
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.3423752784729004,
+            "rank": 9
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 0.3305675983428955,
+            "rank": 10
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.3224892318248749,
+            "rank": 11
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.313072144985199,
+            "rank": 12
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 0.3080523610115051,
+            "rank": 13
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.30141979455947876,
+            "rank": 14
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.2990072965621948,
+            "rank": 15
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.2907371520996094,
+            "rank": 16
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "score": 0.2799057364463806,
+            "rank": 17
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.2742367386817932,
+            "rank": 18
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.26687532663345337,
+            "rank": 19
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::1",
+            "score": 0.2636635899543762,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 27.049911108241464,
+            "rank": 1
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 23.332812912079998,
+            "rank": 2
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 18.217134552100546,
+            "rank": 3
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 15.564841548715796,
+            "rank": 4
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 14.256479274159561,
+            "rank": 5
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 13.663062302996712,
+            "rank": 6
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 13.47526713635018,
+            "rank": 7
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 13.406602570080585,
+            "rank": 8
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 13.270847691647111,
+            "rank": 9
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 12.850649006633283,
+            "rank": 10
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 12.82963343617982,
+            "rank": 11
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 11.704844976458451,
+            "rank": 12
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 11.148389997218816,
+            "rank": 13
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 11.120732274477525,
+            "rank": 14
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 10.966333069526376,
+            "rank": 15
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 10.845527858761919,
+            "rank": 16
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 10.60610791256007,
+            "rank": 17
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::0",
+            "score": 10.302612505313466,
+            "rank": 18
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 10.298020521881243,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 9.414048136683046,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.032266458495966696,
+            "rank": 2
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.030834914611005692,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.03057889822595705,
+            "rank": 4
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.030117753623188408,
+            "rank": 5
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.03007688828584351,
+            "rank": 6
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.029910714285714284,
+            "rank": 7
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 0.02967032967032967,
+            "rank": 8
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 0.029418126757516764,
+            "rank": 9
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.028309409888357256,
+            "rank": 10
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.02667140825035562,
+            "rank": 11
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 0.026356857985087564,
+            "rank": 12
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.015384615384615385,
+            "rank": 13
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.014084507042253521,
+            "rank": 14
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.014084507042253521,
+            "rank": 15
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.013888888888888888,
+            "rank": 16
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 0.013888888888888888,
+            "rank": 17
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.0136986301369863,
+            "rank": 18
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.013513513513513514,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.013333333333333334,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.032266458495966696,
+            "rank": 2
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.030834914611005692,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.03057889822595705,
+            "rank": 4
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.030117753623188408,
+            "rank": 5
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.03007688828584351,
+            "rank": 6
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.029910714285714284,
+            "rank": 7
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 0.02967032967032967,
+            "rank": 8
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 0.029418126757516764,
+            "rank": 9
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.028309409888357256,
+            "rank": 10
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.02667140825035562,
+            "rank": 11
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 0.026356857985087564,
+            "rank": 12
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.015384615384615385,
+            "rank": 13
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.014084507042253521,
+            "rank": 14
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.014084507042253521,
+            "rank": 15
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.013888888888888888,
+            "rank": 16
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 0.013888888888888888,
+            "rank": 17
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.0136986301369863,
+            "rank": 18
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.013513513513513514,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.013333333333333334,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 2.0113656520843506,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 1.3568153381347656,
+            "rank": 2
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.06587961316108704,
+            "rank": 3
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": -1.279844880104065,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": -2.253770351409912,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "Set the sampling temperature flag (e.g.,\u202f`--temperature`) to a near\u2011zero value\u2014typically `0.0`. Running the evaluation with temperature fixed at zero keeps the scores reproducible across runs. \u3010temperature-and-sampling-controls::1\u3011",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1701
+      }
+    }
+  ]
+}

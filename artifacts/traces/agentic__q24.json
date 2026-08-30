@@ -1,0 +1,205 @@
+{
+  "trace_id": "agentic::q24",
+  "architecture": "agentic",
+  "question": "What HTTP client library and version does this RAG engine use to call the embedding API?",
+  "answer": "The provided context does not contain any information about the HTTP client library or its version that the RAG engine uses to call the embedding API.",
+  "metrics": {
+    "latency_ms": 7.064166002237471,
+    "llm_calls": 4,
+    "prompt_tokens": 2310,
+    "completion_tokens": 312
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (1 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.22645799981546588,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What HTTP client library and version does this RAG engine use to call the embedding API?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.1665419986238703,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: sub-question contains an exact-looking token (a quoted string, a --flag-style token, or an ALL-CAPS acronym) that keyword/BM25 search matches literally better than dense embedding similarity would (this is a deterministic regex rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.32470799851580523,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 15.366613544278255,
+            "rank": 1
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 15.319205596675584,
+            "rank": 2
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 13.897283106087105,
+            "rank": 3
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 13.825421588675542,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 13.708105528699704,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.25008399825310335,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any information about the HTTP client library or version used by the RAG engine to call the embedding API.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0011250012903474271,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (sparse) to dense rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 5.588083000475308,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.12274359911680222,
+          0.026497868821024895,
+          -0.021827803924679756,
+          -0.06438737362623215,
+          -0.023098323494195938,
+          0.007153326645493507,
+          -0.07673875987529755,
+          -0.004290119279175997
+        ]
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.019082999642705545,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.30025234818458557,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.27649274468421936,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.26450952887535095,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.2451057881116867,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.22503067553043365,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.2737499999057036,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any information about the HTTP client library or version used by the RAG engine to call the embedding API.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.18533299953560345,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The provided context does not contain any information about the HTTP client library or its version that the RAG engine uses to call the embedding API.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1570
+      }
+    }
+  ]
+}

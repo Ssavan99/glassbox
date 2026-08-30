@@ -1,0 +1,363 @@
+{
+  "trace_id": "corrective::q24",
+  "architecture": "corrective",
+  "question": "What HTTP client library and version does this RAG engine use to call the embedding API?",
+  "answer": "The provided context does not contain information about which HTTP client library or version an RAG engine uses to call the embedding API. Therefore, I cannot answer this question based on the given context. [chunk-id::0][chunk-id::1][chunk-id::2][chunk-id::3]",
+  "metrics": {
+    "latency_ms": 39.643833002628526,
+    "llm_calls": 6,
+    "prompt_tokens": 6519,
+    "completion_tokens": 2309
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.12274359911680222,
+          0.026497868821024895,
+          -0.021827803924679756,
+          -0.06438737362623215,
+          -0.023098323494195938,
+          0.007153326645493507,
+          -0.07673875987529755,
+          -0.004290119279175997
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.30025234818458557,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.27649274468421936,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.26450952887535095,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.2451057881116867,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.22503067553043365,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "verdict": "incorrect",
+            "reason": "The chunk discusses general RAG quality issues and evaluation, but provides no information about the HTTP client library or its version used to call the embedding API."
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "verdict": "incorrect",
+            "reason": "This passage explains the RAG pipeline conceptually and does not mention any HTTP client library or version."
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "verdict": "incorrect",
+            "reason": "The text covers document cleaning before chunking; it contains no details about the HTTP client library or version for embedding API calls."
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "verdict": "incorrect",
+            "reason": "The chunk describes embedding models and semantic search, but does not provide any information about the HTTP client library or its version."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "verdict": "incorrect",
+            "reason": "While it talks about latency budgets in a RAG pipeline, it gives no specifics about the HTTP client library or version used for embedding API requests."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "What HTTP client library and version does this RAG engine use to call the embedding API?",
+        "to": "What HTTP client library and version does the RAG engine use for calling the embedding API (e.g., requests, httpx, urllib3, okhttp) and where is it specified in the code or dependencies?",
+        "reason": "The revised query adds precise technical keywords (HTTP client library, version, embedding API, RAG engine) and hints at code locations (source code, dependencies). This narrows the search to implementation details rather than general RAG concepts, increasing the chance of retrieving documentation, configuration files, or code snippets that mention the specific client library and its version."
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.10680337250232697,
+          0.020267266780138016,
+          0.002842412795871496,
+          -0.07622279226779938,
+          -0.06425889581441879,
+          0.01997857540845871,
+          -0.06940088421106339,
+          0.018708553165197372
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.30894386768341064,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.2925615608692169,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.2447102963924408,
+            "rank": 3
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 0.2378372848033905,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.2344050109386444,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 2)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "verdict": "incorrect",
+            "reason": "The text discusses general RAG failure modes and evaluation, but does not mention the HTTP client library or its version used to call the embedding API."
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "verdict": "incorrect",
+            "reason": "This excerpt explains the RAG pipeline conceptually and does not provide any information about the HTTP client library or version."
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "verdict": "incorrect",
+            "reason": "The passage focuses on document cleaning before embedding and contains no details about the HTTP client library or its version."
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "verdict": "incorrect",
+            "reason": "It describes structured output versus function calling, unrelated to the HTTP client library or version used for embedding API calls."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "verdict": "incorrect",
+            "reason": "The snippet discusses latency considerations in RAG pipelines and does not mention any HTTP client library or version."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "What HTTP client library and version does the RAG engine use for calling the embedding API (e.g., requests, httpx, urllib3, okhttp) and where is it specified in the code or dependencies?",
+        "to": "search codebase for import or dependency of HTTP client libraries (requests, httpx, urllib3, okhttp, aiohttp, etc.) used in the RAG engine when calling the embedding API, including version numbers in requirements.txt, pyproject.toml, pom.xml, setup.cfg, or in the source where the embedding API request is made",
+        "reason": "The revised query explicitly targets import statements, dependency manifests, and the specific call site for the embedding API, narrowing results to concrete library usage and version information rather than generic RAG discussion."
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 3)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.11585058271884918,
+          -0.00849062204360962,
+          0.004810368176549673,
+          -0.06352163106203079,
+          0.015027805231511593,
+          0.019284795969724655,
+          -0.09728650003671646,
+          0.036218661814928055
+        ]
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 3)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.31261390447616577,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.30745935440063477,
+            "rank": 2
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.295612633228302,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.29139161109924316,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.2720308005809784,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 3)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "verdict": "incorrect",
+            "reason": "The text only explains high\u2011level RAG concepts and does not mention any HTTP client library or version used for calling the embedding API."
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "verdict": "incorrect",
+            "reason": "This passage discusses failure modes and evaluation of RAG systems; it provides no information about the HTTP client library or its version."
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "verdict": "incorrect",
+            "reason": "The content focuses on vector database metadata and storage costs, with no reference to the HTTP client library or embedding API call details."
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "verdict": "incorrect",
+            "reason": "It describes how embedding models work and similarity metrics, but does not mention the HTTP client library or version used for API calls."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "verdict": "incorrect",
+            "reason": "The excerpt outlines latency budgeting for RAG pipelines and does not provide any information about the HTTP client library or its version."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The provided context does not contain information about which HTTP client library or version an RAG engine uses to call the embedding API. Therefore, I cannot answer this question based on the given context. [chunk-id::0][chunk-id::1][chunk-id::2][chunk-id::3]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1427
+      }
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q09",
+  "architecture": "corrective",
+  "question": "What is few-shot prompting, and what tradeoff does it create specifically in a RAG prompt?",
+  "answer": "Few-shot prompting means including a small number of complete example input-output pairs directly in the prompt, so the model can infer the desired format and behavior from demonstration rather than from instructions alone. [chunk-id::0]\n\nSpecifically in a Retrieval-Augmented Generation (RAG) prompt, few-shot prompting creates a tradeoff in context window space where each example consumes real space competing with the retrieved evidence needed to answer the current question. A prompt with three verbose examples has measurably less room for retrieved evidence compared to one with a single tight example or none at all. [chunk-id::1]",
+  "metrics": {
+    "latency_ms": 6.579624998266809,
+    "llm_calls": 2,
+    "prompt_tokens": 2417,
+    "completion_tokens": 383
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.0627501904964447,
+          0.07947903871536255,
+          0.059222474694252014,
+          -0.017419517040252686,
+          0.041675008833408356,
+          0.036111265420913696,
+          0.07274550199508667,
+          0.07628323137760162
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 0.7288016676902771,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.6659945845603943,
+            "rank": 2
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.4077821373939514,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "score": 0.40488746762275696,
+            "rank": 4
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.404279887676239,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "verdict": "correct",
+            "reason": "Directly explains the tradeoff in a RAG prompt related to few-shot prompting."
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "verdict": "correct",
+            "reason": "Provides detailed explanation of few-shot prompting and its impact on context window space in a RAG system, directly supporting the tradeoff discussed in the question."
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "verdict": "ambiguous",
+            "reason": "While relevant to prompt design, does not specifically address the tradeoff related to few-shot prompting."
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "verdict": "incorrect",
+            "reason": "Not relevant to the discussion of few-shot prompting or its tradeoffs in RAG systems."
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "verdict": "ambiguous",
+            "reason": "Focuses on when fine-tuning is necessary, which is not directly related to few-shot prompting and the specific tradeoff described."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "Few-shot prompting means including a small number of complete example input-output pairs directly in the prompt, so the model can infer the desired format and behavior from demonstration rather than from instructions alone. [chunk-id::0]\n\nSpecifically in a Retrieval-Augmented Generation (RAG) prompt, few-shot prompting creates a tradeoff in context window space where each example consumes real space competing with the retrieved evidence needed to answer the current question. A prompt with three verbose examples has measurably less room for retrieved evidence compared to one with a single tight example or none at all. [chunk-id::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1192
+      }
+    }
+  ]
+}

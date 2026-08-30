@@ -1,0 +1,359 @@
+{
+  "trace_id": "graph::q02",
+  "architecture": "graph",
+  "question": "What is a cross-encoder, and how does it differ from the bi-encoder architecture used for initial retrieval?",
+  "answer": "A cross-encoder is a type of model architecture designed specifically for reranking tasks in information retrieval. It differs fundamentally from the bi-encoder architecture used primarily for the initial embedding-based retrieval step.\n\nIn the context provided:\n\n- **Bi-Encoder Architecture (Initial Retrieval):** This method encodes both the query and each candidate document separately into vectors, then compares these vectors using cosine similarity to score relevance. The key limitation of this approach is that it doesn't allow the model to jointly attend to the query and the document during scoring.\n\n- **Cross-Encoder (Reranking):** A cross-encoder takes a different approach by taking both the query and one candidate document as joint input, producing a direct relevance score. This allows for more nuanced comparisons between specific words and phrases within the query and candidate document, enabling the model to understand how they interact with each other.\n\nThe cross-encoder architecture is specifically designed to address this limitation of bi-encoder models by ensuring that during reranking, the model can leverage both the query and the document simultaneously. This is achieved through a joint input mechanism where the query and candidate document are fed into the model together, allowing for more accurate re-scoring based on contextual interactions.\n\nIn summary, while initial retrieval relies on separate encodings of queries and documents with a final cosine similarity step, reranking with a cross-encoder involves a joint encoding that directly assesses the relevance between the two texts.",
+  "metrics": {
+    "latency_ms": 0.7351250023930334,
+    "llm_calls": 1,
+    "prompt_tokens": 2050,
+    "completion_tokens": 290
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "Graph RAG finds a completely different entry point than embedding-based retrieval: instead of measuring semantic similarity between a query vector and chunk vectors, it matches literal entity mentions in the question against the pre-built knowledge graph's vocabulary to jump straight to a set of graph nodes. This is a pure string-matching heuristic with no LLM call \u2014 the corpus was already mined for entities and relations offline when the graph was built.",
+      "payload": {
+        "entities": [
+          "cross-encoder"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Two-hop traversal from the seed entities can surface facts connected to the question's topic that never share a chunk with it at all \u2014 a fact only reachable by walking src -> rel -> dst -> rel -> dst through the graph. This is the opposite failure mode from embedding-based retrieval, which can only find chunks that are textually or semantically close to the query itself, not ones connected to it only through an intermediate entity.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "approaches",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "requires",
+            "dst": "kv cache"
+          },
+          {
+            "src": "kv cache",
+            "rel": "affects",
+            "dst": "latency"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "batching"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "quantization"
+          },
+          {
+            "src": "deduplication",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contrasts with",
+            "dst": "sparse retrieval"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "complements",
+            "dst": "bm25"
+          },
+          {
+            "src": "sparse retrieval",
+            "rel": "implemented with",
+            "dst": "bm25"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "needs",
+            "dst": "kv cache"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "sparse retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "breaks",
+            "dst": "latency"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "used for",
+            "dst": "reranking"
+          },
+          {
+            "src": "reranking",
+            "rel": "uses",
+            "dst": "cross-encoder"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "cosine similarity",
+            "rel": "not comparable to",
+            "dst": "bm25"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "does not improve",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "latency",
+            "rel": "contrasts with",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "complements",
+            "dst": "quantization"
+          },
+          {
+            "src": "reranking",
+            "rel": "uses",
+            "dst": "cross-encoder"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "more accurate than",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "used for",
+            "dst": "reranking"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "adds",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "consumes",
+            "dst": "latency"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "is an alternative to",
+            "dst": "bm25"
+          },
+          {
+            "src": "trace",
+            "rel": "measured by",
+            "dst": "latency"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "embeddings-and-semantic-search::0",
+          "embeddings-and-semantic-search::1",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "hybrid-search-with-bm25-and-dense-vectors::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "ai-evaluation-for-personal-knowledge-bases::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "cost-aware-model-routing::1",
+          "kv-cache-and-why-it-matters-for-serving::1",
+          "lora-and-parameter-efficient-fine-tuning::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "reranking-with-cross-encoders::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "knowledge-distillation-for-smaller-models::1",
+          "retrieval-augmented-generation-basics::0",
+          "few-shot-prompting-for-grounded-answers::1"
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The chunks gathered from graph expansion, plus the community summaries for any communities the touched entities belong to, are stuffed into a single prompt and handed to the LLM in one shot \u2014 the only LLM call this architecture makes online, since seeding and expansion are both pure graph traversal.",
+      "payload": {
+        "output": "A cross-encoder is a type of model architecture designed specifically for reranking tasks in information retrieval. It differs fundamentally from the bi-encoder architecture used primarily for the initial embedding-based retrieval step.\n\nIn the context provided:\n\n- **Bi-Encoder Architecture (Initial Retrieval):** This method encodes both the query and each candidate document separately into vectors, then compares these vectors using cosine similarity to score relevance. The key limitation of this approach is that it doesn't allow the model to jointly attend to the query and the document during scoring.\n\n- **Cross-Encoder (Reranking):** A cross-encoder takes a different approach by taking both the query and one candidate document as joint input, producing a direct relevance score. This allows for more nuanced comparisons between specific words and phrases within the query and candidate document, enabling the model to understand how they interact with each other.\n\nThe cross-encoder architecture is specifically designed to address this limitation of bi-encoder models by ensuring that during reranking, the model can leverage both the query and the document simultaneously. This is achieved through a joint input mechanism where the query and candidate document are fed into the model together, allowing for more accurate re-scoring based on contextual interactions.\n\nIn summary, while initial retrieval relies on separate encodings of queries and documents with a final cosine similarity step, reranking with a cross-encoder involves a joint encoding that directly assesses the relevance between the two texts.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2340
+      }
+    }
+  ]
+}

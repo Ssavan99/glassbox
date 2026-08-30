@@ -1,0 +1,90 @@
+{
+  "trace_id": "naive::q17",
+  "architecture": "naive",
+  "question": "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?",
+  "answer": "The engine's rate-limit handling needs to recognize the `429 Too Many Requests` HTTP status code on sight. This information is cited from [rate-limits-and-retry-storms::0].",
+  "metrics": {
+    "latency_ms": 7.241541999974288,
+    "llm_calls": 1,
+    "prompt_tokens": 1375,
+    "completion_tokens": 43
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08318151533603668,
+          0.01745142787694931,
+          -0.06680643558502197,
+          0.0009295037016272545,
+          0.04198012873530388,
+          -0.06736277043819427,
+          -0.030523106455802917,
+          -0.05719131603837013
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.4992207884788513,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.3865494728088379,
+            "rank": 2
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.3361126184463501,
+            "rank": 3
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.33356210589408875,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.3088449537754059,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "The engine's rate-limit handling needs to recognize the `429 Too Many Requests` HTTP status code on sight. This information is cited from [rate-limits-and-retry-storms::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1418
+      }
+    }
+  ]
+}

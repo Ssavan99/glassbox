@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q09",
+  "architecture": "hybrid",
+  "question": "What is few-shot prompting, and what tradeoff does it create specifically in a RAG prompt?",
+  "answer": "Few\u2011shot prompting is the technique of putting a handful of complete input\u2011output demonstrations straight into the prompt so the model can learn the desired format and behavior from those examples rather than from abstract instructions alone\u202f[ few-shot-prompting-for-grounded-answers::0 ].  \n\nIn a retrieval\u2011augmented generation (RAG) setting this creates a concrete trade\u2011off: every example consumes tokens that could otherwise be used for the retrieved evidence, the system instructions, or the model\u2019s answer. Because the context window is limited, adding multiple or verbose few\u2011shot examples reduces the space available for the retrieved chunks, leaving less room for the evidence the model needs to ground its response\u202f[ few-shot-prompting-for-grounded-answers::1 ].",
+  "metrics": {
+    "latency_ms": 95.05483300017659,
+    "llm_calls": 1,
+    "prompt_tokens": 1493,
+    "completion_tokens": 395
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.0627501904964447,
+          0.07947903871536255,
+          0.059222474694252014,
+          -0.017419517040252686,
+          0.041675008833408356,
+          0.036111265420913696,
+          0.07274550199508667,
+          0.07628323137760162
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 0.7288016676902771,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.6659945845603943,
+            "rank": 2
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.4077821373939514,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "score": 0.40488746762275696,
+            "rank": 4
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.404279887676239,
+            "rank": 5
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.37650468945503235,
+            "rank": 6
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.3746870160102844,
+            "rank": 7
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::0",
+            "score": 0.3681461215019226,
+            "rank": 8
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.3666582405567169,
+            "rank": 9
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.3644154667854309,
+            "rank": 10
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.3524515628814697,
+            "rank": 11
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 0.3503223657608032,
+            "rank": 12
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 0.33307692408561707,
+            "rank": 13
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.33250370621681213,
+            "rank": 14
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::0",
+            "score": 0.3295018970966339,
+            "rank": 15
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 0.3233776092529297,
+            "rank": 16
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.32095175981521606,
+            "rank": 17
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.31105393171310425,
+            "rank": 18
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.3075929880142212,
+            "rank": 19
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "score": 0.30599015951156616,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 23.61869449796238,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 18.508905870403925,
+            "rank": 2
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 14.458823543106439,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 12.332599113579011,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 12.322931233512058,
+            "rank": 5
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 12.198320125916853,
+            "rank": 6
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 11.941138234535334,
+            "rank": 7
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 11.91363916543742,
+            "rank": 8
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 11.839830200357488,
+            "rank": 9
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 11.540083152155844,
+            "rank": 10
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 11.4034636400695,
+            "rank": 11
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 11.30438376861256,
+            "rank": 12
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 10.990260075372666,
+            "rank": 13
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 10.952640567137509,
+            "rank": 14
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "score": 10.834598793560335,
+            "rank": 15
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 10.661702510991276,
+            "rank": 16
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 10.615678756738848,
+            "rank": 17
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 10.485323662860464,
+            "rank": 18
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 10.446580726743202,
+            "rank": 19
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 10.44400907158106,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.03225806451612903,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.029709507042253523,
+            "rank": 3
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.02904040404040404,
+            "rank": 4
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.026785714285714288,
+            "rank": 5
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 0.026144907723855092,
+            "rank": 6
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "score": 0.025833333333333333,
+            "rank": 7
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.015873015873015872,
+            "rank": 8
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 0.015873015873015872,
+            "rank": 9
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "score": 0.015625,
+            "rank": 10
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.015384615384615385,
+            "rank": 11
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.015384615384615385,
+            "rank": 12
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.015151515151515152,
+            "rank": 13
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.014925373134328358,
+            "rank": 14
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 0.014925373134328358,
+            "rank": 15
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::0",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.014705882352941176,
+            "rank": 17
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.014492753623188406,
+            "rank": 18
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.014492753623188406,
+            "rank": 19
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 0.014285714285714285,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.03225806451612903,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.029709507042253523,
+            "rank": 3
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.02904040404040404,
+            "rank": 4
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.026785714285714288,
+            "rank": 5
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 0.026144907723855092,
+            "rank": 6
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "score": 0.025833333333333333,
+            "rank": 7
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.015873015873015872,
+            "rank": 8
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 0.015873015873015872,
+            "rank": 9
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "score": 0.015625,
+            "rank": 10
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.015384615384615385,
+            "rank": 11
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.015384615384615385,
+            "rank": 12
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.015151515151515152,
+            "rank": 13
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.014925373134328358,
+            "rank": 14
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 0.014925373134328358,
+            "rank": 15
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::0",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.014705882352941176,
+            "rank": 17
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.014492753623188406,
+            "rank": 18
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.014492753623188406,
+            "rank": 19
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 0.014285714285714285,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 7.8797783851623535,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 4.249222278594971,
+            "rank": 2
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": -0.8242613077163696,
+            "rank": 3
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": -2.3914990425109863,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": -2.8275561332702637,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "Few\u2011shot prompting is the technique of putting a handful of complete input\u2011output demonstrations straight into the prompt so the model can learn the desired format and behavior from those examples rather than from abstract instructions alone\u202f[ few-shot-prompting-for-grounded-answers::0 ].  \n\nIn a retrieval\u2011augmented generation (RAG) setting this creates a concrete trade\u2011off: every example consumes tokens that could otherwise be used for the retrieved evidence, the system instructions, or the model\u2019s answer. Because the context window is limited, adding multiple or verbose few\u2011shot examples reduces the space available for the retrieved chunks, leaving less room for the evidence the model needs to ground its response\u202f[ few-shot-prompting-for-grounded-answers::1 ].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1888
+      }
+    }
+  ]
+}

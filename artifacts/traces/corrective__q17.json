@@ -1,0 +1,363 @@
+{
+  "trace_id": "corrective::q17",
+  "architecture": "corrective",
+  "question": "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?",
+  "answer": "The engine's rate-limit handling needs to recognize the `429 Too Many Requests` HTTP status code on sight. This information is cited from [rate-limits-and-retry-storms::0].",
+  "metrics": {
+    "latency_ms": 44.86499999984517,
+    "llm_calls": 6,
+    "prompt_tokens": 5199,
+    "completion_tokens": 1066
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08318151533603668,
+          0.01745142787694931,
+          -0.06680643558502197,
+          0.0009295037016272545,
+          0.04198012873530388,
+          -0.06736277043819427,
+          -0.030523106455802917,
+          -0.05719131603837013
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.4992207884788513,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.3865494728088379,
+            "rank": 2
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.3361126184463501,
+            "rank": 3
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.33356210589408875,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.3088449537754059,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "verdict": "correct",
+            "reason": "Directly states that a `429 Too Many Requests` HTTP status code should be recognized on sight for rate-limit handling."
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "verdict": "ambiguous",
+            "reason": "Discusses the issue but does not explicitly mention the specific HTTP status code."
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "verdict": "incorrect",
+            "reason": "Does not discuss HTTP status codes or rate limiting."
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "verdict": "ambiguous",
+            "reason": "Discusses streaming responses but does not mention specific HTTP status codes for rate limiting."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "incorrect",
+            "reason": "Does not discuss HTTP status codes or rate limiting."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?",
+        "to": "HTTP 429 \"Too Many Requests\" rate limit handling exact status code phrase",
+        "reason": "Including the specific numeric code (429) and the standard phrase (\"Too Many Requests\") together with keywords like \"rate limit\" and \"handling\" focuses the search on documents that mention the exact status code and phrase required for rate\u2011limit detection, reducing irrelevant results about other HTTP codes or unrelated topics."
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.04791947826743126,
+          0.009445303119719028,
+          -0.019354652613401413,
+          0.001956371357664466,
+          -0.025254501029849052,
+          -0.07512623071670532,
+          -0.03547641634941101,
+          -0.002778278663754463
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.6506954431533813,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.5108625888824463,
+            "rank": 2
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.35425275564193726,
+            "rank": 3
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.3409895598888397,
+            "rank": 4
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.298794150352478,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 2)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "verdict": "correct",
+            "reason": "This chunk directly states that a `429 Too Many Requests` HTTP status code should be recognized, which is relevant to the question."
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "verdict": "ambiguous",
+            "reason": "While this chunk mentions 429, it does not provide specific details about the exact code or phrase needed for rate-limit handling."
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "verdict": "incorrect",
+            "reason": "This chunk discusses context window overflow and truncation issues, which are unrelated to HTTP status codes for rate limiting."
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "verdict": "incorrect",
+            "reason": "This chunk talks about guardrails for autonomous actions, not relevant to the specific HTTP status code for rate limits."
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "verdict": "ambiguous",
+            "reason": "Similar to context-window-overflow-and-truncation::0, this chunk discusses overflow issues and does not address the exact HTTP status code needed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "HTTP 429 \"Too Many Requests\" rate limit handling exact status code phrase",
+        "to": "HTTP 429 Too Many Requests handling exact status code phrase",
+        "reason": "This query focuses directly on the specific HTTP status code (429) related to rate limiting, increasing relevance of retrieved evidence."
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 3)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.01958022080361843,
+          0.026554469019174576,
+          0.02510176971554756,
+          -0.008382954634726048,
+          -0.03328387066721916,
+          -0.07698477804660797,
+          -0.010414070449769497,
+          -0.008000170812010765
+        ]
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 3)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.49929070472717285,
+            "rank": 1
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.36708125472068787,
+            "rank": 2
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.3558332324028015,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.33865320682525635,
+            "rank": 4
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.2950360178947449,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 3)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "verdict": "correct",
+            "reason": "This chunk directly mentions the HTTP status code 429 Too Many Requests and explains its significance, which is relevant to answering the question."
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "verdict": "incorrect",
+            "reason": "This chunk is about context window overflow errors and their handling, which does not directly address the specific HTTP status code needed for rate-limit handling."
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "verdict": "ambiguous",
+            "reason": "While this chunk discusses 429 responses, it does so in the context of retry storms and mitigation strategies rather than explicitly identifying its use as a direct indicator to be recognized."
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "verdict": "incorrect",
+            "reason": "Similar to the previous chunk, this one focuses on context window issues rather than the required HTTP status code for rate limits."
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "verdict": "incorrect",
+            "reason": "This chunk also discusses context window overflow and does not provide relevant information about the specific HTTP status code needed for rate-limit handling."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The engine's rate-limit handling needs to recognize the `429 Too Many Requests` HTTP status code on sight. This information is cited from [rate-limits-and-retry-storms::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 684
+      }
+    }
+  ]
+}

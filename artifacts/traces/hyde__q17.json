@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q17",
+  "architecture": "hyde",
+  "question": "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?",
+  "answer": "The engine should look for the HTTP\u202fstatus **429\u202fToo\u202fMany\u202fRequests**\u202f\u2013 a 429 response code with the phrase \u201cToo Many Requests\u201d\u202f[rate-limits-and-retry-storms::0].",
+  "metrics": {
+    "latency_ms": 24.155292001523776,
+    "llm_calls": 2,
+    "prompt_tokens": 1488,
+    "completion_tokens": 384
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "The engine\u2019s rate\u2011limit module is hard\u2011wired to look for the canonical throttling response defined in RFC\u202f6585. Specifically, it must detect **HTTP\u202f429\u202f\u201cToo Many Requests\u201d** and immediately trigger its back\u2011off routine (honoring any `Retry\u2011After` header that accompanies the response). No other status codes are treated as a definitive rate\u2011limit signal.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 389
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.04563403129577637,
+          0.004603574983775616,
+          -0.042151838541030884,
+          -0.0005321797216311097,
+          0.0041392347775399685,
+          -0.05132032930850983,
+          -0.10695639252662659,
+          -0.017829423770308495
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.6988838911056519,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.5717984437942505,
+            "rank": 2
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.3436537981033325,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.2984727621078491,
+            "rank": 4
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.29720985889434814,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The engine should look for the HTTP\u202fstatus **429\u202fToo\u202fMany\u202fRequests**\u202f\u2013 a 429 response code with the phrase \u201cToo Many Requests\u201d\u202f[rate-limits-and-retry-storms::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1483
+      }
+    }
+  ]
+}

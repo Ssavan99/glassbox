@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q26",
+  "architecture": "hybrid",
+  "question": "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?",
+  "answer": "The provided context does not contain the specific recall@10 score for any particular evaluation run of an engine against its own golden dataset. [chunk-id::0] discusses retrieval metrics and their usage but does not provide a concrete score for any evaluation. Therefore, I cannot answer with a measured score as requested.",
+  "metrics": {
+    "latency_ms": 74.15604199923109,
+    "llm_calls": 1,
+    "prompt_tokens": 1437,
+    "completion_tokens": 63
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.09213951975107193,
+          0.0009580478654243052,
+          -0.0812871977686882,
+          0.050075873732566833,
+          0.011431589722633362,
+          0.07444421947002411,
+          0.010985721834003925,
+          0.07599067687988281
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.43973153829574585,
+            "rank": 1
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.437418669462204,
+            "rank": 2
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.43457165360450745,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.3974769711494446,
+            "rank": 4
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.36479607224464417,
+            "rank": 5
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.3444873094558716,
+            "rank": 6
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.3326118588447571,
+            "rank": 7
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.3141273856163025,
+            "rank": 8
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.2975105047225952,
+            "rank": 9
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.296331524848938,
+            "rank": 10
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.2936488687992096,
+            "rank": 11
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.2908787727355957,
+            "rank": 12
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.278427392244339,
+            "rank": 13
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.27738165855407715,
+            "rank": 14
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 0.2731454074382782,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.2704947590827942,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.2692265510559082,
+            "rank": 17
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 0.2600962519645691,
+            "rank": 18
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.25899869203567505,
+            "rank": 19
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.2540263533592224,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 18.015991064397706,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 14.854341958386772,
+            "rank": 2
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::1",
+            "score": 14.654823652932928,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 13.92493230771761,
+            "rank": 4
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 13.838741002796228,
+            "rank": 5
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 13.742223606620756,
+            "rank": 6
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 13.619674663223208,
+            "rank": 7
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 13.566711501988443,
+            "rank": 8
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 12.93083094971395,
+            "rank": 9
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 12.51140265554075,
+            "rank": 10
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 12.483065377077505,
+            "rank": 11
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 12.275325018842448,
+            "rank": 12
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 12.164726052684003,
+            "rank": 13
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "score": 12.090027344200422,
+            "rank": 14
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 11.770901158346614,
+            "rank": 15
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 11.719247581148554,
+            "rank": 16
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 11.47515685045813,
+            "rank": 17
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 11.462073272170208,
+            "rank": 18
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 11.268182931521176,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 11.16846374235583,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.03200204813108039,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.03125,
+            "rank": 2
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.03076923076923077,
+            "rank": 3
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.03028233151183971,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.02889344262295082,
+            "rank": 5
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.028484848484848488,
+            "rank": 6
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.028006267136701922,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.027912386121341344,
+            "rank": 8
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.02694394213381555,
+            "rank": 9
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.016129032258064516,
+            "rank": 10
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::1",
+            "score": 0.015873015873015872,
+            "rank": 11
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.015151515151515152,
+            "rank": 12
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.03200204813108039,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.03125,
+            "rank": 2
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.03076923076923077,
+            "rank": 3
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.03028233151183971,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.02889344262295082,
+            "rank": 5
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.028484848484848488,
+            "rank": 6
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 0.028006267136701922,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.027912386121341344,
+            "rank": 8
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::1",
+            "score": 0.02694394213381555,
+            "rank": 9
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.016129032258064516,
+            "rank": 10
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::1",
+            "score": 0.015873015873015872,
+            "rank": 11
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.015151515151515152,
+            "rank": 12
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.3182985186576843,
+            "rank": 1
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": -0.5763559937477112,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": -1.4247535467147827,
+            "rank": 3
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": -2.200176239013672,
+            "rank": 4
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::0",
+            "score": -2.519378423690796,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "The provided context does not contain the specific recall@10 score for any particular evaluation run of an engine against its own golden dataset. [chunk-id::0] discusses retrieval metrics and their usage but does not provide a concrete score for any evaluation. Therefore, I cannot answer with a measured score as requested.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1500
+      }
+    }
+  ]
+}

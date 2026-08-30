@@ -1,0 +1,640 @@
+{
+  "trace_id": "agentic::q06",
+  "architecture": "agentic",
+  "question": "Why does deduplication matter differently for fine-tuning data versus a retrieval corpus?",
+  "answer": "Deduplication matters differently for fine-tuning data versus a retrieval corpus because of how duplicates impact the quality and efficiency of model training on one hand, versus affecting retrieval metrics like recall@k on the other.\n\nFor fine-tuning data, duplicated examples can disproportionately reinforce certain phrases or facts during training. This means that a phrase or fact which happens to be duplicated across many source documents gets reinforced more than it should relative to genuinely rarer information. This can bias a fine-tuned model toward overrepresented patterns and, in severe cases, contribute to the model memorizing specific duplicated passages verbatim rather than generalizing from them.\n\nIn contrast, for a retrieval corpus, near-duplicate notes compete with each other for the same top-k retrieval slots. This crowds out genuinely distinct, relevant chunks that might otherwise have been retrieved. From the model's perspective, several duplicate slots effectively count as one useful slot, which means it is shown the same information multiple times instead of different pieces of evidence.\n\nThese differences highlight why deduplication is a critical preprocessing step in both scenarios, but for different reasons and with different impacts. [deduplication-in-training-and-corpus-data::0] [deduplication-in-training-and-corpus-data::1]",
+  "metrics": {
+    "latency_ms": 4.036792000988498,
+    "llm_calls": 8,
+    "prompt_tokens": 8060,
+    "completion_tokens": 744
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.149125000461936,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "How does deduplication affect the quality, bias, and overfitting of fine\u2011tuning data for language models?",
+          "What role does deduplication play in the relevance, coverage, and efficiency of a retrieval corpus used for information retrieval or augmentation?",
+          "Why do the differing objectives and consequences of deduplication in fine\u2011tuning versus retrieval lead to distinct levels of importance and different handling strategies?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.17783299699658528,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.16404200141550973,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "deduplication"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (21 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.02716600283747539,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "deduplication",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "contrasts with",
+            "dst": "deduplication"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "is",
+            "dst": "guardrails"
+          },
+          {
+            "src": "cosine similarity",
+            "rel": "not comparable to",
+            "dst": "bm25"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "more accurate than",
+            "dst": "cosine similarity"
+          }
+        ],
+        "chunk_ids": [
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "hybrid-search-with-bm25-and-dense-vectors::1",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "reranking-with-cross-encoders::0",
+          "reranking-with-cross-encoders::1",
+          "embeddings-and-semantic-search::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "retrieval-augmented-generation-basics::0",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "guardrails-for-autonomous-actions::1",
+          "hallucination-from-prompt-injection::1",
+          "pii-redaction-in-training-data::1",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "pii-redaction-in-training-data::0"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.24375000066356733,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address how deduplication affects the quality, bias, and overfitting of fine-tuning data for language models.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0009169998520519584,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.3070839993597474,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 13.840886251509628,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 12.46531728898105,
+            "rank": 2
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 11.718482954906552,
+            "rank": 3
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 11.672011641534652,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 11.203542594316836,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.20691700046882033,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly address how deduplication affects the quality, bias, and overfitting of fine-tuning data for language models.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.18341699978918768,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.17695899805403315,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "deduplication"
+        ]
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (21 chunks)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.018667000404093415,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "deduplication",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "contrasts with",
+            "dst": "deduplication"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "is",
+            "dst": "guardrails"
+          },
+          {
+            "src": "cosine similarity",
+            "rel": "not comparable to",
+            "dst": "bm25"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "more accurate than",
+            "dst": "cosine similarity"
+          }
+        ],
+        "chunk_ids": [
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "hybrid-search-with-bm25-and-dense-vectors::1",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "reranking-with-cross-encoders::0",
+          "reranking-with-cross-encoders::1",
+          "embeddings-and-semantic-search::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "retrieval-augmented-generation-basics::0",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "guardrails-for-autonomous-actions::1",
+          "hallucination-from-prompt-injection::1",
+          "pii-redaction-in-training-data::1",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "pii-redaction-in-training-data::0"
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.24958300127764232,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address the role of deduplication in relevance, coverage, and efficiency of a retrieval corpus for information retrieval or augmentation.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n12"
+      ],
+      "duration_ms": 0.0007089984137564898,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.3885000005539041,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 24.100268847679043,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 20.105021013203913,
+            "rank": 2
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 18.3966464112185,
+            "rank": 3
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 17.47307398321963,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 17.310673241685407,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.207500001124572,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address the role of deduplication in relevance, coverage, and efficiency of a retrieval corpus for information retrieval or augmentation.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.1989170013985131,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 0.19087499822489917,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "deduplication"
+        ]
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (21 chunks)",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.017082998965634033,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "deduplication",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "contrasts with",
+            "dst": "deduplication"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "is",
+            "dst": "guardrails"
+          },
+          {
+            "src": "cosine similarity",
+            "rel": "not comparable to",
+            "dst": "bm25"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "more accurate than",
+            "dst": "cosine similarity"
+          }
+        ],
+        "chunk_ids": [
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "hybrid-search-with-bm25-and-dense-vectors::1",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "reranking-with-cross-encoders::0",
+          "reranking-with-cross-encoders::1",
+          "embeddings-and-semantic-search::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "retrieval-augmented-generation-basics::0",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "guardrails-for-autonomous-actions::1",
+          "hallucination-from-prompt-injection::1",
+          "pii-redaction-in-training-data::1",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "pii-redaction-in-training-data::0"
+        ]
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.2296249986102339,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The retrieved evidence does not contain specific information on why differing objectives and consequences of deduplication in fine-tuning versus retrieval lead to distinct levels of importance and different handling strategies.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n19"
+      ],
+      "duration_ms": 0.0006669979484286159,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n20"
+      ],
+      "duration_ms": 0.4040419989905786,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 22.799262851870676,
+            "rank": 1
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 21.80594123594312,
+            "rank": 2
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 17.160686801905772,
+            "rank": 3
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 16.582585371097732,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 16.45679803008023,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n21"
+      ],
+      "duration_ms": 0.19891600095434114,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not address the objectives and consequences of deduplication in fine-tuning versus retrieval or their impact on importance and handling strategies.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n15",
+        "n22"
+      ],
+      "duration_ms": 0.24129200028255582,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "Deduplication matters differently for fine-tuning data versus a retrieval corpus because of how duplicates impact the quality and efficiency of model training on one hand, versus affecting retrieval metrics like recall@k on the other.\n\nFor fine-tuning data, duplicated examples can disproportionately reinforce certain phrases or facts during training. This means that a phrase or fact which happens to be duplicated across many source documents gets reinforced more than it should relative to genuinely rarer information. This can bias a fine-tuned model toward overrepresented patterns and, in severe cases, contribute to the model memorizing specific duplicated passages verbatim rather than generalizing from them.\n\nIn contrast, for a retrieval corpus, near-duplicate notes compete with each other for the same top-k retrieval slots. This crowds out genuinely distinct, relevant chunks that might otherwise have been retrieved. From the model's perspective, several duplicate slots effectively count as one useful slot, which means it is shown the same information multiple times instead of different pieces of evidence.\n\nThese differences highlight why deduplication is a critical preprocessing step in both scenarios, but for different reasons and with different impacts. [deduplication-in-training-and-corpus-data::0] [deduplication-in-training-and-corpus-data::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 3150
+      }
+    }
+  ]
+}

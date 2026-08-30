@@ -1,0 +1,565 @@
+{
+  "trace_id": "adaptive::q17",
+  "architecture": "adaptive",
+  "question": "What exact HTTP status code and phrase does this engine's rate-limit handling need to recognize on sight?",
+  "answer": "The engine must look for the HTTP\u202f429\u202f\u201cToo\u00a0Many\u00a0Requests\u201d response.\u202f[rate-limits-and-retry-storms::0]",
+  "metrics": {
+    "latency_ms": 80.75920900228084,
+    "llm_calls": 2,
+    "prompt_tokens": 2165,
+    "completion_tokens": 430
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "route",
+      "label": "Route question to hybrid",
+      "parent_ids": [],
+      "duration_ms": 0.6104580024839379,
+      "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
+      "payload": {
+        "chosen": "hybrid",
+        "scores": {
+          "naive": 0.1,
+          "hybrid": 0.96,
+          "hyde": 0.05,
+          "corrective": 0.2,
+          "graph": 0.03,
+          "agentic": 0.1
+        },
+        "reason": "The query seeks the precise, verbatim HTTP status code and its textual phrase (e.g., \"429 Too Many Requests\"). This requires an exact string match, which the hybrid dense+BM25 retrieval with reranking is designed for."
+      }
+    },
+    {
+      "id": "hybrid::n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08318151533603668,
+          0.01745142787694931,
+          -0.06680643558502197,
+          0.0009295037016272545,
+          0.04198012873530388,
+          -0.06736277043819427,
+          -0.030523106455802917,
+          -0.05719131603837013
+        ]
+      }
+    },
+    {
+      "id": "hybrid::n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "hybrid::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.4992207884788513,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.3865494728088379,
+            "rank": 2
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.3361126184463501,
+            "rank": 3
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.33356210589408875,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.3088449537754059,
+            "rank": 5
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.30311065912246704,
+            "rank": 6
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.2955816686153412,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.2879047691822052,
+            "rank": 8
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.2624157667160034,
+            "rank": 9
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.24269098043441772,
+            "rank": 10
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.241051584482193,
+            "rank": 11
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.23997116088867188,
+            "rank": 12
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.2340449094772339,
+            "rank": 13
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.23298080265522003,
+            "rank": 14
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.22585251927375793,
+            "rank": 15
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.22367021441459656,
+            "rank": 16
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.22320803999900818,
+            "rank": 17
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 0.22236788272857666,
+            "rank": 18
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.22051124274730682,
+            "rank": 19
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.22028246521949768,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "hybrid::n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "hybrid::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 18.136768032340292,
+            "rank": 1
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 12.06536382199246,
+            "rank": 2
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 11.528147981801567,
+            "rank": 3
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 10.193907422258771,
+            "rank": 4
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 10.0186061764447,
+            "rank": 5
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 9.719434437766065,
+            "rank": 6
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 9.364177289933185,
+            "rank": 7
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 9.28053936939078,
+            "rank": 8
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 9.265060525719623,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 9.251935283353866,
+            "rank": 10
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 9.169574716657356,
+            "rank": 11
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 9.111749284228583,
+            "rank": 12
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 8.9703379702855,
+            "rank": 13
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 8.954322229592366,
+            "rank": 14
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 8.904358120519264,
+            "rank": 15
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 8.724972002581831,
+            "rank": 16
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 8.479904211111283,
+            "rank": 17
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 8.456715840306941,
+            "rank": 18
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 8.4401530487959,
+            "rank": 19
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "score": 8.32444702270769,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "hybrid::n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "hybrid::n2",
+        "hybrid::n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.031754032258064516,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.029211087420042643,
+            "rank": 3
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.016129032258064516,
+            "rank": 4
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.015873015873015872,
+            "rank": 5
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.015873015873015872,
+            "rank": 6
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.015625,
+            "rank": 7
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.015384615384615385,
+            "rank": 8
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.015151515151515152,
+            "rank": 10
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.014492753623188406,
+            "rank": 15
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "hybrid::n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "hybrid::n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.031754032258064516,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.029211087420042643,
+            "rank": 3
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.016129032258064516,
+            "rank": 4
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::1",
+            "score": 0.015873015873015872,
+            "rank": 5
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.015873015873015872,
+            "rank": 6
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.015625,
+            "rank": 7
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.015384615384615385,
+            "rank": 8
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.015151515151515152,
+            "rank": 10
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.014492753623188406,
+            "rank": 15
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::1",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 3.5330824851989746,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": -6.913508415222168,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": -7.720431327819824,
+            "rank": 3
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": -9.228425979614258,
+            "rank": 4
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": -10.095136642456055,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "hybrid::n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "hybrid::n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "The engine must look for the HTTP\u202f429\u202f\u201cToo\u00a0Many\u00a0Requests\u201d response.\u202f[rate-limits-and-retry-storms::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1686
+      }
+    }
+  ]
+}

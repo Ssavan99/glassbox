@@ -1,0 +1,1023 @@
+{
+  "trace_id": "agentic::q18",
+  "architecture": "agentic",
+  "question": "What is the exact reranking model identifier this engine uses?",
+  "answer": "The exact reranking model identifier used by this engine is `cross-encoder/ms-marco-MiniLM-L-6-v2`. [chunk-id::1]",
+  "metrics": {
+    "latency_ms": 14.980291998654138,
+    "llm_calls": 8,
+    "prompt_tokens": 9474,
+    "completion_tokens": 437
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.1969580007425975,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "Which specific engine or model is being referred to in the question?",
+          "Does the referenced engine utilize a reranking model as part of its architecture?",
+          "What is the exact identifier or name of the reranking model used by that engine?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.1609999999345746,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 11.04079200013075,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08720459789037704,
+          0.03808385133743286,
+          -0.03617006912827492,
+          0.002642779378220439,
+          0.011645353399217129,
+          0.06355972588062286,
+          -0.037361349910497665,
+          0.03989813104271889
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.023124997824197635,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.3013078570365906,
+            "rank": 1
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.20927175879478455,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.18964242935180664,
+            "rank": 3
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.1886049509048462,
+            "rank": 4
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::2",
+            "score": 0.17116057872772217,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.26687499848776497,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any specific engine or model names.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0012079981388524175,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.2959580015158281,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 14.428529079771275,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 14.281949792251243,
+            "rank": 2
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 13.625410798384303,
+            "rank": 3
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 13.27395532180302,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 13.25679406189029,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.3601669995987322,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided excerpts do not contain any information related to engines or specific models.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15883300147834234,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.1421250017301645,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "reranking"
+        ]
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.04479199924389832,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "approaches",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "requires",
+            "dst": "kv cache"
+          },
+          {
+            "src": "kv cache",
+            "rel": "affects",
+            "dst": "latency"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "batching"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contrasts with",
+            "dst": "sparse retrieval"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "needs",
+            "dst": "kv cache"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "sparse retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "breaks",
+            "dst": "latency"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "used for",
+            "dst": "reranking"
+          },
+          {
+            "src": "reranking",
+            "rel": "uses",
+            "dst": "cross-encoder"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "does not improve",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "latency",
+            "rel": "contrasts with",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "complements",
+            "dst": "quantization"
+          },
+          {
+            "src": "reranking",
+            "rel": "uses",
+            "dst": "cross-encoder"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "more accurate than",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "used for",
+            "dst": "reranking"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "adds",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "consumes",
+            "dst": "latency"
+          },
+          {
+            "src": "trace",
+            "rel": "measured by",
+            "dst": "latency"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "embeddings-and-semantic-search::0",
+          "embeddings-and-semantic-search::1",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "ai-evaluation-for-personal-knowledge-bases::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "cost-aware-model-routing::1",
+          "kv-cache-and-why-it-matters-for-serving::1",
+          "lora-and-parameter-efficient-fine-tuning::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "reranking-with-cross-encoders::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "knowledge-distillation-for-smaller-models::1",
+          "retrieval-augmented-generation-basics::0",
+          "few-shot-prompting-for-grounded-answers::1",
+          "ai-agents-and-tool-use::2"
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.29079100204398856,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly mention a reranking model or its usage in the architecture.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n12"
+      ],
+      "duration_ms": 0.0007500020728912205,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.2562080007919576,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 18.138167250302285,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 17.599724973592387,
+            "rank": 2
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
+            "score": 12.764019833480871,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::0",
+            "score": 12.153045563475022,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 12.118694274022895,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.30654199872515164,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly mention whether the engine utilizes a reranking model as part of its architecture.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.15087499923538417,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 0.1450000017939601,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "reranking"
+        ]
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.028416998247848824,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "chain of thought",
+            "rel": "adds to",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "approaches",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "requires",
+            "dst": "kv cache"
+          },
+          {
+            "src": "kv cache",
+            "rel": "affects",
+            "dst": "latency"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "batching"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contrasts with",
+            "dst": "sparse retrieval"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "needs",
+            "dst": "kv cache"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "dense retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "sparse retrieval",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "contributes to",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "breaks",
+            "dst": "latency"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "used for",
+            "dst": "reranking"
+          },
+          {
+            "src": "reranking",
+            "rel": "uses",
+            "dst": "cross-encoder"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "does not improve",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "latency",
+            "rel": "contrasts with",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "complements",
+            "dst": "quantization"
+          },
+          {
+            "src": "reranking",
+            "rel": "uses",
+            "dst": "cross-encoder"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "more accurate than",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "used for",
+            "dst": "reranking"
+          },
+          {
+            "src": "cross-encoder",
+            "rel": "adds",
+            "dst": "latency"
+          },
+          {
+            "src": "reranking",
+            "rel": "consumes",
+            "dst": "latency"
+          },
+          {
+            "src": "trace",
+            "rel": "measured by",
+            "dst": "latency"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "embeddings-and-semantic-search::0",
+          "embeddings-and-semantic-search::1",
+          "hybrid-search-with-bm25-and-dense-vectors::0",
+          "reciprocal-rank-fusion-explained::0",
+          "retrieval-metrics-recall-at-k-and-mrr::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "ai-evaluation-for-personal-knowledge-bases::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "cost-aware-model-routing::1",
+          "kv-cache-and-why-it-matters-for-serving::1",
+          "lora-and-parameter-efficient-fine-tuning::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "reranking-with-cross-encoders::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "knowledge-distillation-for-smaller-models::1",
+          "retrieval-augmented-generation-basics::0",
+          "few-shot-prompting-for-grounded-answers::1",
+          "ai-agents-and-tool-use::2"
+        ]
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.2859170017472934,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not explicitly mention the name or identifier of the reranking model used by the engine.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n19"
+      ],
+      "duration_ms": 0.0007499984349124134,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n20"
+      ],
+      "duration_ms": 0.2823329996317625,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 17.711057028690643,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 17.690414279232233,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 17.035502003270647,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 16.544852857392605,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 16.462915479056594,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n21"
+      ],
+      "duration_ms": 0.20241599850123748,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not specify a name or exact identifier for the reranking model.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n15",
+        "n22"
+      ],
+      "duration_ms": 0.2692909984034486,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The exact reranking model identifier used by this engine is `cross-encoder/ms-marco-MiniLM-L-6-v2`. [chunk-id::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 3287
+      }
+    }
+  ]
+}
