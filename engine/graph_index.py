@@ -80,6 +80,12 @@ class GraphData:
 
 @lru_cache(maxsize=1)
 def load_graph() -> GraphData:
+    if not GRAPH_PATH.exists():
+        raise FileNotFoundError(
+            f"Knowledge graph not built: {GRAPH_PATH} doesn't exist. "
+            "Run this first: python scripts/build_graph.py"
+        )
+
     raw = json.loads(GRAPH_PATH.read_text())
 
     entities = {
@@ -161,7 +167,13 @@ def expand_hops(
     edges_used = [e for e in graph.edges if e.src in visited and e.dst in visited]
 
     degree = {entity_id: len(graph.adjacency.get(entity_id, ())) for entity_id in visited}
-    ordered_entities = sorted(visited, key=lambda e: -degree.get(e, 0))
+    # Secondary sort key (entity_id, alphabetical) is required, not
+    # cosmetic: `sorted()` is stable, so without it, ties on degree (common
+    # in this graph) fall back to `visited`'s set iteration order, which
+    # CPython randomizes per-process -- making which chunks survive the
+    # max_chunks truncation nondeterministic across separate runs of the
+    # identical question against the identical graph.
+    ordered_entities = sorted(visited, key=lambda e: (-degree.get(e, 0), e))
 
     chunk_ids: list[str] = []
     seen_chunks: set[str] = set()
