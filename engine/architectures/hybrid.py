@@ -59,10 +59,10 @@ class HybridArchitecture(Architecture):
         "the answer."
     )
 
-    def run(self, question: str) -> Trace:
+    def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
-        builder = TraceBuilder(architecture=self.name, question=question)
+        builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
 
         query_vector = embed_texts([question])[0]
         n_embed = builder.node(

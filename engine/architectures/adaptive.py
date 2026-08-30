@@ -131,9 +131,9 @@ class AdaptiveArchitecture(Architecture):
         "an LLM (not a heuristic) picks which whole architecture to run."
     )
 
-    def run(self, question: str) -> Trace:
+    def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
-        builder = TraceBuilder(architecture=self.name, question=question)
+        builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
 
         t0 = time.perf_counter()
         chosen, judgement, route_result = _route(question)

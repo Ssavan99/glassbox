@@ -290,11 +290,11 @@ class AgenticArchitecture(Architecture):
         "6 reflects + 1 generate), never 9."
     )
 
-    def run(self, question: str) -> Trace:
+    def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
         graph = load_graph()
-        builder = TraceBuilder(architecture=self.name, question=question)
+        builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
 
         llm_calls = 0
         total_prompt_tokens = 0

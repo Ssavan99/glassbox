@@ -66,6 +66,16 @@ def test_adaptive_produces_valid_trace(monkeypatch):
     ids = [n.id for n in trace.nodes]
     assert ids[1:] == ["naive::n1", "naive::n2", "naive::n3"]
 
+
+def test_adaptive_accepts_explicit_trace_id(monkeypatch):
+    monkeypatch.setattr(adaptive, "complete", _route_mock("naive"))
+    monkeypatch.setattr(naive_module, "complete", _naive_generate_mock("the naive answer"))
+
+    question = _first_question()
+    trace = AdaptiveArchitecture().run(question, trace_id="adaptive::q01")
+
+    assert trace.trace_id == "adaptive::q01"
+
     assert trace.answer == "the naive answer"
 
 

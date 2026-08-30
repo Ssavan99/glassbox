@@ -120,10 +120,10 @@ class CorrectiveArchitecture(Architecture):
         "to query rewrite + re-retrieval against the local corpus (D7)."
     )
 
-    def run(self, question: str) -> Trace:
+    def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
-        builder = TraceBuilder(architecture=self.name, question=question)
+        builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
 
         llm_calls = 0
         total_prompt_tokens = 0

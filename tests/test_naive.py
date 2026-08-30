@@ -34,6 +34,15 @@ def test_naive_produces_valid_trace(monkeypatch):
     trace.validate()
 
 
+def test_naive_accepts_explicit_trace_id(monkeypatch):
+    _mock_complete(monkeypatch)
+    question = _factual_question()
+
+    trace = naive.NaiveArchitecture().run(question, trace_id="naive::q01")
+
+    assert trace.trace_id == "naive::q01"
+
+
 def test_naive_retrieves_topk(monkeypatch):
     _mock_complete(monkeypatch)
     question = _factual_question()

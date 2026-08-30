@@ -30,11 +30,11 @@ class GraphArchitecture(Architecture):
         "and a single generate call answers from that gathered context."
     )
 
-    def run(self, question: str) -> Trace:
+    def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         graph = load_graph()
         index = load_index()
-        builder = TraceBuilder(architecture=self.name, question=question)
+        builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
 
         seeds = seed_entities(question, graph)
         n_seed = builder.node(

@@ -34,10 +34,10 @@ class HyDEArchitecture(Architecture):
         "original question and the retrieved chunks."
     )
 
-    def run(self, question: str) -> Trace:
+    def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
-        builder = TraceBuilder(architecture=self.name, question=question)
+        builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
 
         hyde_prompt = build_hyde_prompt(question)
         hyde_result = complete(hyde_prompt)
