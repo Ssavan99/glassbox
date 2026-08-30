@@ -94,6 +94,65 @@ def test_extract_stops_at_last_corrective_attempt_not_earlier_discarded_ones():
     assert extract_retrieved_chunk_ids(trace) == ["right1"]
 
 
+def test_extract_excludes_chunks_graded_incorrect_by_the_final_grade_node():
+    # Regression test: corrective.py itself drops any chunk graded
+    # "incorrect" from what it actually hands to generate (see its own
+    # `filtered_chunks` logic) -- extract_retrieved_chunk_ids must mirror
+    # that instead of treating `grade` as a no-op pass-through, or it
+    # credits the architecture with "retrieving" a chunk the LLM never
+    # actually saw.
+    b = TraceBuilder(architecture="corrective", question="q")
+    n1 = b.node("embed_query", "e1", parents=[], explain="e")
+    n2 = b.node(
+        "retrieve_dense",
+        "d1",
+        parents=[n1],
+        explain="e",
+        results=_ranked(["keep1", "drop1", "keep2"]),
+        k=5,
+    )
+    n3 = b.node(
+        "grade",
+        "g1",
+        parents=[n2],
+        explain="e",
+        judgements=[
+            {"chunk_id": "keep1", "verdict": "correct", "reason": "r"},
+            {"chunk_id": "drop1", "verdict": "incorrect", "reason": "r"},
+            {"chunk_id": "keep2", "verdict": "ambiguous", "reason": "r"},
+        ],
+    )
+    b.node("generate", "gen", parents=[n3], explain="e", output="ans")
+    trace = b.build(answer="ans", metrics=_metrics())
+
+    assert extract_retrieved_chunk_ids(trace) == ["keep1", "keep2"]
+
+
+def test_extract_falls_back_to_unfiltered_when_everything_graded_incorrect():
+    # Mirrors corrective.py's own fallback: if filtering out "incorrect"
+    # chunks would leave nothing, keep the full unfiltered set rather than
+    # handing generate (and this extractor) an empty context.
+    b = TraceBuilder(architecture="corrective", question="q")
+    n1 = b.node("embed_query", "e1", parents=[], explain="e")
+    n2 = b.node(
+        "retrieve_dense", "d1", parents=[n1], explain="e", results=_ranked(["a", "b"]), k=5
+    )
+    n3 = b.node(
+        "grade",
+        "g1",
+        parents=[n2],
+        explain="e",
+        judgements=[
+            {"chunk_id": "a", "verdict": "incorrect", "reason": "r"},
+            {"chunk_id": "b", "verdict": "incorrect", "reason": "r"},
+        ],
+    )
+    b.node("generate", "gen", parents=[n3], explain="e", output="ans")
+    trace = b.build(answer="ans", metrics=_metrics())
+
+    assert extract_retrieved_chunk_ids(trace) == ["a", "b"]
+
+
 def test_extract_aggregates_across_agentic_multi_subquestion_parents():
     b = TraceBuilder(architecture="agentic", question="q")
     plan = b.node("plan", "p", parents=[], explain="e", sub_questions=["sq1", "sq2"])

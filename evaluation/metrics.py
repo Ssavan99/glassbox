@@ -36,10 +36,20 @@ def extract_retrieved_chunk_ids(trace: Trace) -> list[str]:
     are an earlier, superseded retrieval attempt -- e.g. Corrective's
     discarded first attempt, or Agentic's discarded first attempt for a
     sub-question -- and shouldn't count towards what the final answer
-    actually used). Non-retrieval nodes (`grade`, `reflect`, `route`,
-    `graph_seed`, `fuse`, `embed_query`, `plan`) are transparent and just
-    keep the walk going. `rerank`'s `after` list (not `before`) is used,
-    since `after` is what's actually handed downstream to `generate`.
+    actually used). `rerank`'s `after` list (not `before`) is used, since
+    `after` is what's actually handed downstream to `generate`.
+
+    `grade` nodes are NOT simply transparent: Corrective drops any chunk
+    graded "incorrect" from what it actually hands to `generate` (falling
+    back to the unfiltered set only if that would leave nothing -- see
+    `engine/architectures/corrective.py`'s own `filtered_chunks` logic,
+    which this mirrors exactly). Each walk branch tracks which chunk ids
+    were marked "incorrect" by any `grade` node it passes through, and
+    applies that same filter to whichever retrieval node it lands on
+    upstream, so a chunk the architecture never actually showed the LLM
+    doesn't get credited as "retrieved" here. Every other non-retrieval node
+    kind (`reflect`, `route`, `graph_seed`, `fuse`, `embed_query`, `plan`,
+    `rewrite`) is transparent and just keeps the walk going.
 
     This is schema-generic (works for all seven architectures, including
     Adaptive's spliced delegate trace) without any architecture-specific
@@ -57,38 +67,64 @@ def extract_retrieved_chunk_ids(trace: Trace) -> list[str]:
     node_by_id: dict[str, Node] = {n.id: n for n in trace.nodes}
     chunk_ids: list[str] = []
     seen: set[str] = set()
-    frontier: list[str] = list(final.parent_ids)
-    visited: set[str] = set()
 
     def _add(cid: str) -> None:
         if cid not in seen:
             seen.add(cid)
             chunk_ids.append(cid)
 
+    def _apply_grade_filter(ids: list[str], graded_incorrect: frozenset[str]) -> list[str]:
+        filtered = [cid for cid in ids if cid not in graded_incorrect]
+        return filtered if filtered else ids  # same fallback rule corrective.py uses
+
+    # Each frontier item carries the chunk ids graded "incorrect" by any
+    # `grade` node already passed through on that branch, so the filter can
+    # be applied once a retrieval node further upstream is reached.
+    frontier: list[tuple[str, frozenset[str]]] = [
+        (parent_id, frozenset()) for parent_id in final.parent_ids
+    ]
+    visited: set[tuple[str, frozenset[str]]] = set()
+
     while frontier:
-        node_id = frontier.pop(0)
-        if node_id in visited:
+        node_id, graded_incorrect = frontier.pop(0)
+        key = (node_id, graded_incorrect)
+        if key in visited:
             continue
-        visited.add(node_id)
+        visited.add(key)
         node = node_by_id.get(node_id)
         if node is None:
             continue
 
+        if node.kind == "grade":
+            judgements = node.payload.get("judgements", [])
+            newly_incorrect = {
+                j["chunk_id"]
+                for j in judgements
+                if isinstance(j, dict) and j.get("verdict") == "incorrect"
+            }
+            frontier.extend(
+                (parent_id, graded_incorrect | newly_incorrect) for parent_id in node.parent_ids
+            )
+            continue
+
         if node.kind == "rerank":
-            for r in node.payload.get("after", []):
-                _add(r["chunk_id"])
+            ids = [r["chunk_id"] for r in node.payload.get("after", [])]
+            for cid in _apply_grade_filter(ids, graded_incorrect):
+                _add(cid)
             continue  # don't walk further back past a rerank
         if node.kind in ("retrieve_dense", "retrieve_sparse"):
-            for r in node.payload.get("results", []):
-                _add(r["chunk_id"])
+            ids = [r["chunk_id"] for r in node.payload.get("results", [])]
+            for cid in _apply_grade_filter(ids, graded_incorrect):
+                _add(cid)
             continue
         if node.kind == "graph_expand":
-            for cid in node.payload.get("chunk_ids", []):
+            ids = list(node.payload.get("chunk_ids", []))
+            for cid in _apply_grade_filter(ids, graded_incorrect):
                 _add(cid)
             continue
 
         # Not a retrieval node -- keep walking backward through it.
-        frontier.extend(node.parent_ids)
+        frontier.extend((parent_id, graded_incorrect) for parent_id in node.parent_ids)
 
     return chunk_ids
 
