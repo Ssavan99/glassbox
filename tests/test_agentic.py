@@ -219,6 +219,46 @@ def test_plan_survives_malformed_or_empty_response():
         assert plan_node.payload["sub_questions"] == [question]
 
 
+def test_reflect_survives_malformed_or_non_dict_json():
+    # Mirrors test_plan_survives_malformed_or_empty_response for _reflect's
+    # own isinstance(parsed, dict) guard -- a malformed reflect response
+    # must default sufficient=False (the safe default: if we can't tell,
+    # assume insufficient and retry) rather than crashing or silently
+    # treating garbage as a "sufficient" verdict. next_action is separately
+    # defaulted based on whatever sufficient ends up being.
+    cases = [
+        # (reflect_json, expected_sufficient, expected_next_action)
+        ([], False, "retrieve_more"),
+        ("not a dict", False, "retrieve_more"),
+        ({"sufficient": "not a bool"}, False, "retrieve_more"),
+        # sufficient is a genuine bool here -- only next_action is malformed
+        # and gets defaulted based on the (valid) sufficient value.
+        ({"sufficient": True, "next_action": "not a valid action"}, True, "proceed"),
+    ]
+
+    import unittest.mock as mock
+
+    for reflect_json, expected_sufficient, expected_next_action in cases:
+
+        def _fake_complete(prompt, json_schema=None, rj=reflect_json, **params):
+            if json_schema is not None and _is_plan_prompt(prompt):
+                return _plan_response([GRAPH_SUBQ])
+            if json_schema is not None and _is_reflect_prompt(prompt):
+                return {"text": "", "json": rj, "prompt_tokens": 5, "completion_tokens": 1}
+            return _generate_response()
+
+        with mock.patch.object(agentic, "complete", _fake_complete):
+            trace = agentic.AgenticArchitecture().run("some question")
+
+        trace.validate()
+        reflect_nodes = [n for n in trace.nodes if n.kind == "reflect"]
+        assert reflect_nodes[0].payload["sufficient"] is expected_sufficient
+        assert reflect_nodes[0].payload["next_action"] == expected_next_action
+        # An insufficient judgement (malformed or not) triggers the retry
+        # attempt (capped at 2, never crashing); a sufficient one stops at 1.
+        assert len(reflect_nodes) == (1 if expected_sufficient else 2)
+
+
 def test_duration_ms_is_populated():
     mock_fn, calls = _make_mock([GRAPH_SUBQ], reflect_sequence=[True])
 

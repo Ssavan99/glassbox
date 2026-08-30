@@ -123,7 +123,23 @@ def _choose_tool(sub_question: str, graph) -> tuple[str, str]:
 
 
 def _retry_tool(first_tool: str) -> str:
-    return "sparse" if first_tool == "dense" else "dense"
+    """Deterministically pick a genuinely different tool for the retry.
+
+    graph is never a valid retry choice regardless of first_tool: _choose_tool
+    already tries graph first, ahead of every other rule, so if attempt 1
+    wasn't graph it's because seed_entities() found zero matching entities --
+    retrying with graph would deterministically find zero again. dense and
+    sparse retry into each other (each is the other's clearest contrast);
+    graph retries into sparse rather than dense, since if graph's relational
+    context wasn't enough, exact keyword matching is a more genuinely
+    different signal to try than falling back to the same dense-similarity
+    default every time.
+    """
+    if first_tool == "dense":
+        return "sparse"
+    if first_tool == "sparse":
+        return "dense"
+    return "sparse"  # first_tool == "graph"
 
 
 def _retrieve_dense(sub_question: str, index, route_node: str, builder: TraceBuilder):
