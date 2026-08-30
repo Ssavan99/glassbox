@@ -11,6 +11,7 @@ Loads corpus/notes -> chunks the notes -> embeds every chunk -> writes:
 from __future__ import annotations
 
 import json
+import os
 import sys
 from collections import Counter
 from pathlib import Path
@@ -27,19 +28,33 @@ from engine.embedding import embed_texts
 from engine.store import tokenize
 
 
-def _write_bm25_artifact(chunk_ids: list[str], texts: list[str], path) -> None:
+def _bm25_payload(chunk_ids: list[str], texts: list[str]) -> dict:
     tokenized = [tokenize(t) for t in texts]
     doc_freqs: Counter[str] = Counter()
     for tokens in tokenized:
         doc_freqs.update(set(tokens))
 
-    payload = {
+    return {
         "chunk_ids": chunk_ids,
         "tokenized_texts": tokenized,
         "doc_freqs": dict(doc_freqs),
         "n_docs": len(tokenized),
     }
-    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _atomic_write_bytes(path: Path, data: bytes) -> None:
+    """Write via a temp file + os.replace() so a crash mid-write can never
+    leave `path` truncated/partial -- the rename is the only visible state
+    change, and it's atomic on the same filesystem."""
+    tmp_path = path.with_name(path.name + ".tmp")
+    tmp_path.write_bytes(data)
+    os.replace(tmp_path, path)
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    tmp_path = path.with_name(path.name + ".tmp")
+    tmp_path.write_text(text, encoding="utf-8")
+    os.replace(tmp_path, path)
 
 
 def main() -> None:
@@ -60,17 +75,21 @@ def main() -> None:
         }
         for c in chunks
     ]
-    CHUNKS_PATH.write_text(json.dumps(chunks_payload), encoding="utf-8")
 
     vectors = embed_texts(texts) if texts else None
-    if vectors is not None:
-        VECTORS_PATH.write_bytes(vectors.tobytes())
-        vector_bytes = vectors.nbytes
-    else:
-        VECTORS_PATH.write_bytes(b"")
-        vector_bytes = 0
+    vector_bytes_data = vectors.tobytes() if vectors is not None else b""
+    vector_bytes = vectors.nbytes if vectors is not None else 0
 
-    _write_bm25_artifact(chunk_ids, texts, BM25_PATH)
+    bm25_payload = _bm25_payload(chunk_ids, texts)
+
+    # Everything above is computed in memory first; only once all three
+    # artifacts are ready do we start writing, and each write is atomic
+    # (temp file + rename) -- an interrupted build can leave the artifacts
+    # at their old, mutually-consistent state, or the new one, never a
+    # partial mix of the two.
+    _atomic_write_text(CHUNKS_PATH, json.dumps(chunks_payload))
+    _atomic_write_bytes(VECTORS_PATH, vector_bytes_data)
+    _atomic_write_text(BM25_PATH, json.dumps(bm25_payload))
 
     print(f"notes: {len(notes)}")
     print(f"chunks: {len(chunks)}")
