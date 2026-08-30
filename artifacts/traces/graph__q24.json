@@ -2,12 +2,12 @@
   "trace_id": "graph::q24",
   "architecture": "graph",
   "question": "What HTTP client library and version does this RAG engine use to call the embedding API?",
-  "answer": "The provided context does not contain any information about the specific HTTP client library or version used by the RAG engine to call the embedding API. [chunk-id::0]",
+  "answer": "The context provided does not contain information about which HTTP client library and version the RAG engine uses to call the embedding API. Therefore, I cannot provide an answer citing specific chunk ids.",
   "metrics": {
-    "latency_ms": 0.40050000097835436,
+    "latency_ms": 1752.3321669941652,
     "llm_calls": 1,
-    "prompt_tokens": 114,
-    "completion_tokens": 35
+    "prompt_tokens": 154,
+    "completion_tokens": 38
   },
   "nodes": [
     {
@@ -46,9 +46,9 @@
       "duration_ms": 0.0,
       "explain": "The chunks gathered from graph expansion, plus the community summaries for any communities the touched entities belong to, are stuffed into a single prompt and handed to the LLM in one shot \u2014 the only LLM call this architecture makes online, since seeding and expansion are both pure graph traversal.",
       "payload": {
-        "output": "The provided context does not contain any information about the specific HTTP client library or version used by the RAG engine to call the embedding API. [chunk-id::0]",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 149
+        "output": "The context provided does not contain information about which HTTP client library and version the RAG engine uses to call the embedding API. Therefore, I cannot provide an answer citing specific chunk ids.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 192
       }
     }
   ]

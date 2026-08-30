@@ -2,12 +2,12 @@
   "trace_id": "hyde::q04",
   "architecture": "hyde",
   "question": "What is a silent failure, and why is it considered the most expensive category of failure?",
-  "answer": "A silent failure is defined as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer\" [chunk-id::0].\n\nIt is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" This means that silent failures can go undetected until they are specifically challenged or verified, making them costly due to their potentially widespread and unchallenged acceptance [chunk-id::0].",
+  "answer": "A silent failure is described as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer.\" It is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" This makes silent failures hard to detect and more costly compared to visible refusals. Citing the chunk id: [silent-failures-and-the-value-of-refusal::0]",
   "metrics": {
-    "latency_ms": 23.923583998112008,
+    "latency_ms": 9721.627375001844,
     "llm_calls": 2,
-    "prompt_tokens": 1361,
-    "completion_tokens": 225
+    "prompt_tokens": 1401,
+    "completion_tokens": 218
   },
   "nodes": [
     {
@@ -59,7 +59,7 @@
         "results": [
           {
             "chunk_id": "silent-failures-and-the-value-of-refusal::0",
-            "score": 0.7227694988250732,
+            "score": 0.7227694392204285,
             "rank": 1
           },
           {
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "A silent failure is defined as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer\" [chunk-id::0].\n\nIt is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" This means that silent failures can go undetected until they are specifically challenged or verified, making them costly due to their potentially widespread and unchallenged acceptance [chunk-id::0].",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1387
+        "output": "A silent failure is described as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer.\" It is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" This makes silent failures hard to detect and more costly compared to visible refusals. Citing the chunk id: [silent-failures-and-the-value-of-refusal::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1420
       }
     }
   ]

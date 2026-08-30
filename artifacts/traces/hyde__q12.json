@@ -2,12 +2,12 @@
   "trace_id": "hyde::q12",
   "architecture": "hyde",
   "question": "Cross-encoder reranking is described as more accurate than bi-encoder cosine similarity because it lets query and document attend to each other directly \u2014 what does that accuracy improvement actually cost a pipeline in milliseconds when reranking a typical shortlist?",
-  "answer": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup used for initial retrieval. Specifically, reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on [chunk-id::latency-budgets-in-a-rag-pipeline::1].",
+  "answer": "Cross-encoder reranking adds real, measurable latency compared to the near-instant cosine similarity lookup. Reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on. This cost is covered in the note on latency budgets [latency-budgets-in-a-rag-pipeline::1].",
   "metrics": {
-    "latency_ms": 23.41383400198538,
+    "latency_ms": 8567.373374993622,
     "llm_calls": 2,
-    "prompt_tokens": 1515,
-    "completion_tokens": 391
+    "prompt_tokens": 1555,
+    "completion_tokens": 392
   },
   "nodes": [
     {
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup used for initial retrieval. Specifically, reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on [chunk-id::latency-budgets-in-a-rag-pipeline::1].",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1424
+        "output": "Cross-encoder reranking adds real, measurable latency compared to the near-instant cosine similarity lookup. Reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on. This cost is covered in the note on latency budgets [latency-budgets-in-a-rag-pipeline::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1465
       }
     }
   ]

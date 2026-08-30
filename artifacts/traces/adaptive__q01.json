@@ -2,12 +2,12 @@
   "trace_id": "adaptive::q01",
   "architecture": "adaptive",
   "question": "What does LoRA freeze, and roughly what fraction of a model's parameters does it actually train?",
-  "answer": "LoRA freezes the original model's weights entirely [chunk-id::0]. It actually trains only small added matrices, often well under 1% of the base model's parameters, depending on the chosen rank [chunk-id::0].",
+  "answer": "LoRA leaves the entire pretrained model **frozen** \u2013 none of the original weight matrices are updated.\u202fInstead, it only learns the small, low\u2011rank adapter matrices that are injected alongside each frozen weight matrix.\u202fBecause those adapters are tiny, LoRA trains only a **very small fraction of the total parameters \u2013 typically well under\u202f1\u202f% of the base model\u2019s parameters**\u3010lora-and-parameter-efficient-fine-tuning::0\u3011\u3010lora-and-parameter-efficient-fine-tuning::1\u3011.",
   "metrics": {
-    "latency_ms": 2.105334002408199,
+    "latency_ms": 1082.8055419988232,
     "llm_calls": 7,
-    "prompt_tokens": 8312,
-    "completion_tokens": 498
+    "prompt_tokens": 8394,
+    "completion_tokens": 730
   },
   "nodes": [
     {
@@ -15,7 +15,7 @@
       "kind": "route",
       "label": "Route question to agentic",
       "parent_ids": [],
-      "duration_ms": 0.1312909989792388,
+      "duration_ms": 0.6365420049405657,
       "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
       "payload": {
         "chosen": "agentic",
@@ -37,7 +37,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.05483299901243299,
+      "duration_ms": 0.19508300465531647,
       "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
       "payload": {
         "sub_questions": [
@@ -53,7 +53,7 @@
       "parent_ids": [
         "agentic::n1"
       ],
-      "duration_ms": 0.15854199955356307,
+      "duration_ms": 0.8888340016710572,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -68,7 +68,7 @@
       "parent_ids": [
         "agentic::n2"
       ],
-      "duration_ms": 0.14274999921326526,
+      "duration_ms": 0.106791005237028,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -83,7 +83,7 @@
       "parent_ids": [
         "agentic::n3"
       ],
-      "duration_ms": 0.046749999455641955,
+      "duration_ms": 0.036833000194747,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -720,7 +720,7 @@
       "parent_ids": [
         "agentic::n4"
       ],
-      "duration_ms": 0.12324999988777563,
+      "duration_ms": 0.4466250029508956,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -735,7 +735,7 @@
       "parent_ids": [
         "agentic::n5"
       ],
-      "duration_ms": 0.0010000003385357559,
+      "duration_ms": 0.0012919990695081651,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -750,7 +750,7 @@
       "parent_ids": [
         "agentic::n6"
       ],
-      "duration_ms": 0.2683749989955686,
+      "duration_ms": 0.7027920000837184,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -790,7 +790,7 @@
       "parent_ids": [
         "agentic::n7"
       ],
-      "duration_ms": 0.07716600157436915,
+      "duration_ms": 0.4306659975554794,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": true,
@@ -805,7 +805,7 @@
       "parent_ids": [
         "agentic::n1"
       ],
-      "duration_ms": 0.17074999777833,
+      "duration_ms": 0.12166599481133744,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -820,7 +820,7 @@
       "parent_ids": [
         "agentic::n9"
       ],
-      "duration_ms": 0.16170799790415913,
+      "duration_ms": 0.11387500126147643,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -835,7 +835,7 @@
       "parent_ids": [
         "agentic::n10"
       ],
-      "duration_ms": 0.03370800186530687,
+      "duration_ms": 0.02658400626387447,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -1472,7 +1472,7 @@
       "parent_ids": [
         "agentic::n11"
       ],
-      "duration_ms": 0.11512499986565672,
+      "duration_ms": 0.5842919999849983,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1487,7 +1487,7 @@
       "parent_ids": [
         "agentic::n12"
       ],
-      "duration_ms": 0.000790998456068337,
+      "duration_ms": 0.001291002263315022,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -1502,7 +1502,7 @@
       "parent_ids": [
         "agentic::n13"
       ],
-      "duration_ms": 0.3282079997006804,
+      "duration_ms": 0.2754579982138239,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -1542,7 +1542,7 @@
       "parent_ids": [
         "agentic::n14"
       ],
-      "duration_ms": 0.0820419991214294,
+      "duration_ms": 0.3699160006362945,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1558,12 +1558,12 @@
         "agentic::n8",
         "agentic::n15"
       ],
-      "duration_ms": 0.10425000073155388,
+      "duration_ms": 1071.8878749976284,
       "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
       "payload": {
-        "output": "LoRA freezes the original model's weights entirely [chunk-id::0]. It actually trains only small added matrices, often well under 1% of the base model's parameters, depending on the chosen rank [chunk-id::0].",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 2362
+        "output": "LoRA leaves the entire pretrained model **frozen** \u2013 none of the original weight matrices are updated.\u202fInstead, it only learns the small, low\u2011rank adapter matrices that are injected alongside each frozen weight matrix.\u202fBecause those adapters are tiny, LoRA trains only a **very small fraction of the total parameters \u2013 typically well under\u202f1\u202f% of the base model\u2019s parameters**\u3010lora-and-parameter-efficient-fine-tuning::0\u3011\u3010lora-and-parameter-efficient-fine-tuning::1\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 2676
       }
     }
   ]

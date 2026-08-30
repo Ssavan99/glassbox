@@ -2,12 +2,12 @@
   "trace_id": "hyde::q15",
   "architecture": "hyde",
   "question": "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost \u2014 given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?",
-  "answer": "The answer lies in the need for efficient per-request KV cache management, which is directly coupled with the benefits of continuous batching. Continuous batching keeps the GPU busy by immediately backfilling freed-up slots, but this requires tracking and managing unique cache states for each request independently as they join and leave the batch [chunk-id::1]. Without proper management, the system would lose most of the latency benefit it aims to provide due to frequent recomputation or reshuffling of cache state on every batch change.\n\nTherefore, continuous batching and KV cache management are not fully independent concerns but are usually discussed and implemented together in a serving stack. Simply treating continuous batching as an independent scheduling optimization without considering the unique KV cache states for each request would defeat its purpose by reintroducing unnecessary latency [chunk-id::1].",
+  "answer": "The KV cache management is intrinsically linked to the effectiveness of continuous batching due to the need for per-request tracking and freeing of cache states. If a scheduler had to reshuffle or recompute cache state on every batch change, it would negate much of the latency benefit continuous batching aims to provide. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own independent cache state as requests join and leave the batch. Therefore, treating continuous batching as an independent scheduling optimization without considering how the cache is managed would undermine its benefits.\n\nCiting chunk ids: [kv-cache-and-why-it-matters-for-serving::1] [continuous-batching-and-throughput::1]",
   "metrics": {
-    "latency_ms": 24.166667000827147,
+    "latency_ms": 8466.817749998881,
     "llm_calls": 2,
-    "prompt_tokens": 1490,
-    "completion_tokens": 402
+    "prompt_tokens": 1530,
+    "completion_tokens": 386
   },
   "nodes": [
     {
@@ -64,7 +64,7 @@
           },
           {
             "chunk_id": "continuous-batching-and-throughput::1",
-            "score": 0.6469377875328064,
+            "score": 0.6469377279281616,
             "rank": 2
           },
           {
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "The answer lies in the need for efficient per-request KV cache management, which is directly coupled with the benefits of continuous batching. Continuous batching keeps the GPU busy by immediately backfilling freed-up slots, but this requires tracking and managing unique cache states for each request independently as they join and leave the batch [chunk-id::1]. Without proper management, the system would lose most of the latency benefit it aims to provide due to frequent recomputation or reshuffling of cache state on every batch change.\n\nTherefore, continuous batching and KV cache management are not fully independent concerns but are usually discussed and implemented together in a serving stack. Simply treating continuous batching as an independent scheduling optimization without considering the unique KV cache states for each request would defeat its purpose by reintroducing unnecessary latency [chunk-id::1].",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1466
+        "output": "The KV cache management is intrinsically linked to the effectiveness of continuous batching due to the need for per-request tracking and freeing of cache states. If a scheduler had to reshuffle or recompute cache state on every batch change, it would negate much of the latency benefit continuous batching aims to provide. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own independent cache state as requests join and leave the batch. Therefore, treating continuous batching as an independent scheduling optimization without considering how the cache is managed would undermine its benefits.\n\nCiting chunk ids: [kv-cache-and-why-it-matters-for-serving::1] [continuous-batching-and-throughput::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1490
       }
     }
   ]

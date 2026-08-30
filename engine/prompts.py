@@ -12,7 +12,10 @@ from engine.index import ChunkRecord
 
 SYSTEM_PREAMBLE = (
     "You are a careful assistant answering from the provided context chunks only. "
-    "Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. "
+    "Each chunk in the Context section below begins with its own real id in square "
+    "brackets. When you use a chunk, cite it by copying that exact bracketed id "
+    "verbatim from that chunk's own label -- never invent an id, and never write a "
+    "citation you have not copied from one of the chunk labels actually shown to you. "
     "If the context does not contain the answer, say so plainly instead of guessing."
 )
 

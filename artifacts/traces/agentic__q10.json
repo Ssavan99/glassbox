@@ -2,12 +2,12 @@
   "trace_id": "agentic::q10",
   "architecture": "agentic",
   "question": "Why does a golden dataset need to stay fixed rather than being regenerated each time a system is evaluated?",
-  "answer": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions. [chunk-id::0] Additionally, treating this as an actual template with named, testable slots makes prompt changes reviewable and their effects measurable against a golden dataset. Keeping the dataset fixed allows for consistent evaluation across different system configurations and changes. [chunk-id::1]",
+  "answer": "A golden dataset must remain *fixed* so that it can serve as a stable yardstick for measuring changes in the system.\u202fIf the test set changes each time you run an evaluation, you can no longer tell whether a difference in score reflects a genuine improvement (or regression) in the retrieval\u2011augmented pipeline or simply the fact that the new questions are easier or harder.\u202fKeeping the questions, answers, and evidence constant lets you attribute any score shift to the component you altered (e.g., chunking, embedding model, prompt template) rather than to a moving target.\u202fBecause the dataset is frozen, you can version it, add new entries deliberately, and keep older entries unchanged so historical comparisons stay meaningful.\u202fThis stability is essential for reproducible evaluation and for turning aggregate numbers into actionable debugging signals.\u202f[building-a-golden-dataset-for-rag-evaluation::0]\u202f[building-a-golden-dataset-for-rag-evaluation::1]\u202f[ai-evaluation-for-personal-knowledge-bases::0]",
   "metrics": {
-    "latency_ms": 4.074625001521781,
+    "latency_ms": 24850.458959001116,
     "llm_calls": 8,
-    "prompt_tokens": 10935,
-    "completion_tokens": 792
+    "prompt_tokens": 11004,
+    "completion_tokens": 1167
   },
   "nodes": [
     {
@@ -15,7 +15,7 @@
       "kind": "plan",
       "label": "Plan (3 sub-question(s))",
       "parent_ids": [],
-      "duration_ms": 0.1821669975470286,
+      "duration_ms": 0.5134999955771491,
       "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
       "payload": {
         "sub_questions": [
@@ -32,7 +32,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.14474999989033677,
+      "duration_ms": 0.2991250003105961,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -47,7 +47,7 @@
       "parent_ids": [
         "n2"
       ],
-      "duration_ms": 0.13829199815518223,
+      "duration_ms": 0.24470800417475402,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -62,7 +62,7 @@
       "parent_ids": [
         "n3"
       ],
-      "duration_ms": 0.05062499985797331,
+      "duration_ms": 0.09441699512535706,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -839,7 +839,7 @@
       "parent_ids": [
         "n4"
       ],
-      "duration_ms": 0.1695829996606335,
+      "duration_ms": 0.4999170050723478,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -854,7 +854,7 @@
       "parent_ids": [
         "n5"
       ],
-      "duration_ms": 0.0012499986041802913,
+      "duration_ms": 0.0020000006770715117,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -869,7 +869,7 @@
       "parent_ids": [
         "n6"
       ],
-      "duration_ms": 0.2810420010064263,
+      "duration_ms": 0.7035000016912818,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -909,7 +909,7 @@
       "parent_ids": [
         "n7"
       ],
-      "duration_ms": 0.1920830000017304,
+      "duration_ms": 0.48566600162303075,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": true,
@@ -924,7 +924,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.17537500025355257,
+      "duration_ms": 0.3345000004628673,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -939,7 +939,7 @@
       "parent_ids": [
         "n9"
       ],
-      "duration_ms": 0.16883400166989304,
+      "duration_ms": 0.3161249987897463,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -954,7 +954,7 @@
       "parent_ids": [
         "n10"
       ],
-      "duration_ms": 0.0380000019504223,
+      "duration_ms": 0.08333300502272323,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -1731,7 +1731,7 @@
       "parent_ids": [
         "n11"
       ],
-      "duration_ms": 0.32079199809231795,
+      "duration_ms": 0.5992500009597279,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1746,7 +1746,7 @@
       "parent_ids": [
         "n12"
       ],
-      "duration_ms": 0.00112499765236862,
+      "duration_ms": 0.0020419975044205785,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -1761,7 +1761,7 @@
       "parent_ids": [
         "n13"
       ],
-      "duration_ms": 0.38587500239373185,
+      "duration_ms": 0.8156670010066591,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -1801,7 +1801,7 @@
       "parent_ids": [
         "n14"
       ],
-      "duration_ms": 0.22112499937065877,
+      "duration_ms": 0.3978750028181821,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1816,7 +1816,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.18149999959859997,
+      "duration_ms": 0.3328340026200749,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -1831,7 +1831,7 @@
       "parent_ids": [
         "n16"
       ],
-      "duration_ms": 0.17091699919546954,
+      "duration_ms": 0.3010000000358559,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -1846,7 +1846,7 @@
       "parent_ids": [
         "n17"
       ],
-      "duration_ms": 0.047916000767145306,
+      "duration_ms": 0.07720899884589016,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -2623,7 +2623,7 @@
       "parent_ids": [
         "n18"
       ],
-      "duration_ms": 0.16200000027311035,
+      "duration_ms": 0.5693749990314245,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -2638,7 +2638,7 @@
       "parent_ids": [
         "n19"
       ],
-      "duration_ms": 0.0010000003385357559,
+      "duration_ms": 0.0017909987946040928,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -2653,7 +2653,7 @@
       "parent_ids": [
         "n20"
       ],
-      "duration_ms": 0.33879200054798275,
+      "duration_ms": 0.6753750058123842,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -2693,7 +2693,7 @@
       "parent_ids": [
         "n21"
       ],
-      "duration_ms": 0.23433300157194026,
+      "duration_ms": 0.9417080000275746,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": true,
@@ -2710,12 +2710,12 @@
         "n15",
         "n22"
       ],
-      "duration_ms": 0.34058299934258685,
+      "duration_ms": 24841.92029100086,
       "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
       "payload": {
-        "output": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions. [chunk-id::0] Additionally, treating this as an actual template with named, testable slots makes prompt changes reviewable and their effects measurable against a golden dataset. Keeping the dataset fixed allows for consistent evaluation across different system configurations and changes. [chunk-id::1]",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 2921
+        "output": "A golden dataset must remain *fixed* so that it can serve as a stable yardstick for measuring changes in the system.\u202fIf the test set changes each time you run an evaluation, you can no longer tell whether a difference in score reflects a genuine improvement (or regression) in the retrieval\u2011augmented pipeline or simply the fact that the new questions are easier or harder.\u202fKeeping the questions, answers, and evidence constant lets you attribute any score shift to the component you altered (e.g., chunking, embedding model, prompt template) rather than to a moving target.\u202fBecause the dataset is frozen, you can version it, add new entries deliberately, and keep older entries unchanged so historical comparisons stay meaningful.\u202fThis stability is essential for reproducible evaluation and for turning aggregate numbers into actionable debugging signals.\u202f[building-a-golden-dataset-for-rag-evaluation::0]\u202f[building-a-golden-dataset-for-rag-evaluation::1]\u202f[ai-evaluation-for-personal-knowledge-bases::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 3365
       }
     }
   ]

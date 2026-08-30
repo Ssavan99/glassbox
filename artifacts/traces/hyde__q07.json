@@ -2,12 +2,12 @@
   "trace_id": "hyde::q07",
   "architecture": "hyde",
   "question": "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?",
-  "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that the model could memorize and later reproduce verbatim unredacted personal data when prompted, even for a user who has no legitimate reason to see that information. This risk is due to PII becoming diffused into the model's weights themselves during training, making it much harder to audit or remove once present [chunk-id::0].",
+  "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"unredacted PII in training data becomes diffused into the model's weights themselves, which is much harder to audit, impossible to selectively delete without retraining, and can resurface unpredictably in response to queries that were never about the original sensitive document at all \u2014 a well-documented failure mode where a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
   "metrics": {
-    "latency_ms": 5.183125002076849,
+    "latency_ms": 7825.027083999885,
     "llm_calls": 2,
-    "prompt_tokens": 1633,
-    "completion_tokens": 318
+    "prompt_tokens": 1673,
+    "completion_tokens": 347
   },
   "nodes": [
     {
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that the model could memorize and later reproduce verbatim unredacted personal data when prompted, even for a user who has no legitimate reason to see that information. This risk is due to PII becoming diffused into the model's weights themselves during training, making it much harder to audit or remove once present [chunk-id::0].",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1562
+        "output": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"unredacted PII in training data becomes diffused into the model's weights themselves, which is much harder to audit, impossible to selectively delete without retraining, and can resurface unpredictably in response to queries that were never about the original sensitive document at all \u2014 a well-documented failure mode where a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1631
       }
     }
   ]

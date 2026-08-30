@@ -2,12 +2,12 @@
   "trace_id": "agentic::q26",
   "architecture": "agentic",
   "question": "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?",
-  "answer": "The context provided does not contain a specific measurement of the engine's recall@10 score on its own golden dataset. Therefore, I cannot provide an answer to this question based solely on the given information. [chunk-id::0][chunk-id::1]",
+  "answer": "The provided context does not include any information about the engine\u2019s measured recall\u202f@\u202f10 score on its own golden dataset.",
   "metrics": {
-    "latency_ms": 1.6346249976777472,
+    "latency_ms": 14370.0581660014,
     "llm_calls": 4,
-    "prompt_tokens": 4152,
-    "completion_tokens": 183
+    "prompt_tokens": 4227,
+    "completion_tokens": 381
   },
   "nodes": [
     {
@@ -15,7 +15,7 @@
       "kind": "plan",
       "label": "Plan (1 sub-question(s))",
       "parent_ids": [],
-      "duration_ms": 0.11995800014119595,
+      "duration_ms": 0.542042005690746,
       "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
       "payload": {
         "sub_questions": [
@@ -30,7 +30,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.16487500033690594,
+      "duration_ms": 0.3279169977759011,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -45,7 +45,7 @@
       "parent_ids": [
         "n2"
       ],
-      "duration_ms": 0.16104200039990246,
+      "duration_ms": 0.2733330038608983,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -60,7 +60,7 @@
       "parent_ids": [
         "n3"
       ],
-      "duration_ms": 0.04904200250166468,
+      "duration_ms": 0.09137499728240073,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -837,7 +837,7 @@
       "parent_ids": [
         "n4"
       ],
-      "duration_ms": 0.30945799881010316,
+      "duration_ms": 0.4975419942638837,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -852,7 +852,7 @@
       "parent_ids": [
         "n5"
       ],
-      "duration_ms": 0.0008750030247028917,
+      "duration_ms": 0.001667001924943179,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -867,7 +867,7 @@
       "parent_ids": [
         "n6"
       ],
-      "duration_ms": 0.3520419995766133,
+      "duration_ms": 0.8358749983017333,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -907,7 +907,7 @@
       "parent_ids": [
         "n7"
       ],
-      "duration_ms": 0.22049999824957922,
+      "duration_ms": 0.44954199984204024,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -922,12 +922,12 @@
       "parent_ids": [
         "n8"
       ],
-      "duration_ms": 0.22112499937065877,
+      "duration_ms": 14366.9466249994,
       "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
       "payload": {
-        "output": "The context provided does not contain a specific measurement of the engine's recall@10 score on its own golden dataset. Therefore, I cannot provide an answer to this question based solely on the given information. [chunk-id::0][chunk-id::1]",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1424
+        "output": "The provided context does not include any information about the engine\u2019s measured recall\u202f@\u202f10 score on its own golden dataset.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1697
       }
     }
   ]

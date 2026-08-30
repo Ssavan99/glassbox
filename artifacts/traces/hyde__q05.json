@@ -2,12 +2,12 @@
   "trace_id": "hyde::q05",
   "architecture": "hyde",
   "question": "What are the two distinct causes of hallucination described in this corpus, and how do they differ?",
-  "answer": "The two distinct causes of hallucination described in this corpus are:\n\n1. Hallucination from missing context [chunk-id::0, chunk-id::1]\n2. Hallucination from prompt injection [chunk-id::0, chunk-id::1]\n\nThese differ fundamentally in the following ways:\n\n- **Missing-context hallucination** occurs when retrieval fails to surface the necessary evidence needed to answer a question. The model then defaults to making ungrounded claims rather than admitting it lacks sufficient information.\n  \n- **Prompt injection hallucination** arises from retrieved content containing text specifically crafted to hijack the model's instructions, causing it to state false claims confidently or ignore its own grounding constraints. This can happen even when retrieval works perfectly and the corpus is complete.\n\nEach type of failure has a different fix and requires distinct approaches for improvement.",
+  "answer": "The two distinct causes of hallucination described in this corpus are:\n\n1. **Hallucination from missing context** - This occurs when retrieval fails to surface necessary evidence for answering a question. The model then fills the gap with ungrounded claims instead of admitting it lacks sufficient information. It can happen due to relevant notes not existing, being split across chunks, or simply not being retrieved because of phrasing differences in queries compared to document content.\n\n2. **Hallucination from prompt injection** - This happens when retrieved content contains text specifically crafted to hijack the model's instructions, leading it to state false claims confidently or ignore its own grounding constraints entirely, even if retrieval worked perfectly. The key difference is that in this case, the hallucination can occur despite the corpus being complete and retrieval working as designed, due to adversarial instructions embedded within the retrieved content.\n\nThese two failure modes require different fixes: missing-context hallucination needs improving retrieval coverage and enforcing refusal in the prompt template; while prompt injection-driven hallucination requires treating retrieved content as strictly untrusted data and explicitly instructing the model to never re-interpret it as an instruction.",
   "metrics": {
-    "latency_ms": 23.66450000045006,
+    "latency_ms": 13889.24179100286,
     "llm_calls": 2,
-    "prompt_tokens": 1507,
-    "completion_tokens": 236
+    "prompt_tokens": 1547,
+    "completion_tokens": 299
   },
   "nodes": [
     {
@@ -69,7 +69,7 @@
           },
           {
             "chunk_id": "hallucination-from-prompt-injection::0",
-            "score": 0.3227364420890808,
+            "score": 0.3227364122867584,
             "rank": 3
           },
           {
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "The two distinct causes of hallucination described in this corpus are:\n\n1. Hallucination from missing context [chunk-id::0, chunk-id::1]\n2. Hallucination from prompt injection [chunk-id::0, chunk-id::1]\n\nThese differ fundamentally in the following ways:\n\n- **Missing-context hallucination** occurs when retrieval fails to surface the necessary evidence needed to answer a question. The model then defaults to making ungrounded claims rather than admitting it lacks sufficient information.\n  \n- **Prompt injection hallucination** arises from retrieved content containing text specifically crafted to hijack the model's instructions, causing it to state false claims confidently or ignore its own grounding constraints. This can happen even when retrieval works perfectly and the corpus is complete.\n\nEach type of failure has a different fix and requires distinct approaches for improvement.",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1557
+        "output": "The two distinct causes of hallucination described in this corpus are:\n\n1. **Hallucination from missing context** - This occurs when retrieval fails to surface necessary evidence for answering a question. The model then fills the gap with ungrounded claims instead of admitting it lacks sufficient information. It can happen due to relevant notes not existing, being split across chunks, or simply not being retrieved because of phrasing differences in queries compared to document content.\n\n2. **Hallucination from prompt injection** - This happens when retrieved content contains text specifically crafted to hijack the model's instructions, leading it to state false claims confidently or ignore its own grounding constraints entirely, even if retrieval worked perfectly. The key difference is that in this case, the hallucination can occur despite the corpus being complete and retrieval working as designed, due to adversarial instructions embedded within the retrieved content.\n\nThese two failure modes require different fixes: missing-context hallucination needs improving retrieval coverage and enforcing refusal in the prompt template; while prompt injection-driven hallucination requires treating retrieved content as strictly untrusted data and explicitly instructing the model to never re-interpret it as an instruction.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1660
       }
     }
   ]

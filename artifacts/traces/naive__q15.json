@@ -2,12 +2,12 @@
   "trace_id": "naive::q15",
   "architecture": "naive",
   "question": "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost \u2014 given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?",
-  "answer": "The answer lies in the interdependence between continuous batching and key-value (KV) cache management. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave [chunk-id::1]. If a scheduler had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit intended by continuous batching. Therefore, these strategies are usually discussed and implemented together rather than as fully independent concerns.\n\n[chunk-id::1]",
+  "answer": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
   "metrics": {
-    "latency_ms": 22.572290999960387,
+    "latency_ms": 48.85216700495221,
     "llm_calls": 1,
-    "prompt_tokens": 1353,
-    "completion_tokens": 110
+    "prompt_tokens": 1393,
+    "completion_tokens": 99
   },
   "nodes": [
     {
@@ -54,7 +54,7 @@
           },
           {
             "chunk_id": "continuous-batching-and-throughput::0",
-            "score": 0.5515794157981873,
+            "score": 0.5515793561935425,
             "rank": 3
           },
           {
@@ -81,9 +81,9 @@
       "duration_ms": 0.0,
       "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
       "payload": {
-        "output": "The answer lies in the interdependence between continuous batching and key-value (KV) cache management. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave [chunk-id::1]. If a scheduler had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit intended by continuous batching. Therefore, these strategies are usually discussed and implemented together rather than as fully independent concerns.\n\n[chunk-id::1]",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1463
+        "output": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1492
       }
     }
   ]

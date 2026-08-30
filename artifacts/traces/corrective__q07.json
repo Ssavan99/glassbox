@@ -2,12 +2,12 @@
   "trace_id": "corrective::q07",
   "architecture": "corrective",
   "question": "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?",
-  "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that the model could memorize and later reproduce unredacted personal data verbatim when prompted. This risk is particularly concerning because the PII becomes diffused into the model's weights, making it much harder to audit or selectively delete without retraining [chunk-id::0].",
+  "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
   "metrics": {
-    "latency_ms": 36.54691599876969,
+    "latency_ms": 5773.128166998504,
     "llm_calls": 6,
-    "prompt_tokens": 5932,
-    "completion_tokens": 950
+    "prompt_tokens": 5972,
+    "completion_tokens": 931
   },
   "nodes": [
     {
@@ -49,7 +49,7 @@
           },
           {
             "chunk_id": "pii-redaction-in-training-data::1",
-            "score": 0.6325225234031677,
+            "score": 0.632522463798523,
             "rank": 2
           },
           {
@@ -171,7 +171,7 @@
           },
           {
             "chunk_id": "hallucination-from-prompt-injection::1",
-            "score": 0.3246802091598511,
+            "score": 0.32468023896217346,
             "rank": 3
           },
           {
@@ -283,12 +283,12 @@
           },
           {
             "chunk_id": "pii-redaction-in-training-data::1",
-            "score": 0.4755389392375946,
+            "score": 0.475538969039917,
             "rank": 2
           },
           {
             "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
-            "score": 0.3432350158691406,
+            "score": 0.34323498606681824,
             "rank": 3
           },
           {
@@ -354,9 +354,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
       "payload": {
-        "output": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that the model could memorize and later reproduce unredacted personal data verbatim when prompted. This risk is particularly concerning because the PII becomes diffused into the model's weights, making it much harder to audit or selectively delete without retraining [chunk-id::0].",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 980
+        "output": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1001
       }
     }
   ]

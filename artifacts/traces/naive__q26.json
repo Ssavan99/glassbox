@@ -2,12 +2,12 @@
   "trace_id": "naive::q26",
   "architecture": "naive",
   "question": "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?",
-  "answer": "The context provided does not contain a specific recall@10 score for the engine's evaluation on its own golden dataset. [chunk-id::0] and [chunk-id::1] discuss the nature of recall@k and MRR metrics but do not provide numerical scores from an actual evaluation. [chunk-id::2], [chunk-id::3], and [chunk-id::4] elaborate on best practices for using a golden dataset and metrics like recall@k and MRR, but no specific score is given in the text provided.",
+  "answer": "The context provided does not contain a specific recall@10 score for the engine evaluated on its own golden dataset. Therefore, I cannot provide an answer citing any of the given chunk IDs.",
   "metrics": {
-    "latency_ms": 21.935374999884516,
+    "latency_ms": 2946.268916995905,
     "llm_calls": 1,
-    "prompt_tokens": 1467,
-    "completion_tokens": 109
+    "prompt_tokens": 1507,
+    "completion_tokens": 39
   },
   "nodes": [
     {
@@ -49,7 +49,7 @@
           },
           {
             "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
-            "score": 0.437418669462204,
+            "score": 0.43741869926452637,
             "rank": 2
           },
           {
@@ -59,12 +59,12 @@
           },
           {
             "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
-            "score": 0.3974769711494446,
+            "score": 0.39747700095176697,
             "rank": 4
           },
           {
             "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
-            "score": 0.36479607224464417,
+            "score": 0.36479610204696655,
             "rank": 5
           }
         ],
@@ -81,9 +81,9 @@
       "duration_ms": 0.0,
       "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
       "payload": {
-        "output": "The context provided does not contain a specific recall@10 score for the engine's evaluation on its own golden dataset. [chunk-id::0] and [chunk-id::1] discuss the nature of recall@k and MRR metrics but do not provide numerical scores from an actual evaluation. [chunk-id::2], [chunk-id::3], and [chunk-id::4] elaborate on best practices for using a golden dataset and metrics like recall@k and MRR, but no specific score is given in the text provided.",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1576
+        "output": "The context provided does not contain a specific recall@10 score for the engine evaluated on its own golden dataset. Therefore, I cannot provide an answer citing any of the given chunk IDs.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1546
       }
     }
   ]

@@ -2,12 +2,12 @@
   "trace_id": "adaptive::q26",
   "architecture": "adaptive",
   "question": "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?",
-  "answer": "The provided context does not contain the specific recall@10 score for any particular evaluation run of an engine against its own golden dataset. [chunk-id::0] discusses retrieval metrics and their usage but does not provide a concrete score for any evaluation. Therefore, I cannot answer with a measured score as requested.",
+  "answer": "The provided context does not contain any information about the engine\u2019s measured\u202frecall@10 score on its own golden dataset, so I cannot provide that number.",
   "metrics": {
-    "latency_ms": 73.82349999897997,
+    "latency_ms": 4077.0011249987874,
     "llm_calls": 2,
-    "prompt_tokens": 2024,
-    "completion_tokens": 158
+    "prompt_tokens": 2097,
+    "completion_tokens": 416
   },
   "nodes": [
     {
@@ -15,7 +15,7 @@
       "kind": "route",
       "label": "Route question to hybrid",
       "parent_ids": [],
-      "duration_ms": 0.23950000104377978,
+      "duration_ms": 0.473915999464225,
       "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
       "payload": {
         "chosen": "hybrid",
@@ -71,7 +71,7 @@
           },
           {
             "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
-            "score": 0.437418669462204,
+            "score": 0.43741869926452637,
             "rank": 2
           },
           {
@@ -81,17 +81,17 @@
           },
           {
             "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
-            "score": 0.3974769711494446,
+            "score": 0.39747700095176697,
             "rank": 4
           },
           {
             "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
-            "score": 0.36479607224464417,
+            "score": 0.36479610204696655,
             "rank": 5
           },
           {
             "chunk_id": "retrieval-failures-lost-in-the-middle::0",
-            "score": 0.3444873094558716,
+            "score": 0.34448733925819397,
             "rank": 6
           },
           {
@@ -106,7 +106,7 @@
           },
           {
             "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
-            "score": 0.2975105047225952,
+            "score": 0.2975105345249176,
             "rank": 9
           },
           {
@@ -136,7 +136,7 @@
           },
           {
             "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
-            "score": 0.2731454074382782,
+            "score": 0.2731454372406006,
             "rank": 15
           },
           {
@@ -556,9 +556,9 @@
       "duration_ms": 0.0,
       "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
       "payload": {
-        "output": "The provided context does not contain the specific recall@10 score for any particular evaluation run of an engine against its own golden dataset. [chunk-id::0] discusses retrieval metrics and their usage but does not provide a concrete score for any evaluation. Therefore, I cannot answer with a measured score as requested.",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1500
+        "output": "The provided context does not contain any information about the engine\u2019s measured\u202frecall@10 score on its own golden dataset, so I cannot provide that number.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1831
       }
     }
   ]

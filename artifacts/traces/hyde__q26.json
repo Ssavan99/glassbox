@@ -2,12 +2,12 @@
   "trace_id": "hyde::q26",
   "architecture": "hyde",
   "question": "What was this engine's measured recall@10 score on its own golden dataset the last time it was evaluated?",
-  "answer": "The provided context does not contain a specific recall@10 score for any particular evaluation. Therefore, I cannot provide a measured recall@10 score based on the given information. [chunk-id::0] [chunk-id::1] [chunk-id::2] [chunk-id::3] [chunk-id::4]",
+  "answer": "The provided context does not contain a specific recall@10 score for any engine on a golden dataset. Therefore, I cannot provide an answer to this question based on the given information.",
   "metrics": {
-    "latency_ms": 26.372750002337852,
+    "latency_ms": 5764.845833000436,
     "llm_calls": 2,
-    "prompt_tokens": 1601,
-    "completion_tokens": 270
+    "prompt_tokens": 1641,
+    "completion_tokens": 241
   },
   "nodes": [
     {
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "The provided context does not contain a specific recall@10 score for any particular evaluation. Therefore, I cannot provide a measured recall@10 score based on the given information. [chunk-id::0] [chunk-id::1] [chunk-id::2] [chunk-id::3] [chunk-id::4]",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1508
+        "output": "The provided context does not contain a specific recall@10 score for any engine on a golden dataset. Therefore, I cannot provide an answer to this question based on the given information.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1519
       }
     }
   ]

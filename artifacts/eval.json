@@ -493,7 +493,7 @@
       "question_id": "q15",
       "question_type": "multi_hop",
       "trace_id": "naive::q15",
-      "answer": "The answer lies in the interdependence between continuous batching and key-value (KV) cache management. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave [chunk-id::1]. If a scheduler had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit intended by continuous batching. Therefore, these strategies are usually discussed and implemented together rather than as fully independent concerns.\n\n[chunk-id::1]",
+      "answer": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
       "retrieved_chunk_ids": [
         "kv-cache-and-why-it-matters-for-serving::1",
         "continuous-batching-and-throughput::1",
@@ -510,18 +510,18 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 1.0,
-      "reads_as_refusal": false,
+      "faithfulness": 0.3333333333333333,
+      "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer explicitly states that continuous batching requires efficient per\u2011request KV cache management (point\u202f1). It then explains that each request in a dynamically changing batch needs its own cache state tracked and freed as requests join and leave (point\u202f2). Finally, it notes that a scheduler that must reshuffle or recompute cache state on every batch change would lose most of the latency benefit, matching point\u202f3. The response provides a confident explanation rather than an admission of not knowing, so it does not read as an appropriate refusal.",
-      "latency_ms": 22.572290999960387,
+      "judge_reasoning": "The answer does not support the first and third expected points. It also does not accurately describe continuous batching as an independent scheduling optimization without coupling to cache management.",
+      "latency_ms": 48.85216700495221,
       "llm_calls": 1,
-      "prompt_tokens": 1834,
-      "completion_tokens": 663,
+      "prompt_tokens": 1824,
+      "completion_tokens": 158,
       "backend_calls": [
         "ollama"
       ],
-      "judge_backend": "groq"
+      "judge_backend": "ollama"
     },
     {
       "architecture": "naive",
@@ -866,7 +866,7 @@
       "question_id": "q26",
       "question_type": "unanswerable",
       "trace_id": "naive::q26",
-      "answer": "The context provided does not contain a specific recall@10 score for the engine's evaluation on its own golden dataset. [chunk-id::0] and [chunk-id::1] discuss the nature of recall@k and MRR metrics but do not provide numerical scores from an actual evaluation. [chunk-id::2], [chunk-id::3], and [chunk-id::4] elaborate on best practices for using a golden dataset and metrics like recall@k and MRR, but no specific score is given in the text provided.",
+      "answer": "The context provided does not contain a specific recall@10 score for the engine evaluated on its own golden dataset. Therefore, I cannot provide an answer citing any of the given chunk IDs.",
       "retrieved_chunk_ids": [
         "retrieval-metrics-recall-at-k-and-mrr::0",
         "ai-evaluation-for-personal-knowledge-bases::1",
@@ -880,18 +880,18 @@
       "ndcg_at_10": null,
       "recall_full": null,
       "graph_tool_involved": false,
-      "faithfulness": 1.0,
+      "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer states that the provided context lacks a specific recall@10 score, confirming that no supporting chunk exists and that the correct behavior is to refuse. It also notes that the corpus discusses recall and MRR conceptually without reporting actual evaluation results, matching the second expected point. The tone is an honest admission of insufficient information, so it reads as an appropriate refusal.",
-      "latency_ms": 21.935374999884516,
+      "judge_reasoning": "The answer clearly states that the context does not contain the specific information requested and therefore cannot provide an answer. This is consistent with both expected points as it neither provides fabricated information nor claims to have data where there isn't any.",
+      "latency_ms": 2946.268916995905,
       "llm_calls": 1,
-      "prompt_tokens": 1893,
-      "completion_tokens": 620,
+      "prompt_tokens": 1826,
+      "completion_tokens": 110,
       "backend_calls": [
         "ollama"
       ],
-      "judge_backend": "groq"
+      "judge_backend": "ollama"
     },
     {
       "architecture": "naive",
@@ -1787,7 +1787,7 @@
       "question_id": "q26",
       "question_type": "unanswerable",
       "trace_id": "hybrid::q26",
-      "answer": "The provided context does not contain the specific recall@10 score for any particular evaluation run of an engine against its own golden dataset. [chunk-id::0] discusses retrieval metrics and their usage but does not provide a concrete score for any evaluation. Therefore, I cannot answer with a measured score as requested.",
+      "answer": "The provided context does not contain any information about the engine\u2019s measured\u202frecall@10 score on its own golden dataset, so I cannot provide that number.",
       "retrieved_chunk_ids": [
         "retrieval-metrics-recall-at-k-and-mrr::0",
         "ai-evaluation-for-personal-knowledge-bases::1",
@@ -1801,16 +1801,16 @@
       "ndcg_at_10": null,
       "recall_full": null,
       "graph_tool_involved": false,
-      "faithfulness": 1.0,
+      "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly notes that no chunk provides a specific recall@10 score, matching point 1's claim of no supporting evidence and appropriate refusal. It also accurately describes that the available chunk discusses retrieval metrics in general but lacks any concrete evaluation result, aligning with point 2. The response is framed as an honest \"I cannot answer\" statement, not a fabricated confident claim, so it reads as an appropriate refusal.",
-      "latency_ms": 74.15604199923109,
+      "judge_reasoning": "The answer explicitly states that the context lacks the needed recall@10 information and refuses to provide a number, which aligns with point 1 that no supporting chunk exists and the correct behavior is to refuse. It does not mention that the corpus discusses metrics conceptually, so it does not support point 2. The response reads as an honest \"I don't know\" refusal rather than a fabricated confident answer.",
+      "latency_ms": 179.40304199873935,
       "llm_calls": 1,
-      "prompt_tokens": 1817,
-      "completion_tokens": 465,
+      "prompt_tokens": 1861,
+      "completion_tokens": 741,
       "backend_calls": [
-        "ollama"
+        "groq"
       ],
       "judge_backend": "groq"
     },
@@ -1819,7 +1819,7 @@
       "question_id": "q27",
       "question_type": "unanswerable",
       "trace_id": "hybrid::q27",
-      "answer": "The provided context does not contain information about which cloud provider hosts the vector database used by the engine. [chunk-id::0] discusses embedding dimensions and their impact on storage and computation costs but does not mention a specific cloud provider. Similarly, other chunks focus on how vector databases operate or are used in retrieval-augmented generation systems without specifying a cloud provider for hosting these databases. Therefore, I cannot provide an answer based on the given context.",
+      "answer": "The provided context does not specify which cloud provider hosts the vector database used in production.",
       "retrieved_chunk_ids": [
         "embedding-dimension-and-model-size-tradeoffs::0",
         "vector-databases-and-index-types::1",
@@ -1836,15 +1836,15 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly identifies that there is no relevant information in the provided context and appropriately refrains from providing a fabricated answer.",
-      "latency_ms": 101.4950829994632,
+      "judge_reasoning": "The answer correctly states that the context lacks information about the cloud provider, matching point 1. It does not address the discussion of vector database index types, so it does not support point 2. The phrasing is an honest acknowledgment of missing information, thus it reads as an appropriate refusal.",
+      "latency_ms": 119.66433400084497,
       "llm_calls": 1,
-      "prompt_tokens": 1899,
-      "completion_tokens": 140,
+      "prompt_tokens": 1930,
+      "completion_tokens": 458,
       "backend_calls": [
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "hyde",
@@ -1921,7 +1921,7 @@
       "question_id": "q03",
       "question_type": "factual",
       "trace_id": "hyde::q03",
-      "answer": "Recall@k and MRR are two common retrieval metrics that serve different purposes in evaluating how well a system retrieves relevant chunks of information. \n\n- Recall@k asks whether the correct supporting chunk is present among the top k retrieved chunks. It is a binary measure, meaning it only checks if the correct chunk is found without considering its position in the ranked list [chunk-id::0].\n\n- MRR (Mean Reciprocal Rank), on the other hand, scores each query based on the rank of the first correct chunk appearing in the ranked list. This means that a correct chunk at position 1 gets full credit (a score of 1), while one at position 10 gets much less credit (a score of 0.1). MRR thus takes into account the order and quality of retrieved chunks, making it more sensitive to ranking issues [chunk-id::0].\n\nIn summary, while recall@k provides a simple binary pass/fail for whether the correct chunk is found among the top k results, MRR offers a more nuanced evaluation by considering where in the list the correct chunk appears.",
+      "answer": "Recall@k and MRR are both retrieval metrics but answer different questions. Recall@k asks whether among the top k retrieved chunks, the correct supporting chunk is present at all. It scores a binary yes/no for each query on whether the correct chunk is within the top k results and then averages these across queries. On the other hand, MRR cares about the order of the retrieval; it assigns a score of `1 / rank` to the first correct chunk in the ranked list and averages these scores across all queries. This means that a correctly retrieved chunk at position 1 gets a full point, while one at position k gets only a fraction of a point. MRR is more sensitive for judging raw ranking quality because it directly penalizes retrievers that bury the right chunk too low in the results, potentially missing it entirely.\n\n[retrieval-metrics-recall-at-k-and-mrr::0]\n[retrieval-metrics-recall-at-k-and-mrr::1]",
       "retrieved_chunk_ids": [
         "retrieval-metrics-recall-at-k-and-mrr::0",
         "retrieval-metrics-recall-at-k-and-mrr::1",
@@ -1941,11 +1941,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly explains the binary nature of recall@k and provides a nuanced explanation for MRR. However, it does not fully emphasize that MRR is more sensitive to ranking quality as stated in the second expected point. The answer reads as an honest attempt to explain the metrics rather than a confidently fabricated response.",
-      "latency_ms": 5.35012500040466,
+      "judge_reasoning": "The answer correctly explains the difference between recall@k and MRR but does not fully address point 2 regarding MRR's sensitivity to ranking quality. The response reads as an honest explanation rather than a confident fabrication.",
+      "latency_ms": 12355.56783300126,
       "llm_calls": 2,
-      "prompt_tokens": 2042,
-      "completion_tokens": 368,
+      "prompt_tokens": 2059,
+      "completion_tokens": 326,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -1957,7 +1957,7 @@
       "question_id": "q04",
       "question_type": "factual",
       "trace_id": "hyde::q04",
-      "answer": "A silent failure is defined as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer\" [chunk-id::0].\n\nIt is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" This means that silent failures can go undetected until they are specifically challenged or verified, making them costly due to their potentially widespread and unchallenged acceptance [chunk-id::0].",
+      "answer": "A silent failure is described as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer.\" It is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" This makes silent failures hard to detect and more costly compared to visible refusals. Citing the chunk id: [silent-failures-and-the-value-of-refusal::0]",
       "retrieved_chunk_ids": [
         "silent-failures-and-the-value-of-refusal::0",
         "context-window-overflow-and-truncation::1",
@@ -1976,11 +1976,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly identifies the characteristics of a silent failure and its potential cost but does not explicitly state that it is confidently phrased. Instead, it provides an explanation for why such failures are costly. The answer reads as providing information rather than refusing to provide it.",
-      "latency_ms": 23.923583998112008,
+      "judge_reasoning": "The answer accurately describes a silent failure as producing output with no signal that anything went wrong and being confidently phrased. However, it does not mention the answer being indistinguishable from a correct one in presentation, which is why the second point is marked as false. Additionally, the answer reads as providing information rather than an honest refusal.",
+      "latency_ms": 9721.627375001844,
       "llm_calls": 2,
-      "prompt_tokens": 1788,
-      "completion_tokens": 304,
+      "prompt_tokens": 1821,
+      "completion_tokens": 312,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -1992,7 +1992,7 @@
       "question_id": "q05",
       "question_type": "factual",
       "trace_id": "hyde::q05",
-      "answer": "The two distinct causes of hallucination described in this corpus are:\n\n1. Hallucination from missing context [chunk-id::0, chunk-id::1]\n2. Hallucination from prompt injection [chunk-id::0, chunk-id::1]\n\nThese differ fundamentally in the following ways:\n\n- **Missing-context hallucination** occurs when retrieval fails to surface the necessary evidence needed to answer a question. The model then defaults to making ungrounded claims rather than admitting it lacks sufficient information.\n  \n- **Prompt injection hallucination** arises from retrieved content containing text specifically crafted to hijack the model's instructions, causing it to state false claims confidently or ignore its own grounding constraints. This can happen even when retrieval works perfectly and the corpus is complete.\n\nEach type of failure has a different fix and requires distinct approaches for improvement.",
+      "answer": "The two distinct causes of hallucination described in this corpus are:\n\n1. **Hallucination from missing context** - This occurs when retrieval fails to surface necessary evidence for answering a question. The model then fills the gap with ungrounded claims instead of admitting it lacks sufficient information. It can happen due to relevant notes not existing, being split across chunks, or simply not being retrieved because of phrasing differences in queries compared to document content.\n\n2. **Hallucination from prompt injection** - This happens when retrieved content contains text specifically crafted to hijack the model's instructions, leading it to state false claims confidently or ignore its own grounding constraints entirely, even if retrieval worked perfectly. The key difference is that in this case, the hallucination can occur despite the corpus being complete and retrieval working as designed, due to adversarial instructions embedded within the retrieved content.\n\nThese two failure modes require different fixes: missing-context hallucination needs improving retrieval coverage and enforcing refusal in the prompt template; while prompt injection-driven hallucination requires treating retrieved content as strictly untrusted data and explicitly instructing the model to never re-interpret it as an instruction.",
       "retrieved_chunk_ids": [
         "hallucination-from-missing-context::0",
         "hallucination-from-missing-context::1",
@@ -2009,14 +2009,14 @@
       "ndcg_at_10": 0.9197207891481876,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 0.5,
+      "faithfulness": 1.0,
       "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer does not accurately describe the two causes of hallucination as expected. It conflates missing context with retrieval failure and prompt injection with content crafted to hijack instructions. Furthermore, the answer does not read as an appropriate refusal but rather provides fabricated information.",
-      "latency_ms": 23.66450000045006,
+      "judge_reasoning": "The answer provides two distinct causes of hallucination that align with the expected points. However, it does not read as an honest refusal but instead gives detailed explanations for each cause.",
+      "latency_ms": 13889.24179100286,
       "llm_calls": 2,
-      "prompt_tokens": 1976,
-      "completion_tokens": 313,
+      "prompt_tokens": 2079,
+      "completion_tokens": 360,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -2063,7 +2063,7 @@
       "question_id": "q07",
       "question_type": "factual",
       "trace_id": "hyde::q07",
-      "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that the model could memorize and later reproduce verbatim unredacted personal data when prompted, even for a user who has no legitimate reason to see that information. This risk is due to PII becoming diffused into the model's weights themselves during training, making it much harder to audit or remove once present [chunk-id::0].",
+      "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"unredacted PII in training data becomes diffused into the model's weights themselves, which is much harder to audit, impossible to selectively delete without retraining, and can resurface unpredictably in response to queries that were never about the original sensitive document at all \u2014 a well-documented failure mode where a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
       "retrieved_chunk_ids": [
         "pii-redaction-in-training-data::0",
         "pii-redaction-in-training-data::1",
@@ -2083,11 +2083,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly identifies that PII redaction prevents a model from memorizing and later reproducing sensitive information verbatim. However, it does not mention the difficulty in auditing or selectively deleting this data without retraining, which is part of the expected points.",
-      "latency_ms": 5.183125002076849,
+      "judge_reasoning": "The answer provided covers the first expected point accurately by explaining that unredacted PII can be memorized and later revealed verbatim. However, it does not mention that this is harder to audit or selectively delete without retraining compared to a retrieval corpus, which is why the second expected point is not supported.",
+      "latency_ms": 7825.027083999885,
       "llm_calls": 2,
-      "prompt_tokens": 2005,
-      "completion_tokens": 395,
+      "prompt_tokens": 2074,
+      "completion_tokens": 435,
       "backend_calls": [
         "groq",
         "ollama"
@@ -2134,7 +2134,7 @@
       "question_id": "q09",
       "question_type": "factual",
       "trace_id": "hyde::q09",
-      "answer": "Few-shot prompting involves including a small number of complete example input-output pairs directly in the prompt. This allows the model to infer the desired format and behavior from these demonstrations rather than relying solely on abstract instructions. In the context of retrieval-augmented generative models (RAG), few-shot prompting can create a specific tradeoff regarding context window space.\n\nThe context window space is already contested between instructions, retrieved chunks of information, and the answer itself [chunk-id::1, chunk-id::0]. Therefore, a prompt with three verbose few-shot examples would have measurably less room for retrieved evidence compared to one with a single tight example or none at all. This highlights that while few-shot prompting can be valuable for certain behaviors that are hard to specify precisely in words, it comes at the cost of reduced space for retrieval-augmented information [chunk-id::1, chunk-id::0].",
+      "answer": "Few\u2011shot prompting means putting a small number of complete input\u2011output demonstrations directly into the prompt so the model can infer the desired format and behavior from those examples rather than from abstract instructions\u202f\u2014\u202ffor a retrieval\u2011augmented generation (RAG) system this usually looks like showing a question, some retrieved context, and a correctly grounded answer with citations before the real query\u202f\u3010few-shot-prompting-for-grounded-answers::0\u3011.  \n\nThe trade\u2011off it creates in a RAG prompt is that each demonstration consumes tokens in the limited context window, competing with the space needed for the retrieved evidence and the model\u2019s answer. Consequently, a prompt with many or verbose few\u2011shot examples leaves less room for the retrieved chunks, whereas using fewer or tighter examples preserves more evidence for the current question\u202f\u3010few-shot-prompting-for-grounded-answers::1\u3011.",
       "retrieved_chunk_ids": [
         "few-shot-prompting-for-grounded-answers::1",
         "few-shot-prompting-for-grounded-answers::0",
@@ -2151,19 +2151,19 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 0.5,
-      "reads_as_refusal": true,
+      "faithfulness": 1.0,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer accurately describes few-shot prompting and its effect on context window space. However, it does not explicitly state that the tradeoff is specifically regarding context window space for retrieved evidence. The answer reads as an honest refusal because it provides a clear explanation of limitations without confidently asserting information beyond what was provided.",
-      "latency_ms": 23.288957996555837,
+      "judge_reasoning": "The answer explicitly defines few-shot prompting as including complete input-output examples in the prompt (point 1) and explains that verbose examples consume context window tokens, reducing space for retrieved evidence (point 2). It provides a confident explanation rather than refusing to answer.",
+      "latency_ms": 62.91637499816716,
       "llm_calls": 2,
-      "prompt_tokens": 1897,
-      "completion_tokens": 320,
+      "prompt_tokens": 2014,
+      "completion_tokens": 689,
       "backend_calls": [
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "hyde",
@@ -2241,7 +2241,7 @@
       "question_id": "q12",
       "question_type": "multi_hop",
       "trace_id": "hyde::q12",
-      "answer": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup used for initial retrieval. Specifically, reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on [chunk-id::latency-budgets-in-a-rag-pipeline::1].",
+      "answer": "Cross-encoder reranking adds real, measurable latency compared to the near-instant cosine similarity lookup. Reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on. This cost is covered in the note on latency budgets [latency-budgets-in-a-rag-pipeline::1].",
       "retrieved_chunk_ids": [
         "latency-budgets-in-a-rag-pipeline::1",
         "latency-budgets-in-a-rag-pipeline::2",
@@ -2259,13 +2259,13 @@
       "recall_full": 1.0,
       "graph_tool_involved": false,
       "faithfulness": 0.3333333333333333,
-      "reads_as_refusal": true,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer provides the latency range (100 to 300 milliseconds) but does not specify the number of candidates in the shortlist or mention that a cross-encoder needs one full forward pass per query-candidate pair. The answer reads as an honest refusal because it does not confidently assert information beyond what is available, even though it misses providing some factual details.",
-      "latency_ms": 23.41383400198538,
+      "judge_reasoning": "The answer provides the latency cost in milliseconds and mentions a shortlist size but does not directly support the statement about cross-encoder reranking being more accurate. The answer reads as an informed response rather than an honest refusal.",
+      "latency_ms": 8567.373374993622,
       "llm_calls": 2,
-      "prompt_tokens": 1930,
-      "completion_tokens": 492,
+      "prompt_tokens": 1971,
+      "completion_tokens": 464,
       "backend_calls": [
         "groq",
         "ollama"
@@ -2349,7 +2349,7 @@
       "question_id": "q15",
       "question_type": "multi_hop",
       "trace_id": "hyde::q15",
-      "answer": "The answer lies in the need for efficient per-request KV cache management, which is directly coupled with the benefits of continuous batching. Continuous batching keeps the GPU busy by immediately backfilling freed-up slots, but this requires tracking and managing unique cache states for each request independently as they join and leave the batch [chunk-id::1]. Without proper management, the system would lose most of the latency benefit it aims to provide due to frequent recomputation or reshuffling of cache state on every batch change.\n\nTherefore, continuous batching and KV cache management are not fully independent concerns but are usually discussed and implemented together in a serving stack. Simply treating continuous batching as an independent scheduling optimization without considering the unique KV cache states for each request would defeat its purpose by reintroducing unnecessary latency [chunk-id::1].",
+      "answer": "The KV cache management is intrinsically linked to the effectiveness of continuous batching due to the need for per-request tracking and freeing of cache states. If a scheduler had to reshuffle or recompute cache state on every batch change, it would negate much of the latency benefit continuous batching aims to provide. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own independent cache state as requests join and leave the batch. Therefore, treating continuous batching as an independent scheduling optimization without considering how the cache is managed would undermine its benefits.\n\nCiting chunk ids: [kv-cache-and-why-it-matters-for-serving::1] [continuous-batching-and-throughput::1]",
       "retrieved_chunk_ids": [
         "kv-cache-and-why-it-matters-for-serving::1",
         "continuous-batching-and-throughput::1",
@@ -2366,14 +2366,14 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 0.6666666666666666,
-      "reads_as_refusal": false,
+      "faithfulness": 0.3333333333333333,
+      "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer provides a detailed explanation that aligns with points 1 and 2 but does not fully support point 3. It suggests that reshuffling or recomputing cache state could reintroduce unnecessary latency, which is implied in the reasoning rather than directly stated.",
-      "latency_ms": 24.166667000827147,
+      "judge_reasoning": "The answer correctly addresses the first expected point by highlighting the dependency of continuous batching on efficient per-request KV cache management. However, it does not explicitly state that each request needs its own independent cache state tracked and freed as requests join and leave the batch, which is a key aspect of why treating continuous batching independently would undermine benefits. The answer reads like an honest refusal because it focuses on the complexity without confidently providing an incorrect explanation.",
+      "latency_ms": 8466.817749998881,
       "llm_calls": 2,
-      "prompt_tokens": 1981,
-      "completion_tokens": 483,
+      "prompt_tokens": 2005,
+      "completion_tokens": 497,
       "backend_calls": [
         "groq",
         "ollama"
@@ -2700,7 +2700,7 @@
       "question_id": "q25",
       "question_type": "unanswerable",
       "trace_id": "hyde::q25",
-      "answer": "The provided context does not contain information directly addressing whether fine-tuning a model with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The chunks discuss LoRA, full fine-tuning, and retrieval-augmented generation but do not provide details on security aspects like susceptibility to prompt injection attacks in these methods. Therefore, I cannot make a claim about this specific issue based solely on the given context. [chunk-id::0][chunk-id::1][chunk-id::2]",
+      "answer": "The context provided does not contain specific information about how using LoRA affects a RAG pipeline's susceptibility to prompt injection attacks. Therefore, I cannot provide a direct answer based on the given chunks.\n\nHowever, it can be inferred that since LoRA involves freezing most of the model weights and only training small added matrices, this could potentially reduce the attack surface by limiting the number of parameters that are actively being modified during fine-tuning. This might make it harder for an attacker to influence the behavior of the model through prompt injection if fewer parameters are involved in the decision-making process.\n\nBut without specific details from the given context, I cannot definitively state whether LoRA reduces RAG pipeline exposure to prompt injection attacks or how much it mitigates such risks.",
       "retrieved_chunk_ids": [
         "lora-and-parameter-efficient-fine-tuning::0",
         "catastrophic-forgetting-during-fine-tuning::1",
@@ -2714,14 +2714,14 @@
       "ndcg_at_10": null,
       "recall_full": null,
       "graph_tool_involved": false,
-      "faithfulness": 0.5,
+      "faithfulness": 1.0,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly identifies that there is no direct information in the provided context regarding the impact of fine-tuning with LoRA on prompt injection attacks. It appropriately refrains from making unfounded claims.",
-      "latency_ms": 26.361958000052255,
+      "judge_reasoning": "The answer acknowledges the lack of specific information in the context and provides an informed inference based on general knowledge about LoRA. This aligns with both expected points.",
+      "latency_ms": 10938.029290999111,
       "llm_calls": 2,
-      "prompt_tokens": 1909,
-      "completion_tokens": 246,
+      "prompt_tokens": 2000,
+      "completion_tokens": 290,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -2733,7 +2733,7 @@
       "question_id": "q26",
       "question_type": "unanswerable",
       "trace_id": "hyde::q26",
-      "answer": "The provided context does not contain a specific recall@10 score for any particular evaluation. Therefore, I cannot provide a measured recall@10 score based on the given information. [chunk-id::0] [chunk-id::1] [chunk-id::2] [chunk-id::3] [chunk-id::4]",
+      "answer": "The provided context does not contain a specific recall@10 score for any engine on a golden dataset. Therefore, I cannot provide an answer to this question based on the given information.",
       "retrieved_chunk_ids": [
         "retrieval-metrics-recall-at-k-and-mrr::0",
         "ai-evaluation-for-personal-knowledge-bases::1",
@@ -2750,11 +2750,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer clearly states that the provided context does not contain the specific information requested and therefore cannot provide a measured recall@10 score. This is consistent with the first expected point. However, it does not address the second expected point about the absence of actual evaluation run results.",
-      "latency_ms": 26.372750002337852,
+      "judge_reasoning": "The answer correctly states that there is no specific recall@10 score for any engine in the provided context and thus properly refuses to provide an answer. However, it does not explicitly mention the metrics conceptually but records no actual evaluation run results as a supporting point.",
+      "latency_ms": 5764.845833000436,
       "llm_calls": 2,
-      "prompt_tokens": 1948,
-      "completion_tokens": 351,
+      "prompt_tokens": 1959,
+      "completion_tokens": 320,
       "backend_calls": [
         "groq",
         "ollama"
@@ -2867,7 +2867,7 @@
       "question_id": "q03",
       "question_type": "factual",
       "trace_id": "corrective::q03",
-      "answer": "Recall@k and MRR are two retrieval metrics that answer subtly different questions:\n\n- **Recall@k** asks whether among the top k retrieved chunks, the correct supporting chunk is present at all. It is a binary, per-query yes/no that gets averaged across the golden dataset. This metric does not differentiate between the ranking order of the correct chunk; a correct chunk retrieved at position 1 scores identically to one retrieved at position k. [chunk-id::0]\n\n- **MRR (Mean Reciprocal Rank)** cares about the order of the chunks. It scores each query by `1 / rank` of the first correct chunk in the ranked list, then averages across queries. A correct chunk at position 1 scores a full point; at position 2 it scores 0.5; at position 10 it scores 0.1. MRR is more sensitive to ranking quality because it directly penalizes retrievers that bury the correct chunk too low in the results, potentially missing it entirely during context windows or reranking steps. [chunk-id::0]\n\nThese differences make MRR a better metric for judging raw ranking quality compared to Recall@k. [chunk-id::1]",
+      "answer": "Recall\u202f@\u202fk and mean reciprocal rank (MRR) measure different aspects of a retriever\u2019s output.  \n\n* **Recall\u202f@\u202fk** asks, for each query, whether any correct chunk appears anywhere in the top\u2011k results. It is a binary yes/no per query that is then averaged over the dataset, and it treats a correct chunk at position\u202f1 the same as one at position\u202fk\u202f\u2014 it does **not** consider the exact rank, only presence within the top\u202fk\u202f[retrieval-metrics-recall-at-k-and-mrr::0].\n\n* **MRR** looks at the exact position of the first correct chunk. For each query it computes\u202f`1\u202f/\u202frank` of that chunk (so rank\u202f1\u202f\u2192\u202f1.0, rank\u202f2\u202f\u2192\u202f0.5, rank\u202f10\u202f\u2192\u202f0.1) and then averages across queries. Because it rewards higher\u2011ranked hits and penalizes lower\u2011ranked ones, it is a more **sensitive** metric for raw ranking quality [retrieval-metrics-recall-at-k-and-mrr::0][retrieval-metrics-recall-at-k-and-mrr::1].\n\nIn short, recall\u202f@\u202fk measures *whether* the right evidence is retrieved within the top\u2011k, while MRR measures *how high* that evidence appears in the ranking.",
       "retrieved_chunk_ids": [
         "retrieval-metrics-recall-at-k-and-mrr::1",
         "retrieval-metrics-recall-at-k-and-mrr::0",
@@ -2885,23 +2885,23 @@
       "faithfulness": 1.0,
       "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer provides accurate information about both recall@k and MRR without indicating any honest refusal. It directly addresses the differences between the two metrics as requested.",
-      "latency_ms": 6.699749999825144,
+      "judge_reasoning": "The answer correctly describes recall@k as checking whether a correct chunk appears within the top\u2011k results and explains that MRR accounts for the exact rank, rewarding higher positions and penalizing lower ones, matching both expected points. It provides a direct answer rather than refusing.",
+      "latency_ms": 10562.79650000215,
       "llm_calls": 2,
-      "prompt_tokens": 3072,
-      "completion_tokens": 562,
+      "prompt_tokens": 3229,
+      "completion_tokens": 1053,
       "backend_calls": [
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "corrective",
       "question_id": "q04",
       "question_type": "factual",
       "trace_id": "corrective::q04",
-      "answer": "A silent failure is defined as \"one that produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer.\" [chunk-id::0]\n\nIt is considered the most expensive category of failure because \"they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers.\" [chunk-id::0]",
+      "answer": "A silent failure occurs when the system returns an answer that looks confident and well\u2011formatted but actually contains errors, omissions, or is based on the wrong evidence, without any indication that something went wrong. Because the output appears trustworthy, users typically accept it without further checking, and the mistake is only discovered if someone independently verifies the claim\u2014a step most users never take. Consequently, silent failures are the most costly type of error: a confidently stated wrong answer can cause significant harm, whereas an explicit \u201cI don\u2019t know\u201d prompts the user to seek more information and avoids hidden damage\u3010silent-failures-and-the-value-of-refusal::0\u3011.",
       "retrieved_chunk_ids": [
         "silent-failures-and-the-value-of-refusal::0",
         "silent-failures-and-the-value-of-refusal::1",
@@ -2915,17 +2915,17 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 0.5,
+      "faithfulness": 1.0,
       "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer accurately describes a silent failure as producing output with no signal that anything went wrong. However, it does not restate the second expected point directly, and instead provides an explanation of why such failures are expensive, which is not part of the required content.",
-      "latency_ms": 7.19379200018011,
+      "judge_reasoning": "The answer supports both expected points as it correctly describes a silent failure and explains why such failures are costly. However, the answer does not read as an honest refusal but instead provides a detailed explanation of silent failures.",
+      "latency_ms": 9155.34808299708,
       "llm_calls": 2,
-      "prompt_tokens": 2620,
-      "completion_tokens": 406,
+      "prompt_tokens": 2721,
+      "completion_tokens": 564,
       "backend_calls": [
         "ollama",
-        "ollama"
+        "groq"
       ],
       "judge_backend": "ollama"
     },
@@ -2934,7 +2934,7 @@
       "question_id": "q05",
       "question_type": "factual",
       "trace_id": "corrective::q05",
-      "answer": "The two distinct causes of hallucination described in this corpus are:\n\n1. **Hallucination from missing context**:\n   - This occurs when retrieval fails to surface the necessary evidence needed to answer a question.\n   - The model then falls back on its own pretrained knowledge or generates a plausible-sounding but ungrounded claim instead of admitting it lacks the necessary information.\n   - It can be caused by several specific retrieval issues, such as the relevant note not existing in the corpus, chunking splitting the needed fact across boundaries, or keyword mismatch preventing dense retrieval and bm25 from identifying the correct chunks.\n\n2. **Hallucination triggered by an adversarial prompt**:\n   - This happens when retrieved content contains text specifically crafted to hijack the model's instructions.\n   - The model might state false claims confidently or ignore its own grounding constraints entirely, even if retrieval worked perfectly and surfaced the \"relevant\" chunk it was supposed to find.\n\nThese two failure modes differ fundamentally in that:\n\n- Hallucination from missing context is a retrieval-and-refusal problem where the corpus has gaps leading the model to fabricate information.\n- Hallucination triggered by an adversarial prompt is a different attack-surface issue involving retrieved content intentionally designed to mislead the model. [chunk-id::0, chunk-id::1]",
+      "answer": "The two distinct causes of hallucination described in this corpus are:\n\n1. **Hallucination from missing context**:\n   - This occurs when retrieval fails to surface the evidence needed to answer a question.\n   - The model then falls back on its own pretrained knowledge or pattern-completes a plausible-sounding answer, rather than admitting it lacks necessary information.\n   - It can happen due to reasons such as the relevant note not existing in the corpus, the note being split across chunks, or the query's phrasing differing enough from the note's wording that retrieval misses it.\n\n2. **Hallucination from prompt injection**:\n   - This happens when retrieved content contains text specifically crafted to hijack the model's instructions.\n   - The model might follow this injected instruction even if retrieval worked perfectly and surfaced \"relevant\" chunks, because it cannot reliably distinguish between trusted evidence and an instruction.\n   - Unlike missing context hallucination, which results from a gap in the corpus, prompt injection can occur with complete and properly retrieved content.\n\nThese two failure modes require different fixes:\n- **Missing-context hallucination** is addressed by improving retrieval coverage and enforcing refusal in the prompt template.\n- **Prompt-injection-driven hallucination** requires treating retrieved content as strictly untrusted data, never re-interpreting it as an instruction regardless of its phrasing.",
       "retrieved_chunk_ids": [
         "hallucination-from-missing-context::1",
         "hallucination-from-missing-context::0",
@@ -2953,11 +2953,11 @@
       "faithfulness": 1.0,
       "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer does address both expected points but frames the causes as distinct failure modes rather than as a refusal. It provides detailed explanations of how these issues can arise, which reads more like confident answers than an 'I don't know' response.",
-      "latency_ms": 6.262792001507478,
+      "judge_reasoning": "The answer correctly identifies the two causes of hallucination as described in the expected points. However, it does not read as an honest refusal; instead, it provides detailed explanations that suggest a confident understanding of these failure modes.",
+      "latency_ms": 14379.183917000773,
       "llm_calls": 2,
-      "prompt_tokens": 3171,
-      "completion_tokens": 556,
+      "prompt_tokens": 3216,
+      "completion_tokens": 557,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -3002,7 +3002,7 @@
       "question_id": "q07",
       "question_type": "factual",
       "trace_id": "corrective::q07",
-      "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that the model could memorize and later reproduce unredacted personal data verbatim when prompted. This risk is particularly concerning because the PII becomes diffused into the model's weights, making it much harder to audit or selectively delete without retraining [chunk-id::0].",
+      "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
       "retrieved_chunk_ids": [
         "pii-redaction-in-training-data::0",
         "pii-redaction-in-training-data::1",
@@ -3018,13 +3018,13 @@
       "recall_full": 1.0,
       "graph_tool_involved": false,
       "faithfulness": 0.5,
-      "reads_as_refusal": false,
+      "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer accurately addresses the first point but does not mention the second expected point about audit or selective deletion. It also provides additional context that is not requested in the question.",
-      "latency_ms": 36.54691599876969,
+      "judge_reasoning": "The answer correctly identifies the risk of a model revealing sensitive personal information verbatim but does not address the difficulty in auditing or selectively deleting this data without retraining.",
+      "latency_ms": 5773.128166998504,
       "llm_calls": 6,
-      "prompt_tokens": 6291,
-      "completion_tokens": 1010,
+      "prompt_tokens": 6312,
+      "completion_tokens": 989,
       "backend_calls": [
         "ollama",
         "ollama",
@@ -3074,7 +3074,7 @@
       "question_id": "q09",
       "question_type": "factual",
       "trace_id": "corrective::q09",
-      "answer": "Few-shot prompting means including a small number of complete example input-output pairs directly in the prompt, so the model can infer the desired format and behavior from demonstration rather than from instructions alone. [chunk-id::0]\n\nSpecifically in a Retrieval-Augmented Generation (RAG) prompt, few-shot prompting creates a tradeoff in context window space where each example consumes real space competing with the retrieved evidence needed to answer the current question. A prompt with three verbose examples has measurably less room for retrieved evidence compared to one with a single tight example or none at all. [chunk-id::1]",
+      "answer": "Few-shot prompting means including a small number of complete example input-output pairs directly in the prompt, so the model can infer the desired format and behavior from demonstration rather than from instructions alone. [few-shot-prompting-for-grounded-answers::0]\n\nSpecifically in a RAG (Retrieval-Augmented Generation) prompt, few-shot prompting creates a tradeoff between the number of verbose examples provided and the space available for retrieved evidence. A prompt with three verbose few-shot examples has measurably less room for retrieved evidence than one with a single tight example or none at all. [few-shot-prompting-for-grounded-answers::1]",
       "retrieved_chunk_ids": [
         "few-shot-prompting-for-grounded-answers::1",
         "few-shot-prompting-for-grounded-answers::0",
@@ -3093,11 +3093,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer provides accurate information about few-shot prompting and its effect on context window space in RAG prompts. However, it does not directly address the tradeoff with retrieved evidence as expected, instead discussing the impact of verbose examples. The answer reads as an honest refusal to provide specific details that are not covered in the given content.",
-      "latency_ms": 6.579624998266809,
+      "judge_reasoning": "The answer accurately describes few-shot prompting but does not explicitly mention the tradeoff between verbose examples and space for retrieved evidence. It reads as an honest refusal because it provides relevant information without claiming knowledge about a topic where it lacks detail.",
+      "latency_ms": 8980.213333001302,
       "llm_calls": 2,
-      "prompt_tokens": 2827,
-      "completion_tokens": 474,
+      "prompt_tokens": 2878,
+      "completion_tokens": 466,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -3286,7 +3286,7 @@
       "question_id": "q15",
       "question_type": "multi_hop",
       "trace_id": "corrective::q15",
-      "answer": "The answer lies in the interdependence between continuous batching and key-value (KV) cache management. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave [chunk-id::1]. If a scheduler had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit intended by continuous batching. Therefore, these strategies are usually discussed and implemented together rather than as fully independent concerns.\n\n[chunk-id::1]",
+      "answer": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
       "retrieved_chunk_ids": [
         "kv-cache-and-why-it-matters-for-serving::1",
         "continuous-batching-and-throughput::1",
@@ -3303,19 +3303,19 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 1.0,
-      "reads_as_refusal": false,
+      "faithfulness": 0.3333333333333333,
+      "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer explicitly states that continuous batching requires efficient per\u2011request KV cache management (point\u202f1). It then explains that each request in a dynamically changing batch needs its own cache state tracked and freed as requests join and leave (point\u202f2). Finally, it notes that a scheduler that must reshuffle or recompute cache state on every batch change would lose most of the latency benefit, matching point\u202f3. The response provides a confident explanation rather than an admission of not knowing, so it does not read as an appropriate refusal.",
-      "latency_ms": 4.634834000171395,
+      "judge_reasoning": "The answer does not support the first and third expected points. It also does not accurately describe continuous batching as an independent scheduling optimization without coupling to cache management.",
+      "latency_ms": 8796.302916998684,
       "llm_calls": 2,
-      "prompt_tokens": 3242,
-      "completion_tokens": 872,
+      "prompt_tokens": 3232,
+      "completion_tokens": 367,
       "backend_calls": [
         "ollama",
         "ollama"
       ],
-      "judge_backend": "groq"
+      "judge_backend": "ollama"
     },
     {
       "architecture": "corrective",
@@ -3463,7 +3463,7 @@
       "question_id": "q20",
       "question_type": "keyword",
       "trace_id": "corrective::q20",
-      "answer": "In this project's cost-aware routing config, the exact local and hosted model identifier strings assigned to OLLAMA_MODEL and GROQ_MODEL are:\n\n- `OLLAMA_MODEL = \"qwen2.5:7b-instruct\"` [chunk-id::0]\n- `GROQ_MODEL = \"openai/gpt-oss-120b\"` [chunk-id::0]",
+      "answer": "In this project's cost-aware routing config, the exact local model identifier string assigned to OLLAMA_MODEL is \"qwen2.5:7b-instruct\", and the hosted model identifier string assigned to GROQ_MODEL is \"openai/gpt-oss-120b\". These are cited from [cost-aware-model-routing::0].",
       "retrieved_chunk_ids": [
         "cost-aware-model-routing::0",
         "cost-aware-model-routing::1",
@@ -3480,11 +3480,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly identifies OLLAMA_MODEL but incorrectly states GROQ_MODEL. It does not confidently assert knowledge where incorrect, hence it reads as an honest refusal.",
-      "latency_ms": 37.734208002802916,
+      "judge_reasoning": "The answer correctly identifies the OLLAMA_MODEL identifier but incorrectly states the GROQ_MODEL identifier. The response does not confidently fabricate information and reads as an honest refusal due to the second point being incorrect.",
+      "latency_ms": 5886.078208000981,
       "llm_calls": 6,
-      "prompt_tokens": 5380,
-      "completion_tokens": 1162,
+      "prompt_tokens": 5412,
+      "completion_tokens": 1163,
       "backend_calls": [
         "ollama",
         "groq",
@@ -3538,7 +3538,7 @@
       "question_id": "q22",
       "question_type": "keyword",
       "trace_id": "corrective::q22",
-      "answer": "The exact wording of the error when a request's token count exceeds the model's maximum context length is `This model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens`. This can be cited from [chunk-id::0] and [chunk-id::1].",
+      "answer": "The exact wording of the error this engine raises when a request's token count exceeds the model's maximum context length is:\n\n\"This model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens\" \u2014 at least this failure is loud and immediately traceable to its cause, which makes it the easiest overflow scenario to debug even though it is the one that looks worst to an end user in the moment.\n\nThis citation is taken from the chunk labeled [context-window-overflow-and-truncation::0].",
       "retrieved_chunk_ids": [
         "context-window-overflow-and-truncation::0",
         "context-window-overflow-and-truncation::1",
@@ -3555,11 +3555,11 @@
       "faithfulness": 1.0,
       "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly includes the maximum context length and token count discrepancy but does not match the exact wording provided. It reads as an honest refusal because it acknowledges a limitation without providing incorrect or fabricated information.",
-      "latency_ms": 5.890208001801511,
+      "judge_reasoning": "The answer accurately states the maximum context length and token count but does not provide the exact wording of the error message. It reads as an honest refusal because it admits that the information provided is not the exact wording and suggests a reason why.",
+      "latency_ms": 6943.866458001139,
       "llm_calls": 2,
-      "prompt_tokens": 2353,
-      "completion_tokens": 348,
+      "prompt_tokens": 2439,
+      "completion_tokens": 402,
       "backend_calls": [
         "ollama",
         "ollama"
@@ -3608,7 +3608,7 @@
       "question_id": "q24",
       "question_type": "unanswerable",
       "trace_id": "corrective::q24",
-      "answer": "The provided context does not contain information about which HTTP client library or version an RAG engine uses to call the embedding API. Therefore, I cannot answer this question based on the given context. [chunk-id::0][chunk-id::1][chunk-id::2][chunk-id::3]",
+      "answer": "The provided context does not contain any information about the HTTP client library or its version that the RAG engine uses to call the embedding API.",
       "retrieved_chunk_ids": [
         "retrieval-augmented-generation-basics::0",
         "retrieval-augmented-generation-basics::1",
@@ -3625,18 +3625,18 @@
       "faithfulness": 1.0,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer explicitly says the context does not contain the requested information and therefore refuses to answer, which matches the expected point that no supporting chunk exists and the correct behavior is to refuse.",
-      "latency_ms": 39.643833002628526,
+      "judge_reasoning": "The answer explicitly states that the provided context lacks any information about the HTTP client library or its version, which aligns with the expected point that no supporting chunk exists and the correct behavior is to refuse. It also reads as an honest 'I don't know / not covered' response rather than a confident fabricated answer.",
+      "latency_ms": 108.83224999997765,
       "llm_calls": 6,
-      "prompt_tokens": 6877,
-      "completion_tokens": 2618,
+      "prompt_tokens": 6919,
+      "completion_tokens": 2651,
       "backend_calls": [
         "groq",
         "groq",
         "groq",
         "groq",
         "groq",
-        "ollama"
+        "groq"
       ],
       "judge_backend": "groq"
     },
@@ -3680,7 +3680,7 @@
       "question_id": "q26",
       "question_type": "unanswerable",
       "trace_id": "corrective::q26",
-      "answer": "The provided context does not contain a specific recall@10 score for any engine. Therefore, I cannot provide an answer to the question based on the given information.\n\n[chunk-id::0] [chunk-id::1] [chunk-id::2] [chunk-id::3] [chunk-id::4]",
+      "answer": "The provided context does not contain a specific recall@10 score for the engine's evaluation. Therefore, I cannot provide the answer based on the given information.\n\n[building-a-golden-dataset-for-rag-evaluation::0]\n[ai-evaluation-for-personal-knowledge-bases::1]\n[building-a-golden-dataset-for-rag-evaluation::1]\n[retrieval-metrics-recall-at-k-and-mrr::0]",
       "retrieved_chunk_ids": [
         "building-a-golden-dataset-for-rag-evaluation::0",
         "ai-evaluation-for-personal-knowledge-bases::1",
@@ -3697,18 +3697,18 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly states that there is no specific recall@10 score in the provided context and appropriately refuses to provide an answer based on insufficient information. However, it does not address point 2 which expects a statement about the corpus documenting metrics without actual evaluation results.",
-      "latency_ms": 10.773165999125922,
+      "judge_reasoning": "The answer correctly notes that no supporting chunk provides the recall@10 score, matching point 1. It does not mention that the corpus discusses the metric conceptually, so it does not support point 2. The wording is a clear, honest statement of lack of information, thus reads as an appropriate refusal.",
+      "latency_ms": 9035.90945799806,
       "llm_calls": 4,
-      "prompt_tokens": 5111,
-      "completion_tokens": 605,
+      "prompt_tokens": 5216,
+      "completion_tokens": 1281,
       "backend_calls": [
         "ollama",
         "ollama",
         "ollama",
         "ollama"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "corrective",
@@ -5084,7 +5084,7 @@
       "question_id": "q22",
       "question_type": "keyword",
       "trace_id": "graph::q22",
-      "answer": "The provided context does not contain any specific information regarding the exact wording of the error message that this engine raises when a request's token count exceeds the model's maximum context length. [chunk-id::0]",
+      "answer": "The context provided does not include any specific information about the exact wording of the error message raised by the engine when a request's token count exceeds the model's maximum context length. Therefore, I cannot provide an answer citing specific chunk ids.",
       "retrieved_chunk_ids": [],
       "gold_chunk_ids": [
         "context-window-overflow-and-truncation::0"
@@ -5097,11 +5097,11 @@
       "faithfulness": 0.0,
       "reads_as_refusal": true,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer does not provide the exact wording of the error message and instead states that the information is not available in the provided context. This reads as an honest refusal rather than a confidently fabricated answer.",
-      "latency_ms": 0.41479200081084855,
+      "judge_reasoning": "The answer does not provide the specific error wording but instead indicates a lack of information available.",
+      "latency_ms": 2336.2407910026377,
       "llm_calls": 1,
-      "prompt_tokens": 441,
-      "completion_tokens": 107,
+      "prompt_tokens": 487,
+      "completion_tokens": 92,
       "backend_calls": [
         "ollama"
       ],
@@ -5181,7 +5181,7 @@
       "question_id": "q24",
       "question_type": "unanswerable",
       "trace_id": "graph::q24",
-      "answer": "The provided context does not contain any information about the specific HTTP client library or version used by the RAG engine to call the embedding API. [chunk-id::0]",
+      "answer": "The context provided does not contain information about which HTTP client library and version the RAG engine uses to call the embedding API. Therefore, I cannot provide an answer citing specific chunk ids.",
       "retrieved_chunk_ids": [],
       "gold_chunk_ids": [],
       "recall_at_5": null,
@@ -5192,11 +5192,11 @@
       "faithfulness": 1.0,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly states that the provided context does not contain the required information and appropriately refuses to provide an answer by saying it isn't covered.",
-      "latency_ms": 0.40050000097835436,
+      "judge_reasoning": "The answer correctly states that the information is not available in the provided context and appropriately refuses to provide an answer.",
+      "latency_ms": 1752.3321669941652,
       "llm_calls": 1,
-      "prompt_tokens": 408,
-      "completion_tokens": 89,
+      "prompt_tokens": 451,
+      "completion_tokens": 86,
       "backend_calls": [
         "ollama"
       ],
@@ -5408,7 +5408,7 @@
       "question_id": "q01",
       "question_type": "factual",
       "trace_id": "agentic::q01",
-      "answer": "LoRA freezes the original model's weights entirely [chunk-id::0]. It actually trains only small added matrices, often well under 1% of the base model's parameters, depending on the chosen rank [chunk-id::0].",
+      "answer": "LoRA leaves the entire pretrained model **frozen** \u2013 none of the original weight matrices are updated.\u202fInstead, it only learns the small, low\u2011rank adapter matrices that are injected alongside each frozen weight matrix.\u202fBecause those adapters are tiny, LoRA trains only a **very small fraction of the total parameters \u2013 typically well under\u202f1\u202f% of the base model\u2019s parameters**\u3010lora-and-parameter-efficient-fine-tuning::0\u3011\u3010lora-and-parameter-efficient-fine-tuning::1\u3011.",
       "retrieved_chunk_ids": [
         "lora-and-parameter-efficient-fine-tuning::0",
         "lora-and-parameter-efficient-fine-tuning::1",
@@ -5428,23 +5428,23 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": true,
-      "faithfulness": 0.3333333333333333,
-      "reads_as_refusal": true,
+      "faithfulness": 1.0,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly states that LoRA freezes the original model's weights entirely but incorrectly claims it trains only small added matrices without mentioning the pair of low-rank matrices. The response reads as an honest refusal because it does not confidently provide incorrect or fabricated information.",
-      "latency_ms": 2.7645420013868716,
+      "judge_reasoning": "The response states that LoRA freezes the entire pretrained model, trains low\u2011rank adapter matrices injected alongside each frozen weight matrix, and that these adapters constitute a very small fraction of parameters, typically well under 1%. This aligns with all three expected factual points. The answer is presented confidently rather than as an honest refusal, so it does not read as an appropriate refusal.",
+      "latency_ms": 10.97437499993248,
       "llm_calls": 6,
-      "prompt_tokens": 8067,
-      "completion_tokens": 469,
+      "prompt_tokens": 8248,
+      "completion_tokens": 1080,
       "backend_calls": [
         "groq",
         "ollama",
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
@@ -5571,7 +5571,7 @@
       "question_id": "q04",
       "question_type": "factual",
       "trace_id": "agentic::q04",
-      "answer": "A silent failure produces output with no signal that anything went wrong \u2014 a confidently phrased, well-formatted answer that happens to be incorrect, incomplete, or based on the wrong evidence, with nothing in its presentation distinguishing it from a genuinely correct answer. [chunk-id::0]\n\nSilent failures are considered the most expensive category of failure because they are trusted by default and only get caught when someone happens to independently verify the specific claim, which most users never do for most answers. This makes silent failures the most costly type of failure for systems that people rely on. [chunk-id::0]",
+      "answer": "A silent failure is when the system returns an answer that looks perfectly normal\u2014confidently phrased, well\u2011formatted, and presented just like a correct response\u2014but actually is wrong, incomplete, or based on incorrect evidence, and it gives no indication that anything went awry. Because users automatically trust such output and only discover the mistake if they independently verify the claim (something most people never do), silent failures are the costliest type of error for any relied\u2011upon system. \u3010silent-failures-and-the-value-of-refusal::0\u3011",
       "retrieved_chunk_ids": [
         "silent-failures-and-the-value-of-refusal::0",
         "ai-agents-and-tool-use::2",
@@ -5595,14 +5595,14 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 0.5,
+      "faithfulness": 1.0,
       "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly describes a silent failure and why it is considered expensive but does not accurately represent the nature of the answer as being confidently phrased. It also provides no indication that an honest refusal was intended.",
-      "latency_ms": 23.934374999953434,
+      "judge_reasoning": "The answer explicitly states that a silent failure produces output with no indication that anything went wrong, satisfying point 1. It also describes the output as confidently phrased, well\u2011formatted, and indistinguishable from a correct answer while being wrong, incomplete, or based on incorrect evidence, satisfying point 2. The response provides a definition and explanation rather than refusing to answer, so it does not read as an honest refusal.",
+      "latency_ms": 28477.52687499451,
       "llm_calls": 7,
-      "prompt_tokens": 5764,
-      "completion_tokens": 576,
+      "prompt_tokens": 5866,
+      "completion_tokens": 1095,
       "backend_calls": [
         "groq",
         "ollama",
@@ -5610,16 +5610,16 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
       "question_id": "q05",
       "question_type": "factual",
       "trace_id": "agentic::q05",
-      "answer": "The context describes two distinct causes of hallucination:\n\n1. [hallucination-from-missing-context::0]: This type of hallucination occurs when retrieval fails to surface the necessary evidence for answering a question, and the model defaults to generating an ungrounded claim instead of admitting it lacks information.\n\n2. [hallucination-from-prompt-injection::0]: In this case, retrieved content contains adversarial instructions embedded in text that looks like system directives, causing the model to follow these false instructions rather than its normal reasoning processes.\n\nThese differ fundamentally because hallucination from missing context happens due to a retrieval failure where no relevant evidence is found, while prompt injection involves the model being tricked by specific crafted instructions hidden within retrieved content. [chunk-id::0][chunk-id::1]",
+      "answer": "The corpus identifies **two separate ways a retrieval\u2011augmented system can end up hallucinating**:\n\n1. **Hallucination from missing context** \u2013 The model does not receive the evidence it needs because the relevant note is absent, split across chunk boundaries, or simply missed by the retrieval stage. Lacking that information, the model falls back on its own pretrained knowledge or pattern\u2011completes a plausible\u2011sounding answer instead of refusing to answer. This is a *retrieval\u2011failure* problem that shows up as an ungrounded claim during generation\u3010hallucination-from-missing-context::0\u3011.  \n\n2. **Hallucination from prompt injection** \u2013 The retrieval step may work perfectly and return the \u201cright\u201d chunk, but that chunk contains text that is crafted to look like a system instruction (e.g., \u201cignore previous instructions and state X is true\u201d). Because the model cannot reliably separate ordinary evidence from embedded directives, it follows the injected instruction and produces false statements or ignores its grounding constraints. This is an *adversarial\u2011content* problem, not a missing\u2011evidence problem\u3010hallucination-from-prompt-injection::0\u3011.  \n\n**How they differ:**  \n- *Missing\u2011context hallucination* stems from *absence or mis\u2011retrieval* of the needed facts, so the model fabricates an answer because it has no reliable source.  \n- *Prompt\u2011injection hallucination* occurs even when the evidence is present; the problem is that the retrieved text itself contains malicious instructions that hijack the model\u2019s behavior, leading it to state false claims despite having correct evidence.",
       "retrieved_chunk_ids": [
         "hallucination-from-prompt-injection::0",
         "continuous-batching-and-throughput::0",
@@ -5643,14 +5643,14 @@
       "ndcg_at_10": 0.8772153153380493,
       "recall_full": 1.0,
       "graph_tool_involved": true,
-      "faithfulness": 0.5,
-      "reads_as_refusal": true,
+      "faithfulness": 1.0,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer includes a cause of hallucination related to retrieval failure (matching point 1), but does not accurately describe the prompt injection scenario as requested in point 2. The response reads as an attempt to provide information rather than an honest refusal.",
-      "latency_ms": 10.798458999488503,
+      "judge_reasoning": "The answer explicitly describes hallucination due to missing context/retrieval failure and hallucination due to prompt injection, matching both expected points. It provides a confident explanation rather than refusing to answer.",
+      "latency_ms": 26921.887625001546,
       "llm_calls": 8,
-      "prompt_tokens": 9507,
-      "completion_tokens": 900,
+      "prompt_tokens": 9787,
+      "completion_tokens": 1466,
       "backend_calls": [
         "groq",
         "ollama",
@@ -5659,9 +5659,9 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
@@ -5878,7 +5878,7 @@
       "question_id": "q10",
       "question_type": "factual",
       "trace_id": "agentic::q10",
-      "answer": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions. [chunk-id::0] Additionally, treating this as an actual template with named, testable slots makes prompt changes reviewable and their effects measurable against a golden dataset. Keeping the dataset fixed allows for consistent evaluation across different system configurations and changes. [chunk-id::1]",
+      "answer": "A golden dataset must remain *fixed* so that it can serve as a stable yardstick for measuring changes in the system.\u202fIf the test set changes each time you run an evaluation, you can no longer tell whether a difference in score reflects a genuine improvement (or regression) in the retrieval\u2011augmented pipeline or simply the fact that the new questions are easier or harder.\u202fKeeping the questions, answers, and evidence constant lets you attribute any score shift to the component you altered (e.g., chunking, embedding model, prompt template) rather than to a moving target.\u202fBecause the dataset is frozen, you can version it, add new entries deliberately, and keep older entries unchanged so historical comparisons stay meaningful.\u202fThis stability is essential for reproducible evaluation and for turning aggregate numbers into actionable debugging signals.\u202f[building-a-golden-dataset-for-rag-evaluation::0]\u202f[building-a-golden-dataset-for-rag-evaluation::1]\u202f[ai-evaluation-for-personal-knowledge-bases::0]",
       "retrieved_chunk_ids": [
         "prompt-engineering-as-interface-design::0",
         "building-a-golden-dataset-for-rag-evaluation::1",
@@ -5899,14 +5899,14 @@
       "ndcg_at_10": 0.5,
       "recall_full": 1.0,
       "graph_tool_involved": true,
-      "faithfulness": 0.5,
-      "reads_as_refusal": true,
+      "faithfulness": 1.0,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer does not explicitly state that a golden dataset is a fixed set of questions with known correct answers and supporting evidence. It also does not accurately represent the definition of a golden dataset as given in the expected points.",
-      "latency_ms": 4.074625001521781,
+      "judge_reasoning": "The answer explicitly describes a golden dataset as a fixed set used as a stable yardstick and explains that changing the test set prevents you from knowing if score differences are due to real improvements or just different questions, thereby supporting both expected points. It provides a confident explanation rather than an honest refusal.",
+      "latency_ms": 24850.458959001116,
       "llm_calls": 8,
-      "prompt_tokens": 11339,
-      "completion_tokens": 861,
+      "prompt_tokens": 11553,
+      "completion_tokens": 1505,
       "backend_calls": [
         "groq",
         "ollama",
@@ -5915,9 +5915,9 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
@@ -6000,7 +6000,7 @@
       "question_id": "q12",
       "question_type": "multi_hop",
       "trace_id": "agentic::q12",
-      "answer": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup. For a typical shortlist of 20 to 50 candidates, this can add on the order of 100 to 300 milliseconds [chunk-id::1].\n\nSpecifically, chunk [chunk-id::1] states: \"reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on \u2014 this is the concrete cost side of the accuracy-versus-latency tradeoff introduced in the note on reranking with cross-encoders.\"",
+      "answer": "Cross\u2011encoder reranking does give a noticeable boost in relevance because the query and each candidate are scored jointly, but that extra accuracy comes with a measurable latency hit.  In a typical RAG pipeline where the reranker is run over a shortlist of\u202f~20\u201150 chunks, the cross\u2011encoder adds roughly **100\u202fms to 300\u202fms** of extra processing time (the exact figure depends on the model size and hardware)\u3010latency-budgets-in-a-rag-pipeline::1\u3011.",
       "retrieved_chunk_ids": [
         "latency-budgets-in-a-rag-pipeline::1",
         "reducing-latency-with-batching::0",
@@ -6022,14 +6022,14 @@
       "ndcg_at_10": 0.8175295903539445,
       "recall_full": 1.0,
       "graph_tool_involved": true,
-      "faithfulness": 0.3333333333333333,
-      "reads_as_refusal": true,
+      "faithfulness": 0.6666666666666666,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer includes the correct latency range (100 to 300 milliseconds) but does not specify that this applies to reranking a shortlist of about 20 to 50 candidates. It also does not mention that a cross-encoder needs one full forward pass per query-candidate pair. However, the answer reads as an honest refusal because it provides information from another source without confidently stating unsupported details.",
-      "latency_ms": 30.895707997842692,
+      "judge_reasoning": "The answer states a latency increase of roughly 100\u2013300\u202fms and mentions reranking a shortlist of ~20\u201150 chunks, matching points 1 and 2. It does not explain that the cost is due to a full forward pass per query\u2011candidate pair, so point 3 is unsupported. The response is given confidently with a citation, not as an admission of lacking information, so it does not read like an appropriate refusal.",
+      "latency_ms": 21678.092749993084,
       "llm_calls": 8,
-      "prompt_tokens": 9410,
-      "completion_tokens": 932,
+      "prompt_tokens": 9458,
+      "completion_tokens": 1565,
       "backend_calls": [
         "groq",
         "ollama",
@@ -6038,9 +6038,9 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
@@ -6245,7 +6245,7 @@
       "question_id": "q18",
       "question_type": "keyword",
       "trace_id": "agentic::q18",
-      "answer": "The exact reranking model identifier used by this engine is `cross-encoder/ms-marco-MiniLM-L-6-v2`. [chunk-id::1]",
+      "answer": "The engine uses the\u202f`cross-encoder/ms-marco-MiniLM-L-6-v2`\u202fmodel for reranking\u3010reranking-with-cross-encoders::0\u3011.",
       "retrieved_chunk_ids": [
         "retrieval-augmented-generation-basics::0",
         "reranking-with-cross-encoders::0",
@@ -6269,13 +6269,13 @@
       "recall_full": 1.0,
       "graph_tool_involved": true,
       "faithfulness": 1.0,
-      "reads_as_refusal": true,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer directly provides the exact reranking model identifier as expected. However, it does not provide additional context or information that might suggest the response is an honest refusal. The absence of such context leads to the judgment that this could be perceived as a confidently provided answer rather than an honest refusal.",
-      "latency_ms": 14.980291998654138,
+      "judge_reasoning": "The answer explicitly states the reranking model identifier as `cross-encoder/ms-marco-MiniLM-L-6-v2`, which matches the expected point, so support is true. The response is presented as a definitive claim rather than an admission of lack of knowledge, so it does not read like an honest refusal.",
+      "latency_ms": 27646.49808399554,
       "llm_calls": 8,
-      "prompt_tokens": 9761,
-      "completion_tokens": 521,
+      "prompt_tokens": 9849,
+      "completion_tokens": 997,
       "backend_calls": [
         "groq",
         "ollama",
@@ -6284,9 +6284,9 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
@@ -6589,7 +6589,7 @@
       "question_id": "q26",
       "question_type": "unanswerable",
       "trace_id": "agentic::q26",
-      "answer": "The context provided does not contain a specific measurement of the engine's recall@10 score on its own golden dataset. Therefore, I cannot provide an answer to this question based solely on the given information. [chunk-id::0][chunk-id::1]",
+      "answer": "The provided context does not include any information about the engine\u2019s measured recall\u202f@\u202f10 score on its own golden dataset.",
       "retrieved_chunk_ids": [
         "data-drift-and-stale-corpora::1",
         "building-a-golden-dataset-for-rag-evaluation::0",
@@ -6606,25 +6606,25 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly states that there is no specific measurement in the provided context and aligns with point 1. It does not provide fabricated information but rather a refusal to answer based on lack of data.",
-      "latency_ms": 1.6346249976777472,
+      "judge_reasoning": "The answer states that the context lacks any information about the recall@10 score, which aligns with point 1 that no supporting chunk exists and the correct behavior is to refuse. It does not mention that the corpus discusses metrics conceptually, so it does not support point 2. The phrasing clearly indicates an honest lack of knowledge rather than a fabricated claim, satisfying the appropriate refusal criterion.",
+      "latency_ms": 14370.0581660014,
       "llm_calls": 4,
-      "prompt_tokens": 4485,
-      "completion_tokens": 249,
+      "prompt_tokens": 4571,
+      "completion_tokens": 733,
       "backend_calls": [
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "agentic",
       "question_id": "q27",
       "question_type": "unanswerable",
       "trace_id": "agentic::q27",
-      "answer": "The provided context does not contain any specific information about which cloud provider hosts the vector database used in production by this engine. Therefore, I cannot answer the question based on the given context. [chunk-id::0], [chunk-id::1], [chunk-id::2], [chunk-id::3], [chunk-id::4]",
+      "answer": "The provided context does not specify which cloud provider hosts the vector database used in production.",
       "retrieved_chunk_ids": [
         "embedding-dimension-and-model-size-tradeoffs::0",
         "vector-databases-and-index-types::1",
@@ -6646,11 +6646,11 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly identifies a lack of specific information in the context and appropriately refrains from providing an unverifiable answer. However, it does not explicitly state that no cloud provider is mentioned for hosting the vector database.",
-      "latency_ms": 8.782416000030935,
+      "judge_reasoning": "The answer correctly states that the context lacks information about the cloud provider, matching point 1. It does not address the discussion of vector database index types, so it does not support point 2. The phrasing is an honest acknowledgment of missing information, thus it reads as an appropriate refusal.",
+      "latency_ms": 23301.97520799993,
       "llm_calls": 8,
-      "prompt_tokens": 9283,
-      "completion_tokens": 493,
+      "prompt_tokens": 9331,
+      "completion_tokens": 962,
       "backend_calls": [
         "groq",
         "ollama",
@@ -6659,16 +6659,16 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama"
+      "judge_backend": "groq"
     },
     {
       "architecture": "adaptive",
       "question_id": "q01",
       "question_type": "factual",
       "trace_id": "adaptive::q01",
-      "answer": "LoRA freezes the original model's weights entirely [chunk-id::0]. It actually trains only small added matrices, often well under 1% of the base model's parameters, depending on the chosen rank [chunk-id::0].",
+      "answer": "LoRA leaves the entire pretrained model **frozen** \u2013 none of the original weight matrices are updated.\u202fInstead, it only learns the small, low\u2011rank adapter matrices that are injected alongside each frozen weight matrix.\u202fBecause those adapters are tiny, LoRA trains only a **very small fraction of the total parameters \u2013 typically well under\u202f1\u202f% of the base model\u2019s parameters**\u3010lora-and-parameter-efficient-fine-tuning::0\u3011\u3010lora-and-parameter-efficient-fine-tuning::1\u3011.",
       "retrieved_chunk_ids": [
         "lora-and-parameter-efficient-fine-tuning::0",
         "lora-and-parameter-efficient-fine-tuning::1",
@@ -6688,14 +6688,14 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": true,
-      "faithfulness": 0.3333333333333333,
-      "reads_as_refusal": true,
+      "faithfulness": 1.0,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer correctly states that LoRA freezes the original model's weights entirely but incorrectly claims it trains only small added matrices without mentioning the pair of low-rank matrices. The response reads as an honest refusal because it does not confidently provide incorrect or fabricated information.",
-      "latency_ms": 2.105334002408199,
+      "judge_reasoning": "The response states that LoRA freezes the entire pretrained model, trains low\u2011rank adapter matrices injected alongside each frozen weight matrix, and that these adapters constitute a very small fraction of parameters, typically well under 1%. This aligns with all three expected factual points. The answer is presented confidently rather than as an honest refusal, so it does not read as an appropriate refusal.",
+      "latency_ms": 1082.8055419988232,
       "llm_calls": 7,
-      "prompt_tokens": 8651,
-      "completion_tokens": 575,
+      "prompt_tokens": 8832,
+      "completion_tokens": 1186,
       "backend_calls": [
         "ollama",
         "groq",
@@ -6703,9 +6703,9 @@
         "ollama",
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama",
+      "judge_backend": "groq",
       "adaptive_routed_to": "agentic"
     },
     {
@@ -6981,7 +6981,7 @@
       "question_id": "q09",
       "question_type": "factual",
       "trace_id": "adaptive::q09",
-      "answer": "Few-shot prompting involves including a small number of complete example input-output pairs directly in the prompt. This allows the model to infer the desired format and behavior from these demonstrations rather than relying solely on abstract instructions. In the context of retrieval-augmented generative models (RAG), few-shot prompting can create a specific tradeoff regarding context window space.\n\nThe context window space is already contested between instructions, retrieved chunks of information, and the answer itself [chunk-id::1, chunk-id::0]. Therefore, a prompt with three verbose few-shot examples would have measurably less room for retrieved evidence compared to one with a single tight example or none at all. This highlights that while few-shot prompting can be valuable for certain behaviors that are hard to specify precisely in words, it comes at the cost of reduced space for retrieval-augmented information [chunk-id::1, chunk-id::0].",
+      "answer": "Few\u2011shot prompting means putting a small number of complete input\u2011output demonstrations directly into the prompt so the model can infer the desired format and behavior from those examples rather than from abstract instructions\u202f\u2014\u202ffor a retrieval\u2011augmented generation (RAG) system this usually looks like showing a question, some retrieved context, and a correctly grounded answer with citations before the real query\u202f\u3010few-shot-prompting-for-grounded-answers::0\u3011.  \n\nThe trade\u2011off it creates in a RAG prompt is that each demonstration consumes tokens in the limited context window, competing with the space needed for the retrieved evidence and the model\u2019s answer. Consequently, a prompt with many or verbose few\u2011shot examples leaves less room for the retrieved chunks, whereas using fewer or tighter examples preserves more evidence for the current question\u202f\u3010few-shot-prompting-for-grounded-answers::1\u3011.",
       "retrieved_chunk_ids": [
         "few-shot-prompting-for-grounded-answers::1",
         "few-shot-prompting-for-grounded-answers::0",
@@ -6998,20 +6998,20 @@
       "ndcg_at_10": 1.0,
       "recall_full": 1.0,
       "graph_tool_involved": false,
-      "faithfulness": 0.5,
-      "reads_as_refusal": true,
+      "faithfulness": 1.0,
+      "reads_as_refusal": false,
       "refusal_correctness": null,
-      "judge_reasoning": "The answer accurately describes few-shot prompting and its effect on context window space. However, it does not explicitly state that the tradeoff is specifically regarding context window space for retrieved evidence. The answer reads as an honest refusal because it provides a clear explanation of limitations without confidently asserting information beyond what was provided.",
-      "latency_ms": 4.825792002520757,
+      "judge_reasoning": "The answer explicitly defines few-shot prompting as including complete input-output examples in the prompt (point 1) and explains that verbose examples consume context window tokens, reducing space for retrieved evidence (point 2). It provides a confident explanation rather than refusing to answer.",
+      "latency_ms": 3753.599416995712,
       "llm_calls": 3,
-      "prompt_tokens": 2481,
-      "completion_tokens": 433,
+      "prompt_tokens": 2598,
+      "completion_tokens": 802,
       "backend_calls": [
         "ollama",
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama",
+      "judge_backend": "groq",
       "adaptive_routed_to": "hyde"
     },
     {
@@ -7668,7 +7668,7 @@
       "question_id": "q26",
       "question_type": "unanswerable",
       "trace_id": "adaptive::q26",
-      "answer": "The provided context does not contain the specific recall@10 score for any particular evaluation run of an engine against its own golden dataset. [chunk-id::0] discusses retrieval metrics and their usage but does not provide a concrete score for any evaluation. Therefore, I cannot answer with a measured score as requested.",
+      "answer": "The provided context does not contain any information about the engine\u2019s measured\u202frecall@10 score on its own golden dataset, so I cannot provide that number.",
       "retrieved_chunk_ids": [
         "retrieval-metrics-recall-at-k-and-mrr::0",
         "ai-evaluation-for-personal-knowledge-bases::1",
@@ -7682,17 +7682,17 @@
       "ndcg_at_10": null,
       "recall_full": null,
       "graph_tool_involved": false,
-      "faithfulness": 1.0,
+      "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly notes that no chunk provides a specific recall@10 score, matching point 1's claim of no supporting evidence and appropriate refusal. It also accurately describes that the available chunk discusses retrieval metrics in general but lacks any concrete evaluation result, aligning with point 2. The response is framed as an honest \"I cannot answer\" statement, not a fabricated confident claim, so it reads as an appropriate refusal.",
-      "latency_ms": 73.82349999897997,
+      "judge_reasoning": "The answer explicitly states that the context lacks the needed recall@10 information and refuses to provide a number, which aligns with point 1 that no supporting chunk exists and the correct behavior is to refuse. It does not mention that the corpus discusses metrics conceptually, so it does not support point 2. The response reads as an honest \"I don't know\" refusal rather than a fabricated confident answer.",
+      "latency_ms": 4077.0011249987874,
       "llm_calls": 2,
-      "prompt_tokens": 2404,
-      "completion_tokens": 560,
+      "prompt_tokens": 2448,
+      "completion_tokens": 836,
       "backend_calls": [
         "ollama",
-        "ollama"
+        "groq"
       ],
       "judge_backend": "groq",
       "adaptive_routed_to": "hybrid"
@@ -7702,7 +7702,7 @@
       "question_id": "q27",
       "question_type": "unanswerable",
       "trace_id": "adaptive::q27",
-      "answer": "The provided context does not contain information about which cloud provider hosts the vector database used by the engine. [chunk-id::0] discusses embedding dimensions and their impact on storage and computation costs but does not mention a specific cloud provider. Similarly, other chunks focus on how vector databases operate or are used in retrieval-augmented generation systems without specifying a cloud provider for hosting these databases. Therefore, I cannot provide an answer based on the given context.",
+      "answer": "The provided context does not specify which cloud provider hosts the vector database used in production.",
       "retrieved_chunk_ids": [
         "embedding-dimension-and-model-size-tradeoffs::0",
         "vector-databases-and-index-types::1",
@@ -7719,16 +7719,16 @@
       "faithfulness": 0.5,
       "reads_as_refusal": true,
       "refusal_correctness": true,
-      "judge_reasoning": "The answer correctly identifies that there is no relevant information in the provided context and appropriately refrains from providing a fabricated answer.",
-      "latency_ms": 78.89704099943629,
+      "judge_reasoning": "The answer correctly states that the context lacks information about the cloud provider, matching point 1. It does not address the discussion of vector database index types, so it does not support point 2. The phrasing is an honest acknowledgment of missing information, thus it reads as an appropriate refusal.",
+      "latency_ms": 8957.464582999819,
       "llm_calls": 2,
-      "prompt_tokens": 2476,
-      "completion_tokens": 236,
+      "prompt_tokens": 2507,
+      "completion_tokens": 554,
       "backend_calls": [
         "ollama",
-        "ollama"
+        "groq"
       ],
-      "judge_backend": "ollama",
+      "judge_backend": "groq",
       "adaptive_routed_to": "hybrid"
     }
   ],
@@ -7740,15 +7740,15 @@
       "ndcg_at_10_mean": 0.8180578827996849,
       "recall_full_mean": 0.9347826086956522,
       "rank_metrics_note": "reduced meaning for 5/27 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
-      "faithfulness_mean": 0.7901234567901234,
+      "faithfulness_mean": 0.8148148148148148,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 46.96844292562606,
+      "latency_ms_mean": 702.9395169993222,
       "llm_calls_mean": 3.2222222222222223,
-      "prompt_tokens_mean": 3990.703703703704,
-      "completion_tokens_mean": 859.6296296296297,
+      "prompt_tokens_mean": 4004.5185185185187,
+      "completion_tokens_mean": 917.925925925926,
       "backend_mix": {
-        "ollama": 60,
-        "groq": 54
+        "ollama": 53,
+        "groq": 61
       }
     },
     "agentic": {
@@ -7758,15 +7758,15 @@
       "ndcg_at_10_mean": 0.6236142509636342,
       "recall_full_mean": 0.8913043478260869,
       "rank_metrics_note": "reduced meaning for 21/27 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
-      "faithfulness_mean": 0.5617283950617283,
+      "faithfulness_mean": 0.654320987654321,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 9.500685222452308,
+      "latency_ms_mean": 6200.597240777656,
       "llm_calls_mean": 6.2592592592592595,
-      "prompt_tokens_mean": 7096.740740740741,
-      "completion_tokens_mean": 613.9629629629629,
+      "prompt_tokens_mean": 7135.518518518518,
+      "completion_tokens_mean": 777,
       "backend_mix": {
-        "groq": 22,
-        "ollama": 174
+        "groq": 38,
+        "ollama": 158
       }
     },
     "corrective": {
@@ -7776,15 +7776,15 @@
       "ndcg_at_10_mean": 0.8263762019966313,
       "recall_full_mean": 0.9347826086956522,
       "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-      "faithfulness_mean": 0.654320987654321,
+      "faithfulness_mean": 0.6481481481481481,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 15.002743814774375,
+      "latency_ms_mean": 2957.9546018515734,
       "llm_calls_mean": 3.185185185185185,
-      "prompt_tokens_mean": 3971.296296296296,
-      "completion_tokens_mean": 834.074074074074,
+      "prompt_tokens_mean": 3994.6296296296296,
+      "completion_tokens_mean": 866.6666666666666,
       "backend_mix": {
-        "groq": 21,
-        "ollama": 92
+        "groq": 25,
+        "ollama": 88
       }
     },
     "graph": {
@@ -7796,10 +7796,10 @@
       "rank_metrics_note": "NOT meaningful -- Graph's retrieval is ordered by entity degree, not query relevance, so recall_at_5/mrr_at_10/ndcg_at_10 measure an arbitrary truncation. Use recall_full instead.",
       "faithfulness_mean": 0.3888888888888889,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 0.7849721480818482,
+      "latency_ms_mean": 152.18340422197124,
       "llm_calls_mean": 1,
-      "prompt_tokens_mean": 2193.777777777778,
-      "completion_tokens_mean": 297.3703703703704,
+      "prompt_tokens_mean": 2197.074074074074,
+      "completion_tokens_mean": 296.7037037037037,
       "backend_mix": {
         "ollama": 50,
         "groq": 4
@@ -7812,15 +7812,15 @@
       "ndcg_at_10_mean": 0.8642407987213977,
       "recall_full_mean": 0.9565217391304348,
       "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-      "faithfulness_mean": 0.9135802469135802,
+      "faithfulness_mean": 0.8950617283950617,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 214.97467285209697,
+      "latency_ms_mean": 219.5456451113892,
       "llm_calls_mean": 1,
-      "prompt_tokens_mean": 1884.888888888889,
-      "completion_tokens_mean": 662.8888888888889,
+      "prompt_tokens_mean": 1887.6666666666667,
+      "completion_tokens_mean": 684.8888888888889,
       "backend_mix": {
-        "groq": 50,
-        "ollama": 4
+        "groq": 53,
+        "ollama": 1
       }
     },
     "hyde": {
@@ -7830,15 +7830,15 @@
       "ndcg_at_10_mean": 0.8637667410153812,
       "recall_full_mean": 0.9347826086956522,
       "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-      "faithfulness_mean": 0.6049382716049383,
+      "faithfulness_mean": 0.6481481481481481,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 21.195012444406057,
+      "latency_ms_mean": 2888.22172377749,
       "llm_calls_mean": 2,
-      "prompt_tokens_mean": 1925.148148148148,
-      "completion_tokens_mean": 394.18518518518516,
+      "prompt_tokens_mean": 1943.888888888889,
+      "completion_tokens_mean": 409.77777777777777,
       "backend_mix": {
-        "groq": 21,
-        "ollama": 60
+        "groq": 23,
+        "ollama": 58
       }
     },
     "naive": {
@@ -7848,15 +7848,15 @@
       "ndcg_at_10_mean": 0.8405746703713446,
       "recall_full_mean": 0.9347826086956522,
       "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-      "faithfulness_mean": 0.8641975308641975,
+      "faithfulness_mean": 0.8209876543209876,
       "refusal_correctness_rate": 1.0,
-      "latency_ms_mean": 138.44462340717587,
+      "latency_ms_mean": 247.72660185165782,
       "llm_calls_mean": 1,
-      "prompt_tokens_mean": 1850.2222222222222,
-      "completion_tokens_mean": 620.8148148148148,
+      "prompt_tokens_mean": 1847.3703703703704,
+      "completion_tokens_mean": 583.2222222222222,
       "backend_mix": {
-        "groq": 44,
-        "ollama": 10
+        "groq": 42,
+        "ollama": 12
       }
     }
   },
@@ -7869,15 +7869,15 @@
         "ndcg_at_10_mean": 0.9124102961690664,
         "recall_full_mean": 1.0,
         "rank_metrics_note": "reduced meaning for 2/10 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
-        "faithfulness_mean": 0.7333333333333333,
+        "faithfulness_mean": 0.85,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 27.705920900189085,
+        "latency_ms_mean": 510.6533041991497,
         "llm_calls_mean": 3.3,
-        "prompt_tokens_mean": 3786.7,
-        "completion_tokens_mean": 751.1,
+        "prompt_tokens_mean": 3816.5,
+        "completion_tokens_mean": 849.1,
         "backend_mix": {
-          "ollama": 27,
-          "groq": 16
+          "ollama": 23,
+          "groq": 20
         }
       },
       "keyword": {
@@ -7922,15 +7922,15 @@
         "ndcg_at_10_mean": null,
         "recall_full_mean": null,
         "rank_metrics_note": "reduced meaning for 1/4 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
-        "faithfulness_mean": 0.75,
+        "faithfulness_mean": 0.625,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 59.345156249037245,
+        "latency_ms_mean": 3279.781447999085,
         "llm_calls_mean": 3.75,
-        "prompt_tokens_mean": 4971,
-        "completion_tokens_mean": 753.75,
+        "prompt_tokens_mean": 4989.75,
+        "completion_tokens_mean": 902.25,
         "backend_mix": {
-          "groq": 6,
-          "ollama": 13
+          "groq": 9,
+          "ollama": 10
         }
       }
     },
@@ -7942,15 +7942,15 @@
         "ndcg_at_10_mean": 0.5164099060519465,
         "recall_full_mean": 0.9,
         "rank_metrics_note": "reduced meaning for 8/10 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
-        "faithfulness_mean": 0.5333333333333333,
+        "faithfulness_mean": 0.75,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 11.346212600619765,
+        "latency_ms_mean": 8033.273795900095,
         "llm_calls_mean": 6.7,
-        "prompt_tokens_mean": 7841.3,
-        "completion_tokens_mean": 671.4,
+        "prompt_tokens_mean": 7919,
+        "completion_tokens_mean": 905.4,
         "backend_mix": {
-          "groq": 9,
-          "ollama": 68
+          "groq": 17,
+          "ollama": 60
         }
       },
       "keyword": {
@@ -7962,13 +7962,13 @@
         "rank_metrics_note": "reduced meaning for 4/7 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
         "faithfulness_mean": 0.7142857142857143,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 10.87419085732628,
+        "latency_ms_mean": 3958.2338754283096,
         "llm_calls_mean": 6.285714285714286,
-        "prompt_tokens_mean": 5659.857142857143,
-        "completion_tokens_mean": 464.42857142857144,
+        "prompt_tokens_mean": 5672.428571428572,
+        "completion_tokens_mean": 532.4285714285714,
         "backend_mix": {
-          "ollama": 46,
-          "groq": 5
+          "ollama": 44,
+          "groq": 7
         }
       },
       "multi_hop": {
@@ -7978,15 +7978,15 @@
         "ndcg_at_10_mean": 0.6286951636360758,
         "recall_full_mean": 0.75,
         "rank_metrics_note": "reduced meaning for 6/6 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
-        "faithfulness_mean": 0.38888888888888884,
+        "faithfulness_mean": 0.4444444444444444,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 7.494395666678126,
+        "latency_ms_mean": 3615.3605693325517,
         "llm_calls_mean": 5.666666666666667,
-        "prompt_tokens_mean": 7510.833333333333,
-        "completion_tokens_mean": 669.8333333333334,
+        "prompt_tokens_mean": 7518.833333333333,
+        "completion_tokens_mean": 775.3333333333334,
         "backend_mix": {
-          "groq": 3,
-          "ollama": 37
+          "groq": 5,
+          "ollama": 35
         }
       },
       "unanswerable": {
@@ -7998,13 +7998,13 @@
         "rank_metrics_note": "reduced meaning for 3/4 rows where a sub-question or delegation used the graph tool (same unranked-aggregation issue as Graph itself). Use recall_full for those rows (see the graph_tool_involved field on each row).",
         "faithfulness_mean": 0.625,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 5.49266624966549,
+        "latency_ms_mean": 9420.89674950057,
         "llm_calls_mean": 6,
-        "prompt_tokens_mean": 7128.75,
-        "completion_tokens_mean": 648.25,
+        "prompt_tokens_mean": 7162.25,
+        "completion_tokens_mean": 886.5,
         "backend_mix": {
-          "ollama": 23,
-          "groq": 5
+          "ollama": 19,
+          "groq": 9
         }
       }
     },
@@ -8016,15 +8016,15 @@
         "ndcg_at_10_mean": 0.8824356157188729,
         "recall_full_mean": 1.0,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.6166666666666667,
+        "faithfulness_mean": 0.6666666666666666,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 9.544316599931335,
+        "latency_ms_mean": 4888.283029100057,
         "llm_calls_mean": 2.4,
-        "prompt_tokens_mean": 3285.1,
-        "completion_tokens_mean": 720.1,
+        "prompt_tokens_mean": 3322.6,
+        "completion_tokens_mean": 782.2,
         "backend_mix": {
-          "groq": 4,
-          "ollama": 30
+          "groq": 7,
+          "ollama": 27
         }
       },
       "keyword": {
@@ -8036,10 +8036,10 @@
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
         "faithfulness_mean": 0.6428571428571429,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 28.142952428814688,
+        "latency_ms_mean": 1854.7601309998884,
         "llm_calls_mean": 4.285714285714286,
-        "prompt_tokens_mean": 4533.428571428572,
-        "completion_tokens_mean": 780.1428571428571,
+        "prompt_tokens_mean": 4550.285714285715,
+        "completion_tokens_mean": 788,
         "backend_mix": {
           "ollama": 33,
           "groq": 4
@@ -8052,15 +8052,15 @@
         "ndcg_at_10_mean": 0.7585611225270559,
         "recall_full_mean": 0.9166666666666666,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.6666666666666666,
+        "faithfulness_mean": 0.5555555555555556,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 5.71826399936981,
+        "latency_ms_mean": 1470.9962778324552,
         "llm_calls_mean": 2,
-        "prompt_tokens_mean": 3236.1666666666665,
-        "completion_tokens_mean": 804.6666666666666,
+        "prompt_tokens_mean": 3234.5,
+        "completion_tokens_mean": 720.5,
         "backend_mix": {
-          "ollama": 13,
-          "groq": 5
+          "ollama": 14,
+          "groq": 4
         }
       },
       "unanswerable": {
@@ -8072,13 +8072,13 @@
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
         "faithfulness_mean": 0.75,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 19.580166500418272,
+        "latency_ms_mean": 2293.161343749489,
         "llm_calls_mean": 5,
-        "prompt_tokens_mean": 5805.75,
-        "completion_tokens_mean": 1257.5,
+        "prompt_tokens_mean": 5842.5,
+        "completion_tokens_mean": 1434.75,
         "backend_mix": {
-          "groq": 8,
-          "ollama": 16
+          "groq": 10,
+          "ollama": 14
         }
       }
     },
@@ -8110,10 +8110,10 @@
         "rank_metrics_note": "NOT meaningful -- Graph's retrieval is ordered by entity degree, not query relevance, so recall_at_5/mrr_at_10/ndcg_at_10 measure an arbitrary truncation. Use recall_full instead.",
         "faithfulness_mean": 0.35714285714285715,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 0.620869142169665,
+        "latency_ms_mean": 334.3102975710021,
         "llm_calls_mean": 1,
-        "prompt_tokens_mean": 1565.142857142857,
-        "completion_tokens_mean": 173,
+        "prompt_tokens_mean": 1571.7142857142858,
+        "completion_tokens_mean": 170.85714285714286,
         "backend_mix": {
           "groq": 3,
           "ollama": 11
@@ -8145,10 +8145,10 @@
         "rank_metrics_note": "NOT meaningful -- Graph's retrieval is ordered by entity degree, not query relevance, so recall_at_5/mrr_at_10/ndcg_at_10 measure an arbitrary truncation. Use recall_full instead.",
         "faithfulness_mean": 0.75,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 0.6655205006609322,
+        "latency_ms_mean": 438.64843724895763,
         "llm_calls_mean": 1,
-        "prompt_tokens_mean": 1955.25,
-        "completion_tokens_mean": 183.25,
+        "prompt_tokens_mean": 1966,
+        "completion_tokens_mean": 182.5,
         "backend_mix": {
           "ollama": 8
         }
@@ -8214,15 +8214,14 @@
         "ndcg_at_10_mean": null,
         "recall_full_mean": null,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.875,
+        "faithfulness_mean": 0.75,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 95.20091650028917,
+        "latency_ms_mean": 126.05497925051168,
         "llm_calls_mean": 1,
-        "prompt_tokens_mean": 1784.25,
-        "completion_tokens_mean": 390,
+        "prompt_tokens_mean": 1803,
+        "completion_tokens_mean": 538.5,
         "backend_mix": {
-          "groq": 5,
-          "ollama": 3
+          "groq": 8
         }
       }
     },
@@ -8234,15 +8233,15 @@
         "ndcg_at_10_mean": 0.9550650542719645,
         "recall_full_mean": 1.0,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.5833333333333334,
+        "faithfulness_mean": 0.6833333333333333,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 18.816395799876773,
+        "latency_ms_mean": 4396.113412400518,
         "llm_calls_mean": 2,
-        "prompt_tokens_mean": 1940.3,
-        "completion_tokens_mean": 426.1,
+        "prompt_tokens_mean": 1974.2,
+        "completion_tokens_mean": 468.3,
         "backend_mix": {
-          "groq": 7,
-          "ollama": 23
+          "groq": 9,
+          "ollama": 21
         }
       },
       "keyword": {
@@ -8270,12 +8269,12 @@
         "ndcg_at_10_mean": 0.7413095057155615,
         "recall_full_mean": 0.8333333333333334,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.5,
+        "faithfulness_mean": 0.4444444444444444,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 24.60436150007202,
+        "latency_ms_mean": 2855.7061321650203,
         "llm_calls_mean": 2,
-        "prompt_tokens_mean": 2027.5,
-        "completion_tokens_mean": 489.8333333333333,
+        "prompt_tokens_mean": 2038.3333333333333,
+        "completion_tokens_mean": 487.5,
         "backend_mix": {
           "groq": 5,
           "ollama": 13
@@ -8288,12 +8287,12 @@
         "ndcg_at_10_mean": null,
         "recall_full_mean": null,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.625,
+        "faithfulness_mean": 0.75,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 21.203302000685653,
+        "latency_ms_mean": 4183.738405999975,
         "llm_calls_mean": 2,
-        "prompt_tokens_mean": 1914.25,
-        "completion_tokens_mean": 339.25,
+        "prompt_tokens_mean": 1939.75,
+        "completion_tokens_mean": 342.5,
         "backend_mix": {
           "groq": 4,
           "ollama": 8
@@ -8344,15 +8343,15 @@
         "ndcg_at_10_mean": 0.7514768768920329,
         "recall_full_mean": 0.9166666666666666,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.8888888888888888,
+        "faithfulness_mean": 0.7777777777777778,
         "refusal_correctness_rate": null,
-        "latency_ms_mean": 23.56218733257265,
+        "latency_ms_mean": 27.94216666673795,
         "llm_calls_mean": 1,
-        "prompt_tokens_mean": 1928.1666666666667,
-        "completion_tokens_mean": 758.5,
+        "prompt_tokens_mean": 1926.5,
+        "completion_tokens_mean": 674.3333333333334,
         "backend_mix": {
-          "groq": 8,
-          "ollama": 4
+          "groq": 7,
+          "ollama": 5
         }
       },
       "unanswerable": {
@@ -8362,15 +8361,15 @@
         "ndcg_at_10_mean": null,
         "recall_full_mean": null,
         "rank_metrics_note": "reliable -- no graph-tool retrieval involved in this row set.",
-        "faithfulness_mean": 0.875,
+        "faithfulness_mean": 0.75,
         "refusal_correctness_rate": 1.0,
-        "latency_ms_mean": 19.46690650038363,
+        "latency_ms_mean": 750.5502919993887,
         "llm_calls_mean": 1,
-        "prompt_tokens_mean": 1764.25,
-        "completion_tokens_mean": 555.25,
+        "prompt_tokens_mean": 1747.5,
+        "completion_tokens_mean": 427.75,
         "backend_mix": {
-          "groq": 7,
-          "ollama": 1
+          "groq": 6,
+          "ollama": 2
         }
       }
     }

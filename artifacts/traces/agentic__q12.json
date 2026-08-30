@@ -2,12 +2,12 @@
   "trace_id": "agentic::q12",
   "architecture": "agentic",
   "question": "Cross-encoder reranking is described as more accurate than bi-encoder cosine similarity because it lets query and document attend to each other directly \u2014 what does that accuracy improvement actually cost a pipeline in milliseconds when reranking a typical shortlist?",
-  "answer": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup. For a typical shortlist of 20 to 50 candidates, this can add on the order of 100 to 300 milliseconds [chunk-id::1].\n\nSpecifically, chunk [chunk-id::1] states: \"reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on \u2014 this is the concrete cost side of the accuracy-versus-latency tradeoff introduced in the note on reranking with cross-encoders.\"",
+  "answer": "Cross\u2011encoder reranking does give a noticeable boost in relevance because the query and each candidate are scored jointly, but that extra accuracy comes with a measurable latency hit.  In a typical RAG pipeline where the reranker is run over a shortlist of\u202f~20\u201150 chunks, the cross\u2011encoder adds roughly **100\u202fms to 300\u202fms** of extra processing time (the exact figure depends on the model size and hardware)\u3010latency-budgets-in-a-rag-pipeline::1\u3011.",
   "metrics": {
-    "latency_ms": 30.895707997842692,
+    "latency_ms": 21678.092749993084,
     "llm_calls": 8,
-    "prompt_tokens": 8938,
-    "completion_tokens": 821
+    "prompt_tokens": 8999,
+    "completion_tokens": 1026
   },
   "nodes": [
     {
@@ -15,7 +15,7 @@
       "kind": "plan",
       "label": "Plan (3 sub-question(s))",
       "parent_ids": [],
-      "duration_ms": 0.27954200049862266,
+      "duration_ms": 0.731250001990702,
       "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
       "payload": {
         "sub_questions": [
@@ -32,7 +32,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.20241699894540943,
+      "duration_ms": 0.38408399996114895,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -47,7 +47,7 @@
       "parent_ids": [
         "n2"
       ],
-      "duration_ms": 0.19483399955788627,
+      "duration_ms": 0.3427499977988191,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -62,7 +62,7 @@
       "parent_ids": [
         "n3"
       ],
-      "duration_ms": 0.04724999962490983,
+      "duration_ms": 0.09945899364538491,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -774,7 +774,7 @@
       "parent_ids": [
         "n4"
       ],
-      "duration_ms": 0.2773749984044116,
+      "duration_ms": 0.7595409988425672,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -789,7 +789,7 @@
       "parent_ids": [
         "n5"
       ],
-      "duration_ms": 0.0009590003173798323,
+      "duration_ms": 0.0024999972083605826,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -804,7 +804,7 @@
       "parent_ids": [
         "n6"
       ],
-      "duration_ms": 0.4562920003081672,
+      "duration_ms": 1.0550410006544553,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -844,7 +844,7 @@
       "parent_ids": [
         "n7"
       ],
-      "duration_ms": 0.2103749975503888,
+      "duration_ms": 0.5023749981774017,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -859,7 +859,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.18825000006472692,
+      "duration_ms": 0.3453329991316423,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
       "payload": {
         "chosen": "dense",
@@ -874,7 +874,7 @@
       "parent_ids": [
         "n9"
       ],
-      "duration_ms": 25.7061660013278,
+      "duration_ms": 116.12091700226301,
       "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
       "payload": {
         "dims": 384,
@@ -897,13 +897,13 @@
       "parent_ids": [
         "n10"
       ],
-      "duration_ms": 0.02787500125123188,
+      "duration_ms": 0.6147089952719398,
       "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
       "payload": {
         "results": [
           {
             "chunk_id": "latency-budgets-in-a-rag-pipeline::1",
-            "score": 0.6993866562843323,
+            "score": 0.6993865966796875,
             "rank": 1
           },
           {
@@ -913,7 +913,7 @@
           },
           {
             "chunk_id": "reranking-with-cross-encoders::1",
-            "score": 0.6233985424041748,
+            "score": 0.62339848279953,
             "rank": 3
           },
           {
@@ -923,7 +923,7 @@
           },
           {
             "chunk_id": "vector-databases-and-index-types::1",
-            "score": 0.43700751662254333,
+            "score": 0.4370075464248657,
             "rank": 5
           }
         ],
@@ -937,7 +937,7 @@
       "parent_ids": [
         "n11"
       ],
-      "duration_ms": 0.47645899758208543,
+      "duration_ms": 0.8939580002333969,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -952,7 +952,7 @@
       "parent_ids": [
         "n12"
       ],
-      "duration_ms": 0.0015000005078036338,
+      "duration_ms": 0.0010839939932338893,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -967,7 +967,7 @@
       "parent_ids": [
         "n13"
       ],
-      "duration_ms": 0.4735410002467688,
+      "duration_ms": 0.3934159976779483,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -1007,7 +1007,7 @@
       "parent_ids": [
         "n14"
       ],
-      "duration_ms": 0.30004200016264804,
+      "duration_ms": 0.26779199833981693,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1022,7 +1022,7 @@
       "parent_ids": [
         "n1"
       ],
-      "duration_ms": 0.24641699928906746,
+      "duration_ms": 0.18245799583382905,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 3 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
       "payload": {
         "chosen": "graph",
@@ -1037,7 +1037,7 @@
       "parent_ids": [
         "n16"
       ],
-      "duration_ms": 0.21691599977202713,
+      "duration_ms": 0.15600000187987462,
       "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
       "payload": {
         "entities": [
@@ -1054,7 +1054,7 @@
       "parent_ids": [
         "n17"
       ],
-      "duration_ms": 0.0674580005579628,
+      "duration_ms": 0.04949999856762588,
       "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
       "payload": {
         "hops": 2,
@@ -1776,7 +1776,7 @@
       "parent_ids": [
         "n18"
       ],
-      "duration_ms": 0.3438749990891665,
+      "duration_ms": 0.2973750015371479,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1791,7 +1791,7 @@
       "parent_ids": [
         "n19"
       ],
-      "duration_ms": 0.0012500022421590984,
+      "duration_ms": 0.0007499984349124134,
       "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
       "payload": {
         "chosen": "sparse",
@@ -1806,7 +1806,7 @@
       "parent_ids": [
         "n20"
       ],
-      "duration_ms": 0.5199169972911477,
+      "duration_ms": 0.4204170036246069,
       "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
       "payload": {
         "results": [
@@ -1846,7 +1846,7 @@
       "parent_ids": [
         "n21"
       ],
-      "duration_ms": 0.2586249975138344,
+      "duration_ms": 0.264208996668458,
       "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
       "payload": {
         "sufficient": false,
@@ -1863,12 +1863,12 @@
         "n15",
         "n22"
       ],
-      "duration_ms": 0.2961669997603167,
+      "duration_ms": 21554.04662500223,
       "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
       "payload": {
-        "output": "The cross-encoder reranking process adds real, measurable latency compared to the near-instant cosine similarity lookup. For a typical shortlist of 20 to 50 candidates, this can add on the order of 100 to 300 milliseconds [chunk-id::1].\n\nSpecifically, chunk [chunk-id::1] states: \"reranking even a modest shortlist of 20 to 50 candidates can add on the order of 100 to 300 milliseconds, depending on the cross-encoder's size and the hardware it runs on \u2014 this is the concrete cost side of the accuracy-versus-latency tradeoff introduced in the note on reranking with cross-encoders.\"",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 2717
+        "output": "Cross\u2011encoder reranking does give a noticeable boost in relevance because the query and each candidate are scored jointly, but that extra accuracy comes with a measurable latency hit.  In a typical RAG pipeline where the reranker is run over a shortlist of\u202f~20\u201150 chunks, the cross\u2011encoder adds roughly **100\u202fms to 300\u202fms** of extra processing time (the exact figure depends on the model size and hardware)\u3010latency-budgets-in-a-rag-pipeline::1\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 2983
       }
     }
   ]

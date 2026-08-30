@@ -2,12 +2,12 @@
   "trace_id": "hyde::q25",
   "architecture": "hyde",
   "question": "Does fine-tuning a model with LoRA reduce a RAG pipeline's exposure to prompt injection attacks?",
-  "answer": "The provided context does not contain information directly addressing whether fine-tuning a model with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The chunks discuss LoRA, full fine-tuning, and retrieval-augmented generation but do not provide details on security aspects like susceptibility to prompt injection attacks in these methods. Therefore, I cannot make a claim about this specific issue based solely on the given context. [chunk-id::0][chunk-id::1][chunk-id::2]",
+  "answer": "The context provided does not contain specific information about how using LoRA affects a RAG pipeline's susceptibility to prompt injection attacks. Therefore, I cannot provide a direct answer based on the given chunks.\n\nHowever, it can be inferred that since LoRA involves freezing most of the model weights and only training small added matrices, this could potentially reduce the attack surface by limiting the number of parameters that are actively being modified during fine-tuning. This might make it harder for an attacker to influence the behavior of the model through prompt injection if fewer parameters are involved in the decision-making process.\n\nBut without specific details from the given context, I cannot definitively state whether LoRA reduces RAG pipeline exposure to prompt injection attacks or how much it mitigates such risks.",
   "metrics": {
-    "latency_ms": 26.361958000052255,
+    "latency_ms": 10938.029290999111,
     "llm_calls": 2,
-    "prompt_tokens": 1530,
-    "completion_tokens": 181
+    "prompt_tokens": 1570,
+    "completion_tokens": 232
   },
   "nodes": [
     {
@@ -64,12 +64,12 @@
           },
           {
             "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
-            "score": 0.5427062511444092,
+            "score": 0.542706310749054,
             "rank": 2
           },
           {
             "chunk_id": "full-fine-tuning-vs-adapters::0",
-            "score": 0.49513012170791626,
+            "score": 0.49513009190559387,
             "rank": 3
           },
           {
@@ -79,7 +79,7 @@
           },
           {
             "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
-            "score": 0.47042280435562134,
+            "score": 0.47042277455329895,
             "rank": 5
           }
         ],
@@ -96,9 +96,9 @@
       "duration_ms": 0.0,
       "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
       "payload": {
-        "output": "The provided context does not contain information directly addressing whether fine-tuning a model with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The chunks discuss LoRA, full fine-tuning, and retrieval-augmented generation but do not provide details on security aspects like susceptibility to prompt injection attacks in these methods. Therefore, I cannot make a claim about this specific issue based solely on the given context. [chunk-id::0][chunk-id::1][chunk-id::2]",
-        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
-        "tokens": 1512
+        "output": "The context provided does not contain specific information about how using LoRA affects a RAG pipeline's susceptibility to prompt injection attacks. Therefore, I cannot provide a direct answer based on the given chunks.\n\nHowever, it can be inferred that since LoRA involves freezing most of the model weights and only training small added matrices, this could potentially reduce the attack surface by limiting the number of parameters that are actively being modified during fine-tuning. This might make it harder for an attacker to influence the behavior of the model through prompt injection if fewer parameters are involved in the decision-making process.\n\nBut without specific details from the given context, I cannot definitively state whether LoRA reduces RAG pipeline exposure to prompt injection attacks or how much it mitigates such risks.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1603
       }
     }
   ]
