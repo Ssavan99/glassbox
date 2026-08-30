@@ -8,6 +8,11 @@ later phases goes through the single `complete()` entry point defined here.
 Responses are cached to disk (keyed by backend + model + prompt + params) so that
 re-running an architecture is near-free and reproducible regardless of which
 backend originally served a given call.
+
+Every dict `complete()` returns carries a `"backend"` field (`"groq"` or
+`"ollama"`) naming whichever backend actually served that call, live or
+cached -- callers (notably `evaluation/run_eval.py`, which reports this per
+question in `artifacts/eval.json`) can rely on this without scraping logs.
 """
 
 from __future__ import annotations
@@ -233,7 +238,12 @@ def complete(prompt: str, json_schema: dict | None = None, **params: Any) -> dic
         cached = _read_cache(backend, model, effective_prompt, params)
         if cached is not None:
             logger.info("llm cache hit: backend=%s", backend)
-            return cached
+            # `backend` here is which (backend, model) pair's cache file
+            # matched -- patched into the returned dict regardless of
+            # whether the cached response itself already carries it, so
+            # callers (e.g. the eval harness) can always tell which
+            # backend actually served a call, cache hit or not.
+            return {**cached, "backend": backend}
 
     backend_used: str
     try:
@@ -255,5 +265,6 @@ def complete(prompt: str, json_schema: dict | None = None, **params: Any) -> dic
         )
 
     model = GROQ_MODEL if backend_used == GROQ_BACKEND else OLLAMA_MODEL
+    result = {**result, "backend": backend_used}
     _write_cache(backend_used, model, effective_prompt, params, result)
     return result

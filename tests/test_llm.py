@@ -107,6 +107,45 @@ def test_cache_hit_skips_both_backends(monkeypatch):
     assert len(groq_calls) == 0  # never reached: no GROQ_API_KEY set
 
 
+def test_backend_field_reflects_actual_serving_backend_live_call(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "fake-key-present")
+
+    def _fail_groq(prompt, params):
+        raise RuntimeError("groq unreachable")
+
+    def _ok_ollama(prompt, params):
+        return _ollama_response()
+
+    monkeypatch.setattr(llm, "_call_groq", _fail_groq)
+    monkeypatch.setattr(llm, "_call_ollama", _ok_ollama)
+
+    result = llm.complete("which backend")
+    assert result["backend"] == llm.OLLAMA_BACKEND
+
+
+def test_backend_field_present_on_cache_hit_even_for_pre_existing_cache_files(monkeypatch):
+    # Simulates a cache file written before the "backend" field existed
+    # (~600 real entries from Phases 3-5 are in exactly this shape) --
+    # complete() must still report the correct backend on a hit by using
+    # which (backend, model) cache slot matched, not by trusting the
+    # stored response to carry its own "backend" key.
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    prompt = "old-format cache entry"
+    params: dict = {}
+
+    old_style_response = _ollama_response()  # no "backend" key inside
+    llm._write_cache(llm.OLLAMA_BACKEND, llm.OLLAMA_MODEL, prompt, params, old_style_response)
+
+    def _groq_should_not_run(prompt, params):
+        raise AssertionError("should be a cache hit, never reach a live backend")
+
+    monkeypatch.setattr(llm, "_call_groq", _groq_should_not_run)
+    monkeypatch.setattr(llm, "_call_ollama", _groq_should_not_run)
+
+    result = llm.complete(prompt, **params)
+    assert result["backend"] == llm.OLLAMA_BACKEND
+
+
 def test_malformed_json_triggers_one_repair_attempt(monkeypatch):
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
 
