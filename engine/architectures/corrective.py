@@ -23,7 +23,7 @@ import time
 from engine.config import CORRECTIVE_MAX_CORRECTIONS, TOP_K
 from engine.embedding import embed_texts
 from engine.index import ChunkRecord, load_index
-from engine.llm import complete
+from engine.llm import complete, safe_json_dict
 from engine.prompts import build_answer_prompt
 from engine.trace import Metrics, Trace, TraceBuilder
 
@@ -78,8 +78,8 @@ def _grade_chunks(question: str, chunks: list[ChunkRecord]) -> tuple[list[dict],
     result = complete(prompt, json_schema=GRADE_JSON_SCHEMA)
 
     retrieved_ids = [c.chunk_id for c in chunks]
-    parsed = result.get("json")
-    raw_judgements = parsed.get("judgements", []) if isinstance(parsed, dict) else []
+    parsed = safe_json_dict(result)
+    raw_judgements = parsed.get("judgements", [])
     if not isinstance(raw_judgements, list):
         raw_judgements = []
 
@@ -216,9 +216,7 @@ class CorrectiveArchitecture(Architecture):
             total_prompt_tokens += rewrite_result["prompt_tokens"]
             total_completion_tokens += rewrite_result["completion_tokens"]
 
-            rewrite_json = rewrite_result.get("json")
-            if not isinstance(rewrite_json, dict):
-                rewrite_json = {}
+            rewrite_json = safe_json_dict(rewrite_result)
             new_query = rewrite_json.get("to") or query
             reason = rewrite_json.get("reason", "")
 

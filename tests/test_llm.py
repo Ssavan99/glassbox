@@ -14,6 +14,28 @@ def _ollama_response(text="ollama answer", pt=8, ct=4):
     return {"text": text, "prompt_tokens": pt, "completion_tokens": ct}
 
 
+class TestSafeJsonDict:
+    """complete(json_schema=...) only guarantees the response parses as
+    *some* JSON on success, never that it matches the schema's shape --
+    safe_json_dict() is the single shared guard every architecture that
+    passes json_schema= relies on before calling .get() on the result."""
+
+    def test_returns_the_dict_when_json_is_a_dict(self):
+        assert llm.safe_json_dict({"json": {"a": 1}}) == {"a": 1}
+
+    def test_returns_empty_dict_when_json_is_a_list(self):
+        assert llm.safe_json_dict({"json": ["not", "a", "dict"]}) == {}
+
+    def test_returns_empty_dict_when_json_is_a_string(self):
+        assert llm.safe_json_dict({"json": "not a dict"}) == {}
+
+    def test_returns_empty_dict_when_json_key_is_missing(self):
+        assert llm.safe_json_dict({"text": "no json key at all"}) == {}
+
+    def test_returns_empty_dict_when_json_is_none(self):
+        assert llm.safe_json_dict({"json": None}) == {}
+
+
 def test_fallback_engages_when_groq_unreachable(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "fake-key-present")
 

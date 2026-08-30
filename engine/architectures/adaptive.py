@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import time
 
-from engine.llm import complete
+from engine.llm import complete, safe_json_dict
 from engine.trace import Metrics, Trace, TraceBuilder
 
 from .agentic import AgenticArchitecture
@@ -99,11 +99,11 @@ def _route(question: str) -> tuple[str, dict, dict]:
     """Returns (chosen_architecture_name, judgement_payload, llm_result)."""
     prompt = _build_route_prompt(question)
     result = complete(prompt, json_schema=ROUTE_JSON_SCHEMA)
-    parsed = result.get("json")
+    parsed = safe_json_dict(result)
 
-    chosen = parsed.get("chosen") if isinstance(parsed, dict) else None
-    scores = parsed.get("scores") if isinstance(parsed, dict) else None
-    reason = parsed.get("reason") if isinstance(parsed, dict) else None
+    chosen = parsed.get("chosen")
+    scores = parsed.get("scores")
+    reason = parsed.get("reason")
 
     if not isinstance(scores, dict):
         scores = {}

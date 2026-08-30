@@ -155,6 +155,20 @@ def _try_parse_json(text: str) -> Any | None:
     return None
 
 
+def safe_json_dict(result: dict) -> dict:
+    """Returns `result["json"]` if it's a dict, else `{}`.
+
+    `complete(prompt, json_schema=...)` only guarantees the response parses
+    as *some* JSON value on success -- never that it matches the requested
+    schema's shape. A model can return a bare list, string, or number
+    instead of the expected object. Every caller that passes `json_schema=`
+    needs this exact guard before it can safely call `.get(...)` on the
+    parsed value; centralizing it here means it only has to be gotten right
+    once instead of independently re-derived at each call site."""
+    parsed = result.get("json")
+    return parsed if isinstance(parsed, dict) else {}
+
+
 def _ensure_json(
     result: dict,
     json_schema: dict,
