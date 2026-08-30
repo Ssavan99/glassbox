@@ -75,6 +75,39 @@ def test_eval_one_computes_metrics_and_judge_fields():
     assert row["backend_calls"] == ["ollama"]
     assert row["judge_backend"] == "ollama"
     assert "adaptive_routed_to" not in row
+    # naive's whole retrieved set is <=5 chunks here, so recall_full == recall@5
+    assert row["recall_full"] == row["recall_at_5"]
+    assert row["graph_tool_involved"] is False  # naive's trace has no graph_expand node
+
+
+def test_eval_one_reuses_a_precomputed_judge_without_calling_judge_answer():
+    # scripts/recompute_metrics.py's whole point: recompute recall_full/etc.
+    # against an already-recorded trace with zero new LLM calls, by passing
+    # judge= instead of letting eval_one call judge_answer() itself.
+    question = run_eval_mod.load_questions()[0]
+    with mock.patch.object(naive_mod, "complete", _fake_generate()):
+        trace, backend_calls = run_eval_mod.run_one("naive", question)
+
+    precomputed_judge = {
+        "faithfulness": 0.75,
+        "reads_as_refusal": True,
+        "reasoning": "reused, not recomputed",
+        "backend": "groq",
+        "prompt_tokens": 10,
+        "completion_tokens": 4,
+    }
+    def _boom(*args, **kwargs):
+        raise AssertionError("judge_answer must not be called when judge= is passed")
+
+    with mock.patch.object(run_eval_mod, "judge_answer", _boom):
+        row = run_eval_mod.eval_one(
+            "naive", question, trace, backend_calls, judge=precomputed_judge
+        )
+
+    assert row["faithfulness"] == 0.75
+    assert row["reads_as_refusal"] is True
+    assert row["judge_reasoning"] == "reused, not recomputed"
+    assert row["judge_backend"] == "groq"
 
 
 def test_eval_one_persists_adaptive_routing_decision():
@@ -164,3 +197,60 @@ def test_build_report_computes_adaptive_routing_accuracy_against_the_rubric():
 def test_build_report_includes_llm_judge_caveat_text():
     report = run_eval_mod.build_report([])
     assert "same Groq/Ollama backend" in report["llm_judge_caveat"]
+
+
+def test_build_report_includes_rank_metrics_caveat_text():
+    report = run_eval_mod.build_report([])
+    assert "entity degree" in report["rank_metrics_caveat"]
+    assert "recall_full" in report["rank_metrics_caveat"]
+
+
+def _minimal_row(**overrides) -> dict:
+    row = {
+        "architecture": "graph",
+        "question_id": "q01",
+        "question_type": "factual",
+        "trace_id": "graph::q01",
+        "answer": "a",
+        "retrieved_chunk_ids": [],
+        "gold_chunk_ids": ["gold1"],
+        "recall_at_5": 0.0,
+        "mrr_at_10": 0.0,
+        "ndcg_at_10": 0.0,
+        "recall_full": 1.0,
+        "graph_tool_involved": True,
+        "faithfulness": None,
+        "reads_as_refusal": False,
+        "refusal_correctness": None,
+        "judge_reasoning": "",
+        "latency_ms": 1.0,
+        "llm_calls": 1,
+        "prompt_tokens": 1,
+        "completion_tokens": 1,
+        "backend_calls": ["ollama"],
+        "judge_backend": "ollama",
+    }
+    row.update(overrides)
+    return row
+
+
+def test_summarize_flags_graph_rows_as_rank_metrics_not_meaningful():
+    report = run_eval_mod.build_report([_minimal_row()])
+    summary = report["by_architecture"]["graph"]
+    assert summary["recall_full_mean"] == 1.0
+    assert "NOT meaningful" in summary["rank_metrics_note"]
+
+
+def test_summarize_flags_agentic_rows_as_partially_affected_only_when_graph_tool_used():
+    rows = [
+        _minimal_row(architecture="agentic", question_id="q01", graph_tool_involved=True),
+        _minimal_row(architecture="agentic", question_id="q02", graph_tool_involved=False),
+    ]
+    summary = run_eval_mod.build_report(rows)["by_architecture"]["agentic"]
+    assert "1/2 rows" in summary["rank_metrics_note"]
+
+
+def test_summarize_marks_naive_reliable_when_graph_tool_never_involved():
+    rows = [_minimal_row(architecture="naive", question_id="q01", graph_tool_involved=False)]
+    summary = run_eval_mod.build_report(rows)["by_architecture"]["naive"]
+    assert summary["rank_metrics_note"].startswith("reliable")

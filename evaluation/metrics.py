@@ -1,6 +1,6 @@
-"""Evaluation metrics: retrieval quality (recall@5, MRR@10, nDCG@10) against
-gold_chunk_ids, plus LLM-judged faithfulness and refusal correctness against
-gold_answer_points.
+"""Evaluation metrics: retrieval quality (recall@5, MRR@10, nDCG@10, and the
+rank-insensitive recall_full) against gold_chunk_ids, plus LLM-judged
+faithfulness and refusal correctness against gold_answer_points.
 
 ## LLM-judge caveat (read before trusting the faithfulness/refusal numbers)
 
@@ -13,6 +13,36 @@ refusal_correctness as a directional signal, not a ground truth -- retrieval
 metrics (recall/MRR/nDCG), which are computed deterministically against
 `gold_chunk_ids` with no LLM involved, are the more trustworthy numbers in
 this harness. This caveat is intentionally repeated in
+`evaluation/run_eval.py`'s output and belongs in the Phase 11 README too.
+
+## Rank-metrics caveat (Phase 6.1 -- read before trusting recall@5/MRR@10/nDCG@10
+   for Graph, and partially for Agentic/Adaptive)
+
+`recall_at_k`/`mrr_at_k`/`ndcg_at_k` all assume `retrieved` is a single
+relevance-ordered list and score only its first `k` entries. That assumption
+holds for Naive/Hybrid/HyDE/Corrective, whose `retrieve_dense`/
+`retrieve_sparse`/`rerank` nodes really do rank by query relevance. It does
+NOT hold for Graph: `engine/graph_index.py`'s `expand_hops` orders the chunks
+it returns by entity *degree* (a global structural property of the graph,
+computed identically regardless of the question), not by relevance to the
+query, and then hands up to `GRAPH_MAX_HOP_CHUNKS` (40) of them to `generate`
+unranked. Truncating that degree-ordered list to `k=5` for `recall_at_5`
+measures an arbitrary truncation, not retrieval quality -- it is not a sign
+Graph's generation starves for context (`generate` sees the full up-to-40
+gathered set, never the truncated one), it is a metrics artifact. The same
+issue partially affects Agentic (whenever a sub-question routes to the graph
+tool) and Adaptive (whenever it delegates to Graph, or to an Agentic run that
+used the graph tool for a sub-question), since their final aggregated chunk
+lists -- built by concatenating each sub-question/delegate's last retrieval
+attempt -- are not cross-branch relevance-ranked either.
+
+`recall_full()` below is the rank-insensitive companion metric this motivates:
+it checks whether each gold chunk appears *anywhere* in the retrieved set,
+with no `k` cutoff, so an unranked or degree-ordered set can still score
+fairly. `graph_tool_involved()` flags which rows the caveat actually applies
+to. Use `recall_full` (not `recall_at_5`/`mrr_at_10`/`ndcg_at_10`) as the
+trustworthy retrieval-quality number for Graph rows, and for Agentic/Adaptive
+rows where `graph_tool_involved` is true. This caveat is repeated in
 `evaluation/run_eval.py`'s output and belongs in the Phase 11 README too.
 """
 
@@ -172,6 +202,33 @@ def ndcg_at_k(retrieved: list[str], gold: list[str], k: int = 10) -> float | Non
     if idcg == 0:
         return 0.0
     return dcg / idcg
+
+
+def recall_full(retrieved: list[str], gold: list[str]) -> float | None:
+    """Fraction of gold chunks present *anywhere* in `retrieved`, with no
+    top-k cutoff. Rank-insensitive companion to `recall_at_k` -- see this
+    module's docstring section on the rank-metrics caveat for why this
+    exists alongside recall@5/MRR@10/nDCG@10 rather than replacing them:
+    those three are still the right lens for architectures whose retrieval
+    really is relevance-ranked, this one is the fair lens for Graph's
+    degree-ordered set and Agentic/Adaptive's unranked aggregation. None
+    (undefined, not zero) when gold is empty."""
+    if not gold:
+        return None
+    return len(set(retrieved) & set(gold)) / len(set(gold))
+
+
+def graph_tool_involved(trace: Trace) -> bool:
+    """Whether this trace's execution used the Graph tool anywhere, i.e.
+    contains at least one `graph_expand` node. True for every Graph
+    architecture trace by construction; also true for an Agentic trace
+    where at least one sub-question routed to the graph tool, and for an
+    Adaptive trace that delegated to Graph (or to an Agentic run that used
+    the graph tool) -- the spliced-in delegate nodes are walked the same
+    way as any other node, so this needs no per-architecture branching.
+    Used to flag which rows the rank-metrics caveat above actually applies
+    to for Agentic/Adaptive specifically."""
+    return any(n.kind == "graph_expand" for n in trace.nodes)
 
 
 JUDGE_JSON_SCHEMA = {

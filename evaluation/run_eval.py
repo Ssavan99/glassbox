@@ -47,10 +47,12 @@ from engine.config import EVAL_PATH, QUESTIONS_PATH
 from engine.trace import Trace
 from evaluation.metrics import (
     extract_retrieved_chunk_ids,
+    graph_tool_involved,
     judge_answer,
     mrr_at_k,
     ndcg_at_k,
     recall_at_k,
+    recall_full,
     refusal_correctness,
 )
 
@@ -100,6 +102,22 @@ LLM_JUDGE_CAVEAT = (
     "signal, not ground truth. recall_at_5, mrr_at_10, and ndcg_at_10 are "
     "computed deterministically against gold_chunk_ids with no LLM involved "
     "and are the more trustworthy numbers in this report."
+)
+
+RANK_METRICS_CAVEAT = (
+    "recall_at_5, mrr_at_10, and ndcg_at_10 assume `retrieved_chunk_ids` is a "
+    "single relevance-ranked list and score only its first k entries. That "
+    "assumption does NOT hold for Graph: its retrieval is ordered by entity "
+    "degree (a global structural property, not query relevance), so "
+    "truncating it to k=5 measures an arbitrary cut, not retrieval quality -- "
+    "this is a metrics artifact, not evidence that Graph's generation "
+    "starves for context (generate sees the full gathered set, never the "
+    "truncated one). The same issue partially affects Agentic/Adaptive rows "
+    "where graph_tool_involved is true, since their aggregated chunk lists "
+    "aren't cross-branch relevance-ranked either. Use recall_full (no k "
+    "cutoff) as the trustworthy retrieval number for Graph rows and for "
+    "Agentic/Adaptive rows with graph_tool_involved=true; see "
+    "evaluation/metrics.py's module docstring for the full explanation."
 )
 
 
@@ -155,13 +173,27 @@ def _adaptive_routed_to(trace: Trace) -> str | None:
     return chosen if isinstance(chosen, str) else None
 
 
-def eval_one(arch_name: str, question: dict, trace: Trace, backend_calls: list[str]) -> dict:
+def eval_one(
+    arch_name: str,
+    question: dict,
+    trace: Trace,
+    backend_calls: list[str],
+    judge: dict | None = None,
+) -> dict:
+    """Computes one eval row for (arch_name, question, trace). `judge`
+    defaults to a fresh `judge_answer()` LLM call (normal full-sweep use);
+    pass an already-computed judge dict (matching judge_answer()'s return
+    shape) to recompute a row's deterministic metrics -- recall_at_5,
+    mrr_at_10, ndcg_at_10, recall_full, graph_tool_involved -- against an
+    already-recorded trace with zero new LLM calls, as
+    scripts/recompute_metrics.py does."""
     retrieved = extract_retrieved_chunk_ids(trace)
     gold_chunk_ids = question.get("gold_chunk_ids", [])
     gold_answer_points = question.get("gold_answer_points", [])
     is_unanswerable = question["type"] == "unanswerable"
 
-    judge = judge_answer(question["question"], trace.answer, gold_answer_points)
+    if judge is None:
+        judge = judge_answer(question["question"], trace.answer, gold_answer_points)
 
     row = {
         "architecture": arch_name,
@@ -174,6 +206,8 @@ def eval_one(arch_name: str, question: dict, trace: Trace, backend_calls: list[s
         "recall_at_5": recall_at_k(retrieved, gold_chunk_ids, k=5),
         "mrr_at_10": mrr_at_k(retrieved, gold_chunk_ids, k=10),
         "ndcg_at_10": ndcg_at_k(retrieved, gold_chunk_ids, k=10),
+        "recall_full": recall_full(retrieved, gold_chunk_ids),
+        "graph_tool_involved": graph_tool_involved(trace),
         "faithfulness": judge["faithfulness"],
         "reads_as_refusal": judge["reads_as_refusal"],
         "refusal_correctness": refusal_correctness(is_unanswerable, judge["reads_as_refusal"]),
@@ -204,6 +238,36 @@ def _backend_mix(rows: list[dict]) -> dict[str, int]:
     return mix
 
 
+def _rank_metrics_note(rows: list[dict]) -> str:
+    """Per-summary explanation of whether recall_at_5/mrr_at_10/ndcg_at_10
+    are trustworthy for this row set -- see RANK_METRICS_CAVEAT above and
+    evaluation/metrics.py's module docstring for the full reasoning.
+
+    Reads `rows[0]["architecture"]` to decide which branch applies -- every
+    caller in this module (`_summarize`, via `by_architecture` and
+    `by_architecture_and_type`) only ever passes a single-architecture row
+    set, so this holds today, but it's not enforced here. A future caller
+    that mixes architectures in one `rows` list would silently get the
+    first row's architecture's note applied to the whole set."""
+    if not rows:
+        return "no rows"
+    if rows[0]["architecture"] == "graph":
+        return (
+            "NOT meaningful -- Graph's retrieval is ordered by entity degree, not "
+            "query relevance, so recall_at_5/mrr_at_10/ndcg_at_10 measure an "
+            "arbitrary truncation. Use recall_full instead."
+        )
+    involved = sum(1 for r in rows if r.get("graph_tool_involved"))
+    if involved == 0:
+        return "reliable -- no graph-tool retrieval involved in this row set."
+    return (
+        f"reduced meaning for {involved}/{len(rows)} rows where a sub-question or "
+        "delegation used the graph tool (same unranked-aggregation issue as Graph "
+        "itself). Use recall_full for those rows (see the graph_tool_involved "
+        "field on each row)."
+    )
+
+
 def _summarize(rows: list[dict]) -> dict:
     unanswerable_rows = [r for r in rows if r["question_type"] == "unanswerable"]
     return {
@@ -211,6 +275,8 @@ def _summarize(rows: list[dict]) -> dict:
         "recall_at_5_mean": _mean_or_none([r["recall_at_5"] for r in rows]),
         "mrr_at_10_mean": _mean_or_none([r["mrr_at_10"] for r in rows]),
         "ndcg_at_10_mean": _mean_or_none([r["ndcg_at_10"] for r in rows]),
+        "recall_full_mean": _mean_or_none([r.get("recall_full") for r in rows]),
+        "rank_metrics_note": _rank_metrics_note(rows),
         "faithfulness_mean": _mean_or_none([r["faithfulness"] for r in rows]),
         "refusal_correctness_rate": _mean_or_none(
             [1.0 if r["refusal_correctness"] else 0.0 for r in unanswerable_rows]
@@ -264,6 +330,7 @@ def build_report(rows: list[dict]) -> dict:
 
     return {
         "llm_judge_caveat": LLM_JUDGE_CAVEAT,
+        "rank_metrics_caveat": RANK_METRICS_CAVEAT,
         "n_architectures": len(architectures),
         "n_questions": len(rows) // len(architectures) if architectures else 0,
         "rows": rows,
@@ -290,8 +357,8 @@ def main() -> None:
             dt = time.time() - t0
             print(
                 f"[{done}/{total}] {arch_name:10s} {question['id']:5s} "
-                f"recall@5={row['recall_at_5']} faithfulness={row['faithfulness']} "
-                f"({dt:.1f}s)",
+                f"recall@5={row['recall_at_5']} recall_full={row['recall_full']} "
+                f"faithfulness={row['faithfulness']} ({dt:.1f}s)",
                 flush=True,
             )
 

@@ -3,10 +3,12 @@ import pytest
 from engine.trace import Metrics, TraceBuilder
 from evaluation.metrics import (
     extract_retrieved_chunk_ids,
+    graph_tool_involved,
     judge_answer,
     mrr_at_k,
     ndcg_at_k,
     recall_at_k,
+    recall_full,
     refusal_correctness,
 )
 
@@ -238,6 +240,50 @@ def test_ndcg_at_k_zero_when_nothing_relevant_found():
 
 def test_ndcg_at_k_undefined_for_empty_gold():
     assert ndcg_at_k(["a"], [], k=10) is None
+
+
+def test_recall_full_finds_gold_chunks_regardless_of_position():
+    # Both gold chunks are present, but the second is far past where
+    # recall_at_5 would ever look -- recall_full has no k cutoff.
+    retrieved = ["z"] * 20 + ["a", "b"]
+    assert recall_full(retrieved, ["a", "b"]) == 1.0
+    assert recall_at_k(retrieved, ["a", "b"], k=5) == 0.0
+
+
+def test_recall_full_partial_and_zero():
+    assert recall_full(["a", "b", "c"], ["a", "z"]) == 0.5
+    assert recall_full(["a", "b", "c"], ["z"]) == 0.0
+
+
+def test_recall_full_undefined_for_empty_gold():
+    assert recall_full(["a", "b"], []) is None
+
+
+# --- graph_tool_involved -----------------------------------------------------
+
+
+def test_graph_tool_involved_true_when_trace_has_graph_expand_node():
+    b = TraceBuilder(architecture="graph", question="q")
+    n1 = b.node("graph_seed", "seed", parents=[], explain="e", entities=["x"])
+    n2 = b.node(
+        "graph_expand", "expand", parents=[n1], explain="e", hops=2, edges=[], chunk_ids=["a"]
+    )
+    b.node("generate", "gen", parents=[n2], explain="e", output="ans")
+    trace = b.build(answer="ans", metrics=_metrics())
+
+    assert graph_tool_involved(trace) is True
+
+
+def test_graph_tool_involved_false_when_no_graph_expand_node_anywhere():
+    b = TraceBuilder(architecture="naive", question="q")
+    n1 = b.node("embed_query", "embed", parents=[], explain="e")
+    n2 = b.node(
+        "retrieve_dense", "retrieve", parents=[n1], explain="e", results=_ranked(["a"]), k=5
+    )
+    b.node("generate", "gen", parents=[n2], explain="e", output="ans")
+    trace = b.build(answer="ans", metrics=_metrics())
+
+    assert graph_tool_involved(trace) is False
 
 
 # --- judge_answer / refusal_correctness -------------------------------------
