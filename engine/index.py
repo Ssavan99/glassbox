@@ -37,11 +37,26 @@ class Index:
 
 @lru_cache(maxsize=1)
 def load_index() -> Index:
+    if not CHUNKS_PATH.exists() or not VECTORS_PATH.exists():
+        raise FileNotFoundError(
+            f"Retrieval index not built: {CHUNKS_PATH} and/or {VECTORS_PATH} don't exist. "
+            "Run this first: python scripts/build_index.py"
+        )
+
     records = json.loads(CHUNKS_PATH.read_text())
     chunks = [ChunkRecord(**r) for r in records]
     chunk_ids = [c.chunk_id for c in chunks]
 
-    vectors = np.fromfile(VECTORS_PATH, dtype=np.float32).reshape(len(chunks), EMBEDDING_DIM)
+    raw_vectors = np.fromfile(VECTORS_PATH, dtype=np.float32)
+    expected_size = len(chunks) * EMBEDDING_DIM
+    if raw_vectors.size != expected_size:
+        raise ValueError(
+            f"{VECTORS_PATH} has {raw_vectors.size} float32 values, expected "
+            f"{expected_size} ({len(chunks)} chunks x {EMBEDDING_DIM} dims) to match "
+            f"{CHUNKS_PATH}. The two artifacts are out of sync -- rebuild both together: "
+            "python scripts/build_index.py"
+        )
+    vectors = raw_vectors.reshape(len(chunks), EMBEDDING_DIM)
     dense = DenseStore(chunk_ids, vectors)
     sparse = SparseStore(chunk_ids, [c.text for c in chunks])
     chunk_by_id = {c.chunk_id: c for c in chunks}
