@@ -204,3 +204,8 @@ def test_json_repair_falls_back_to_ollama_when_groq_repair_fails(monkeypatch):
     assert len(groq_calls) == 2  # initial + failed repair attempt
     assert len(ollama_calls) == 1  # repair fell back here instead of raising
     assert result["json"] == {"answer": "ok"}
+    # The initial call was served by groq, but the *repair* (which is what
+    # actually produced the final usable JSON) fell back to ollama -- the
+    # reported backend must reflect the backend that really served the
+    # call, not the initial attempt's backend.
+    assert result["backend"] == llm.OLLAMA_BACKEND
