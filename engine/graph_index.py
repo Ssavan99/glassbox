@@ -112,13 +112,17 @@ def seed_entities(query: str, graph: GraphData) -> list[str]:
     mentioned in the query text. Must stay non-LLM — the Graph architecture's
     online budget is exactly one LLM call (the final generate), per §3.3.
 
-    Longest entities are checked first so a more specific multi-word entity
-    ("embedding dimension") wins over a shorter one that's also a substring
-    of the query ("embedding"), and matching is word-boundary-aware so e.g.
-    the entity "trace" doesn't spuriously match inside an unrelated word.
-    Spaces and hyphens are treated as equivalent word separators on both
-    sides, so a spaced entity ("needle in a haystack") still matches a
-    hyphenated mention in the query ("needle-in-a-haystack") and vice versa.
+    Candidates are checked longest-first, but this returns every matching
+    entity rather than only the longest — a query containing "embedding
+    dimension" also matches the shorter entity "embedding" if that's a
+    separate vocabulary entry, since a broader seed set is harmless here
+    (expand_hops's degree-based capping tolerates it fine). The
+    longest-first order only matters for readability of the returned list,
+    not exclusivity. Matching is word-boundary-aware so e.g. the entity
+    "trace" doesn't spuriously match inside an unrelated word, and spaces
+    and hyphens are treated as equivalent word separators on both sides, so
+    a spaced entity ("needle in a haystack") still matches a hyphenated
+    mention in the query ("needle-in-a-haystack") and vice versa.
     """
     query_lower = query.lower()
     candidates = sorted(graph.entities.keys(), key=len, reverse=True)

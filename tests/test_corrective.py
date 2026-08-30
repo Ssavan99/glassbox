@@ -193,6 +193,72 @@ def test_grader_survives_malformed_or_incomplete_json(monkeypatch):
     assert missing_judgement["verdict"] == "ambiguous"
 
 
+def test_grader_survives_non_dict_json(monkeypatch):
+    # engine.llm.complete() only guarantees *some* parsed JSON value on
+    # success, not that it matches the requested schema's shape -- a model
+    # could return a bare list/string/int instead of {"judgements": [...]}.
+    question = _factual_question()
+
+    def _fake_complete(prompt, json_schema=None, **params):
+        if json_schema is not None and _is_grade_prompt(prompt):
+            return {
+                "text": "[]",
+                "json": ["not", "a", "dict"],
+                "prompt_tokens": 5,
+                "completion_tokens": 2,
+            }
+        return {"text": "mocked answer", "prompt_tokens": 5, "completion_tokens": 2}
+
+    monkeypatch.setattr(corrective, "complete", _fake_complete)
+
+    trace = corrective.CorrectiveArchitecture().run(question)
+    trace.validate()
+
+    grade_node = next(n for n in trace.nodes if n.kind == "grade")
+    # every retrieved chunk defaults to ambiguous since nothing usable came back
+    assert all(j["verdict"] == "ambiguous" for j in grade_node.payload["judgements"])
+
+
+def test_rewrite_survives_non_dict_json(monkeypatch):
+    # Same defensive requirement on the rewrite call's response.
+    question = _factual_question()
+
+    def _fake_complete(prompt, json_schema=None, **params):
+        if json_schema is not None and _is_grade_prompt(prompt):
+            judgements = [
+                {"chunk_id": cid, "verdict": "incorrect", "reason": "off-topic"}
+                for cid in (
+                    line.strip()[1:-1]
+                    for line in prompt.splitlines()
+                    if line.strip().startswith("[") and line.strip().endswith("]")
+                )
+            ]
+            return {
+                "text": "",
+                "json": {"judgements": judgements},
+                "prompt_tokens": 5,
+                "completion_tokens": 2,
+            }
+        if json_schema is not None and _is_rewrite_prompt(prompt):
+            return {
+                "text": "oops",
+                "json": ["not", "a", "dict"],
+                "prompt_tokens": 5,
+                "completion_tokens": 2,
+            }
+        return {"text": "mocked answer", "prompt_tokens": 5, "completion_tokens": 2}
+
+    monkeypatch.setattr(corrective, "complete", _fake_complete)
+
+    # Must not raise (would previously AttributeError on list.get(...)); the
+    # rewrite should fall back to reusing the original query unchanged.
+    trace = corrective.CorrectiveArchitecture().run(question)
+    trace.validate()
+
+    rewrite_node = next(n for n in trace.nodes if n.kind == "rewrite")
+    assert rewrite_node.payload["to"] == rewrite_node.payload["from"]
+
+
 def test_llm_calls_counted_not_hardcoded(monkeypatch):
     mock_fn, calls = _make_mock(["mostly_incorrect", "all_correct"])
     monkeypatch.setattr(corrective, "complete", mock_fn)

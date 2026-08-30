@@ -78,7 +78,8 @@ def _grade_chunks(question: str, chunks: list[ChunkRecord]) -> tuple[list[dict],
     result = complete(prompt, json_schema=GRADE_JSON_SCHEMA)
 
     retrieved_ids = [c.chunk_id for c in chunks]
-    raw_judgements = result.get("json", {}).get("judgements", [])
+    parsed = result.get("json")
+    raw_judgements = parsed.get("judgements", []) if isinstance(parsed, dict) else []
     if not isinstance(raw_judgements, list):
         raw_judgements = []
 
@@ -215,7 +216,9 @@ class CorrectiveArchitecture(Architecture):
             total_prompt_tokens += rewrite_result["prompt_tokens"]
             total_completion_tokens += rewrite_result["completion_tokens"]
 
-            rewrite_json = rewrite_result.get("json") or {}
+            rewrite_json = rewrite_result.get("json")
+            if not isinstance(rewrite_json, dict):
+                rewrite_json = {}
             new_query = rewrite_json.get("to") or query
             reason = rewrite_json.get("reason", "")
 
