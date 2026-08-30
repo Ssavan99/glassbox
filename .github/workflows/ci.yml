@@ -22,6 +22,8 @@ jobs:
         run: ruff check .
       - name: Pytest
         run: pytest
+      - name: Verify corpus
+        run: python scripts/verify_corpus.py
 
   web:
     runs-on: ubuntu-latest

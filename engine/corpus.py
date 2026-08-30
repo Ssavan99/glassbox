@@ -63,14 +63,33 @@ def _coerce_created(value) -> str:
     return str(value)
 
 
+def _require_str_list(value, field_name: str, path: Path) -> list[str]:
+    """Coerce a frontmatter field that must be a YAML list of strings.
+
+    A bare scalar here (e.g. `entities: some-term` missing its `[...]`
+    brackets) would otherwise reach `list(...)`, which silently splits a
+    string into its individual characters instead of erroring -- raise a
+    clear error instead so a corpus typo fails loudly at load time rather
+    than quietly corrupting whatever consumes it (e.g. the knowledge-graph
+    vocabulary in scripts/build_graph.py)."""
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise ValueError(
+            f"{path}: frontmatter field '{field_name}' must be a YAML list "
+            f"(e.g. `{field_name}: [one, two]`), got {type(value).__name__}: {value!r}"
+        )
+    return [str(item) for item in value]
+
+
 def load_note(path: Path) -> Note:
     text = path.read_text(encoding="utf-8")
     data, body = _parse_frontmatter(text)
     return Note(
         note_id=path.stem,
         title=str(data.get("title", "")),
-        tags=list(data.get("tags", []) or []),
-        entities=list(data.get("entities", []) or []),
+        tags=_require_str_list(data.get("tags"), "tags", path),
+        entities=_require_str_list(data.get("entities"), "entities", path),
         created=_coerce_created(data.get("created", "")),
         body=body,
     )
