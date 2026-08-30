@@ -55,9 +55,20 @@ class GraphArchitecture(Architecture):
         )
 
         chunk_ids, edges = expand_hops(seeds, graph)
+        # Resolve to real ChunkRecords *before* building the graph_expand
+        # node, and record that same resolved list in the node's payload --
+        # not expand_hops's raw output -- so the trace can never claim a
+        # chunk_id was part of this run's context when it wasn't actually
+        # looked up and handed to generate (e.g. if artifacts/graph.json and
+        # artifacts/chunks.json have drifted out of sync).
+        retrieved_chunks = [
+            index.chunk_by_id[cid] for cid in chunk_ids if cid in index.chunk_by_id
+        ]
+        used_chunk_ids = [c.chunk_id for c in retrieved_chunks]
+
         n_expand = builder.node(
             "graph_expand",
-            f"2-hop expansion ({len(chunk_ids)} chunks)",
+            f"2-hop expansion ({len(used_chunk_ids)} chunks)",
             parents=[n_seed],
             explain=(
                 "Two-hop traversal from the seed entities can surface facts "
@@ -71,24 +82,22 @@ class GraphArchitecture(Architecture):
             ),
             hops=2,
             edges=[{"src": e.src, "rel": e.rel, "dst": e.dst} for e in edges],
-            chunk_ids=list(chunk_ids),
+            chunk_ids=used_chunk_ids,
         )
 
-        retrieved_chunks = [
-            index.chunk_by_id[cid] for cid in chunk_ids if cid in index.chunk_by_id
-        ]
-
         touched_entities = set(seeds) | {e.src for e in edges} | {e.dst for e in edges}
-        community_ids: list[int] = []
-        seen_communities: set[int] = set()
-        for entity_id in touched_entities:
-            entity = graph.entities.get(entity_id)
-            if entity is None or entity.community is None:
-                continue
-            if entity.community in seen_communities:
-                continue
-            seen_communities.add(entity.community)
-            community_ids.append(entity.community)
+        # Sorted, not just deduped: `touched_entities` is a set, whose
+        # iteration order varies across process runs (CPython string-hash
+        # randomization) -- an unsorted community_ids list would make the
+        # community-summary block order in the generate prompt (and
+        # therefore engine/llm.py's cache key, which hashes the literal
+        # prompt text) nondeterministic across reruns of the same question.
+        touched_community_ids: set[int] = {
+            graph.entities[entity_id].community
+            for entity_id in touched_entities
+            if entity_id in graph.entities and graph.entities[entity_id].community is not None
+        }
+        community_ids = sorted(touched_community_ids)
 
         summaries = []
         for community_id in community_ids:

@@ -259,6 +259,34 @@ def test_reflect_survives_malformed_or_non_dict_json():
         assert len(reflect_nodes) == (1 if expected_sufficient else 2)
 
 
+def test_graph_expand_payload_matches_what_was_actually_used():
+    # Same trace-fidelity requirement as engine/architectures/graph.py: a
+    # stale/desynced chunk_id returned by expand_hops must not appear in
+    # the graph_expand node's payload if it couldn't actually be resolved
+    # and handed to reflect/generate.
+    mock_fn, calls = _make_mock([GRAPH_SUBQ], reflect_sequence=[True])
+
+    graph = load_graph()
+    real_chunk_ids, real_edges = agentic.expand_hops(seed_entities(GRAPH_SUBQ, graph), graph)
+    assert real_chunk_ids, "expected GRAPH_SUBQ's expansion to find at least one real chunk"
+    poisoned_chunk_ids = ["stale-note::999", *real_chunk_ids]
+
+    def _fake_expand_hops(seeds, g, *args, **kwargs):
+        return poisoned_chunk_ids, real_edges
+
+    import unittest.mock as mock
+
+    with mock.patch.object(agentic, "complete", mock_fn), mock.patch.object(
+        agentic, "expand_hops", _fake_expand_hops
+    ):
+        trace = agentic.AgenticArchitecture().run("some question")
+
+    trace.validate()
+    expand_node = next(n for n in trace.nodes if n.kind == "graph_expand")
+    assert "stale-note::999" not in expand_node.payload["chunk_ids"]
+    assert expand_node.payload["chunk_ids"] == real_chunk_ids
+
+
 def test_duration_ms_is_populated():
     mock_fn, calls = _make_mock([GRAPH_SUBQ], reflect_sequence=[True])
 

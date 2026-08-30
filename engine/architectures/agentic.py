@@ -44,7 +44,7 @@ from engine.config import AGENTIC_MAX_STEPS, AGENTIC_MAX_SUBQUESTIONS, TOP_K
 from engine.embedding import embed_texts
 from engine.graph_index import expand_hops, load_graph, seed_entities
 from engine.index import ChunkRecord, load_index
-from engine.llm import complete
+from engine.llm import complete, safe_json_dict
 from engine.prompts import build_answer_prompt
 from engine.trace import Metrics, Trace, TraceBuilder
 
@@ -78,8 +78,8 @@ def _build_plan_prompt(question: str) -> str:
 def _plan_sub_questions(question: str) -> tuple[list[str], dict]:
     prompt = _build_plan_prompt(question)
     result = complete(prompt, json_schema=PLAN_JSON_SCHEMA)
-    parsed = result.get("json")
-    sub_questions = parsed.get("sub_questions") if isinstance(parsed, dict) else None
+    parsed = safe_json_dict(result)
+    sub_questions = parsed.get("sub_questions")
     if not isinstance(sub_questions, list) or not sub_questions:
         sub_questions = [question]
     sub_questions = [str(q) for q in sub_questions][:AGENTIC_MAX_SUBQUESTIONS]
@@ -205,7 +205,7 @@ def _retrieve_sparse(sub_question: str, index, route_node: str, builder: TraceBu
     return chunk_ids, retrieve_node
 
 
-def _retrieve_graph(sub_question: str, graph, route_node: str, builder: TraceBuilder):
+def _retrieve_graph(sub_question: str, graph, index, route_node: str, builder: TraceBuilder):
     t0 = time.perf_counter()
     seeds = seed_entities(sub_question, graph)
     seed_node = builder.node(
@@ -222,10 +222,15 @@ def _retrieve_graph(sub_question: str, graph, route_node: str, builder: TraceBui
     )
 
     t1 = time.perf_counter()
-    chunk_ids, edges = expand_hops(seeds, graph)
+    raw_chunk_ids, edges = expand_hops(seeds, graph)
+    # Resolve against the loaded index *before* building the node, and
+    # record that same resolved list in the payload -- not expand_hops's
+    # raw output -- so the trace can't claim a chunk_id was part of this
+    # attempt's context when it wasn't actually looked up downstream.
+    used_chunk_ids = [cid for cid in raw_chunk_ids if cid in index.chunk_by_id]
     expand_node = builder.node(
         "graph_expand",
-        f"2-hop expansion ({len(chunk_ids)} chunks)",
+        f"2-hop expansion ({len(used_chunk_ids)} chunks)",
         parents=[seed_node],
         explain=(
             "Two-hop traversal from the seed entities pulls in chunks "
@@ -235,9 +240,9 @@ def _retrieve_graph(sub_question: str, graph, route_node: str, builder: TraceBui
         duration_ms=(time.perf_counter() - t1) * 1000,
         hops=2,
         edges=[{"src": e.src, "rel": e.rel, "dst": e.dst} for e in edges],
-        chunk_ids=list(chunk_ids),
+        chunk_ids=used_chunk_ids,
     )
-    return list(chunk_ids), expand_node
+    return used_chunk_ids, expand_node
 
 
 def _build_reflect_prompt(sub_question: str, chunks: list[ChunkRecord]) -> str:
@@ -261,9 +266,7 @@ def _build_reflect_prompt(sub_question: str, chunks: list[ChunkRecord]) -> str:
 def _reflect(sub_question: str, chunks: list[ChunkRecord]) -> tuple[dict, dict]:
     prompt = _build_reflect_prompt(sub_question, chunks)
     result = complete(prompt, json_schema=REFLECT_JSON_SCHEMA)
-    parsed = result.get("json")
-    if not isinstance(parsed, dict):
-        parsed = {}
+    parsed = safe_json_dict(result)
     sufficient = parsed.get("sufficient")
     if not isinstance(sufficient, bool):
         sufficient = False
@@ -391,7 +394,7 @@ class AgenticArchitecture(Architecture):
                     )
                 else:
                     chunk_ids, retrieve_node = _retrieve_graph(
-                        sub_question, graph, route_node, builder
+                        sub_question, graph, index, route_node, builder
                     )
 
                 attempt_chunks = [
