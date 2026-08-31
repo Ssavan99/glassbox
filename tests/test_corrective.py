@@ -4,6 +4,7 @@ import yaml
 
 import engine.architectures.corrective as corrective
 from engine.config import CORRECTIVE_MAX_CORRECTIONS, QUESTIONS_PATH
+from tests.conftest import requires_live_llm_backend
 
 
 def _all_questions() -> list[dict]:
@@ -269,6 +270,7 @@ def test_llm_calls_counted_not_hardcoded(monkeypatch):
     assert trace.metrics.llm_calls == len(calls)
 
 
+@requires_live_llm_backend
 def test_real_end_to_end_factual_question():
     question = _factual_question()
     trace = corrective.CorrectiveArchitecture().run(question)
@@ -278,6 +280,7 @@ def test_real_end_to_end_factual_question():
     assert 1 <= grade_count <= CORRECTIVE_MAX_CORRECTIONS + 1
 
 
+@requires_live_llm_backend
 def test_real_end_to_end_unanswerable_question():
     question = _unanswerable_question()
     trace = corrective.CorrectiveArchitecture().run(question)

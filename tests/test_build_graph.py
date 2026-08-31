@@ -15,11 +15,20 @@ import pytest
 import engine.llm as llm
 import scripts.build_graph as build_graph
 from engine.config import GRAPH_PATH
+from tests.conftest import live_backend_available
 
 
 @pytest.fixture(scope="module")
 def build_stats():
-    """Run the real build once for the whole module (expensive: ~140 LLM calls)."""
+    """Run the real build once for the whole module (expensive: ~140 LLM calls).
+
+    A `pytest.mark.skipif` on a fixture doesn't propagate to skip the tests
+    that use it (not officially supported by pytest) -- the fixture itself
+    must call `pytest.skip()`, which does correctly skip every dependent
+    test.
+    """
+    if not live_backend_available():
+        pytest.skip("neither GROQ_API_KEY nor a local Ollama daemon is reachable")
     return build_graph.main()
 
 
