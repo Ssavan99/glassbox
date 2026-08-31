@@ -9,6 +9,7 @@ ARTIFACTS_DIR = ROOT / "artifacts"
 TRACES_DIR = ARTIFACTS_DIR / "traces"
 LLM_CACHE_DIR = ROOT / ".llm_cache"
 QUESTIONS_PATH = ROOT / "evaluation" / "questions.yaml"
+WEB_DATA_DIR = ROOT / "web" / "public" / "data"
 
 CHUNKS_PATH = ARTIFACTS_DIR / "chunks.json"
 VECTORS_PATH = ARTIFACTS_DIR / "vectors.f32"

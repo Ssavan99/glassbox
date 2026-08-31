@@ -290,6 +290,7 @@ class AgenticArchitecture(Architecture):
         "6 reflects + 1 generate), never 9."
     )
 
+    # region: run
     def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
@@ -482,3 +483,4 @@ class AgenticArchitecture(Architecture):
             completion_tokens=total_completion_tokens,
         )
         return builder.build(answer=answer, metrics=metrics)
+    # endregion

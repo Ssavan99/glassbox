@@ -34,6 +34,7 @@ class HyDEArchitecture(Architecture):
         "original question and the retrieved chunks."
     )
 
+    # region: run
     def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
@@ -122,3 +123,4 @@ class HyDEArchitecture(Architecture):
             completion_tokens=hyde_result["completion_tokens"] + answer_result["completion_tokens"],
         )
         return builder.build(answer=answer, metrics=metrics)
+    # endregion

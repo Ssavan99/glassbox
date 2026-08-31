@@ -141,3 +141,61 @@ kbd {
 ::selection {
   background: color-mix(in oklab, var(--arch-naive) 35%, transparent);
 }
+
+/*
+ * Syntax highlighting (Phase 9's CodeBlock, highlight.js's Python grammar).
+ * Mapped to this project's own design tokens rather than a pre-packaged
+ * theme, so real source excerpts stay visually consistent with the rest of
+ * the site in both themes without a second palette to maintain.
+ */
+.hljs {
+  color: var(--ink-secondary);
+}
+.hljs-comment,
+.hljs-quote {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-subst {
+  color: var(--ink);
+  font-weight: 600;
+}
+.hljs-string,
+.hljs-doctag,
+.hljs-regexp {
+  color: var(--status-good);
+}
+.hljs-number {
+  color: var(--status-warning);
+}
+.hljs-title,
+.hljs-section,
+.hljs-selector-id,
+.hljs-built_in,
+.hljs-type,
+.hljs-class .hljs-title {
+  color: var(--ink);
+  font-weight: 600;
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attribute,
+.hljs-params {
+  color: var(--ink-secondary);
+}
+.hljs-meta,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: var(--ink-muted);
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
+}

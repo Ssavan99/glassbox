@@ -47,6 +47,11 @@ jobs:
         run: |
           pip install pyyaml
           python scripts/export_web.py
+      - name: Extract code excerpts from engine/ source
+        if: steps.check.outputs.exists == 'true'
+        # Must run after export_web.py -- see deploy.yml's identical step
+        # for why. No extra deps (stdlib only).
+        run: python scripts/extract_code_excerpts.py
       - uses: actions/setup-node@v4
         if: steps.check.outputs.exists == 'true'
         with:

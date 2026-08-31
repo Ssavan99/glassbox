@@ -1,4 +1,12 @@
-import type { ArchitectureId, ChunkRecord, EvalReport, GraphData, Question, Trace } from "./types";
+import type {
+  ArchitectureId,
+  ChunkRecord,
+  CodeExcerpts,
+  EvalReport,
+  GraphData,
+  Question,
+  Trace,
+} from "./types";
 
 /** All data is exported by scripts/export_web.py into public/data/ (run it
  * before `npm run dev` if that directory is missing -- a fresh clone won't
@@ -33,6 +41,7 @@ let chunksPromise: Promise<ChunkRecord[]> | undefined;
 let evalPromise: Promise<EvalReport> | undefined;
 let graphPromise: Promise<GraphData> | undefined;
 let questionsPromise: Promise<Question[]> | undefined;
+let codeExcerptsPromise: Promise<CodeExcerpts> | undefined;
 const tracePromises = new Map<string, Promise<Trace>>();
 
 export function loadChunks(): Promise<ChunkRecord[]> {
@@ -53,6 +62,11 @@ export function loadGraph(): Promise<GraphData> {
 export function loadQuestions(): Promise<Question[]> {
   questionsPromise ??= fetchJson<Question[]>("questions.json");
   return questionsPromise;
+}
+
+export function loadCodeExcerpts(): Promise<CodeExcerpts> {
+  codeExcerptsPromise ??= fetchJson<CodeExcerpts>("code_excerpts.json");
+  return codeExcerptsPromise;
 }
 
 export function loadTrace(architecture: ArchitectureId, questionId: string): Promise<Trace> {

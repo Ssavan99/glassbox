@@ -120,6 +120,7 @@ class CorrectiveArchitecture(Architecture):
         "to query rewrite + re-retrieval against the local corpus (D7)."
     )
 
+    # region: run
     def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
@@ -283,3 +284,4 @@ class CorrectiveArchitecture(Architecture):
             completion_tokens=total_completion_tokens,
         )
         return builder.build(answer=answer, metrics=metrics)
+    # endregion

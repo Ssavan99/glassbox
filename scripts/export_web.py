@@ -29,9 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import yaml
 
-from engine.config import ARTIFACTS_DIR, QUESTIONS_PATH, ROOT
-
-WEB_DATA_DIR = ROOT / "web" / "public" / "data"
+from engine.config import ARTIFACTS_DIR, QUESTIONS_PATH, WEB_DATA_DIR
 
 FILES_TO_COPY = ["chunks.json", "eval.json", "graph.json", "bm25.json", "vectors.f32"]
 

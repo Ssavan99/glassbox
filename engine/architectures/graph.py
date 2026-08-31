@@ -30,6 +30,7 @@ class GraphArchitecture(Architecture):
         "and a single generate call answers from that gathered context."
     )
 
+    # region: run
     def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         graph = load_graph()
@@ -135,3 +136,4 @@ class GraphArchitecture(Architecture):
             completion_tokens=llm_result["completion_tokens"],
         )
         return builder.build(answer=answer, metrics=metrics)
+    # endregion

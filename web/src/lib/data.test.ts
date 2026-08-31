@@ -9,7 +9,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import type { ChunkRecord, EvalReport, GraphData, Question, Trace } from "./types";
+import type { ChunkRecord, CodeExcerpts, EvalReport, GraphData, Question, Trace } from "./types";
 import { ARCHITECTURE_IDS } from "./types";
 
 const DATA_DIR = resolve(__dirname, "../../public/data");
@@ -170,6 +170,27 @@ describe("eval.json matches EvalReport", () => {
     expect(typeof acc.correct).toBe("number");
     expect(typeof acc.total).toBe("number");
     expect(typeof acc.rubric).toBe("object");
+  });
+});
+
+describe("code_excerpts.json matches CodeExcerpts (Phase 9)", () => {
+  const excerpts = readJson<CodeExcerpts>("code_excerpts.json");
+
+  it("has exactly the seven architectures, each with a non-empty real code excerpt", () => {
+    expect(Object.keys(excerpts).sort()).toEqual([...ARCHITECTURE_IDS].sort());
+    for (const id of ARCHITECTURE_IDS) {
+      const excerpt = excerpts[id];
+      expect(excerpt.architecture).toBe(id);
+      expect(typeof excerpt.file).toBe("string");
+      expect(excerpt.region).toBe("run");
+      expect(excerpt.start_line).toBeLessThan(excerpt.end_line);
+      // Every excerpt is a `def run(...)` method extracted from real,
+      // current source (scripts/extract_code_excerpts.py) -- this is what
+      // "docs cannot drift from code" actually means in the frontend's
+      // own test suite, not just the Python side's.
+      expect(excerpt.code).toContain("def run(");
+      expect(excerpt.code.length).toBeGreaterThan(0);
+    }
   });
 });
 

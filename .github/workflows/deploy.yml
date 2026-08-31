@@ -32,6 +32,14 @@ jobs:
         run: |
           pip install pyyaml
           python scripts/export_web.py
+      - name: Extract code excerpts from engine/ source
+        # Must run after export_web.py, not before -- export_web.py clears
+        # and recreates web/public/data/ on every run, so extracting first
+        # would just get wiped. No extra deps (stdlib only): this is a pure
+        # source-file read, never an LLM call, which is what lets the
+        # tutorial pages' code excerpts be regenerated fresh on every build
+        # instead of committed and risking drift from engine/.
+        run: python scripts/extract_code_excerpts.py
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

@@ -59,6 +59,7 @@ class HybridArchitecture(Architecture):
         "the answer."
     )
 
+    # region: run
     def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         index = load_index()
@@ -189,3 +190,4 @@ class HybridArchitecture(Architecture):
             completion_tokens=llm_result["completion_tokens"],
         )
         return builder.build(answer=answer, metrics=metrics)
+    # endregion

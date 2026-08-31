@@ -131,6 +131,7 @@ class AdaptiveArchitecture(Architecture):
         "an LLM (not a heuristic) picks which whole architecture to run."
     )
 
+    # region: run
     def run(self, question: str, trace_id: str | None = None) -> Trace:
         start = time.perf_counter()
         builder = TraceBuilder(architecture=self.name, question=question, trace_id=trace_id)
@@ -179,3 +180,4 @@ class AdaptiveArchitecture(Architecture):
             + delegated_trace.metrics.completion_tokens,
         )
         return builder.build(answer=answer, metrics=metrics)
+    # endregion

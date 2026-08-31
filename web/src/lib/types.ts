@@ -219,6 +219,26 @@ export interface Question {
 }
 
 // ---------------------------------------------------------------------------
+// Code excerpts (web/public/data/code_excerpts.json) — generated fresh on
+// every build by scripts/extract_code_excerpts.py from `# region: run` /
+// `# endregion` markers in engine/architectures/*.py (Phase 9). Never
+// committed, unlike the other artifacts here — regenerating it costs
+// nothing (no LLM calls, just reading local source), which is what lets the
+// tutorial pages' code excerpts genuinely never drift from real source.
+// ---------------------------------------------------------------------------
+
+export interface CodeExcerpt {
+  architecture: ArchitectureId;
+  file: string;
+  region: string;
+  start_line: number;
+  end_line: number;
+  code: string;
+}
+
+export type CodeExcerpts = Record<ArchitectureId, CodeExcerpt>;
+
+// ---------------------------------------------------------------------------
 // Evaluation report (artifacts/eval.json) — real shape as of Phase 6.2
 // ---------------------------------------------------------------------------
 
