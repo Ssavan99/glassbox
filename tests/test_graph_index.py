@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 import engine.graph_index as graph_index_mod
@@ -15,6 +17,17 @@ def test_load_graph_missing_file_raises_actionable_error(tmp_path, monkeypatch):
     monkeypatch.setattr(graph_index_mod, "GRAPH_PATH", tmp_path / "graph.json")
 
     with pytest.raises(FileNotFoundError, match="python scripts/build_graph.py"):
+        graph_index_mod.load_graph()
+
+
+def test_load_graph_rejects_a_graph_from_a_different_retrieval_build(tmp_path, monkeypatch):
+    graph_path = tmp_path / "graph.json"
+    graph_path.write_text(
+        json.dumps({"build_id": "0" * 64, "entities": [], "edges": [], "communities": []})
+    )
+    monkeypatch.setattr(graph_index_mod, "GRAPH_PATH", graph_path)
+
+    with pytest.raises(ValueError, match="Knowledge graph and retrieval index are out of sync"):
         graph_index_mod.load_graph()
 
 

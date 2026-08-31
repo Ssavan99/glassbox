@@ -176,6 +176,12 @@ export interface ChunkRecord {
   heading: string | null;
 }
 
+/** One self-consistent generation of the retrieval corpus. */
+export interface ChunksArtifact {
+  build_id: string;
+  chunks: ChunkRecord[];
+}
+
 // ---------------------------------------------------------------------------
 // Knowledge graph (artifacts/graph.json)
 // ---------------------------------------------------------------------------
@@ -200,6 +206,7 @@ export interface GraphCommunity {
 }
 
 export interface GraphData {
+  build_id: string;
   entities: GraphEntity[];
   edges: GraphEdge[];
   communities: GraphCommunity[];

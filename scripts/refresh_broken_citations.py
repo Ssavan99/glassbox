@@ -1,7 +1,6 @@
-"""Phase 6.2: after fixing engine/prompts.py's SYSTEM_PREAMBLE (the old "e.g.
+"""After fixing engine/prompts.py's SYSTEM_PREAMBLE (the old "e.g.
 [chunk-id::0]" example was sometimes echoed verbatim by the model as a fake
-citation instead of a real chunk id -- see repo-plans/glassbox_PLAN.md's
-Phase 6.2 decision log), regenerates the final `generate` node for every
+citation instead of a real chunk id), regenerate the final `generate` node for every
 trace whose currently-recorded answer still exhibits the bug (contains the
 literal string "chunk-id::").
 

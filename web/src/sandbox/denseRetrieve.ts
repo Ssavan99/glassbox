@@ -1,23 +1,21 @@
-import { loadChunks } from "../lib/data";
+import { loadChunksArtifact } from "../lib/data";
 import type { RetrievalResult } from "../lib/types";
 
 const EMBEDDING_DIM = 384;
 
-/** Fetches the real `vectors.f32` artifact (raw, row-major Float32,
- * written by scripts/build_index.py) as an ArrayBuffer and wraps it as a
- * `Float32Array` view -- no copy, no parsing beyond the typed-array cast.
- * Row i is chunk i's vector, in the exact same order as `chunks.json`
- * (both are built from the same `chunks` list in `build_index.py`'s single
- * pass), which is why this reuses `loadChunks()` for the parallel
- * chunk_id array rather than trusting bm25.json's own `chunk_ids` (same
- * order in practice, but chunks.json is the authoritative source every
- * other route in this app already reads chunk records from). */
+const VECTOR_BUILD_ID_PREFIX = "GLASSBOX_BUILD_ID:";
+const VECTOR_BUILD_ID_LENGTH = 64;
+const VECTOR_HEADER_SIZE = VECTOR_BUILD_ID_PREFIX.length + VECTOR_BUILD_ID_LENGTH + 1;
+
+/** Fetches the real `vectors.f32` artifact. Its fixed-size build-id header
+ * is checked against chunks.json before the remaining row-major Float32
+ * payload is used, so a partially published artifact generation fails fast. */
 let vectorsPromise: Promise<{ chunkIds: string[]; vectors: Float32Array }> | undefined;
 
 function loadVectors(): Promise<{ chunkIds: string[]; vectors: Float32Array }> {
   vectorsPromise ??= (async () => {
-    const [chunks, buf] = await Promise.all([
-      loadChunks(),
+    const [chunksArtifact, buf] = await Promise.all([
+      loadChunksArtifact(),
       fetch(`${import.meta.env.BASE_URL}data/vectors.f32`).then((res) => {
         if (!res.ok) {
           throw new Error(`failed to load vectors.f32: ${res.status} ${res.statusText}`);
@@ -25,15 +23,33 @@ function loadVectors(): Promise<{ chunkIds: string[]; vectors: Float32Array }> {
         return res.arrayBuffer();
       }),
     ]);
-    const vectors = new Float32Array(buf);
-    const expectedLength = chunks.length * EMBEDDING_DIM;
+    const header = new TextDecoder().decode(new Uint8Array(buf, 0, VECTOR_HEADER_SIZE));
+    const vectorBuildId = header.slice(
+      VECTOR_BUILD_ID_PREFIX.length,
+      VECTOR_BUILD_ID_PREFIX.length + VECTOR_BUILD_ID_LENGTH,
+    );
+    if (
+      !header.startsWith(VECTOR_BUILD_ID_PREFIX) ||
+      !header.endsWith("\n") ||
+      !/^[0-9a-f]{64}$/.test(vectorBuildId)
+    ) {
+      throw new Error("vectors.f32 is missing a valid retrieval build-id header");
+    }
+    if (vectorBuildId !== chunksArtifact.build_id) {
+      throw new Error(
+        "vectors.f32 and chunks.json have different build ids -- artifacts are out of sync, " +
+          "re-run scripts/export_web.py",
+      );
+    }
+    const vectors = new Float32Array(buf.slice(VECTOR_HEADER_SIZE));
+    const expectedLength = chunksArtifact.chunks.length * EMBEDDING_DIM;
     if (vectors.length !== expectedLength) {
       throw new Error(
-        `vectors.f32 has ${vectors.length} floats but chunks.json has ${chunks.length} chunks ` +
+        `vectors.f32 has ${vectors.length} floats but chunks.json has ${chunksArtifact.chunks.length} chunks ` +
           `(expected ${expectedLength}) -- artifacts are out of sync, re-run scripts/export_web.py`,
       );
     }
-    return { chunkIds: chunks.map((c) => c.chunk_id), vectors };
+    return { chunkIds: chunksArtifact.chunks.map((c) => c.chunk_id), vectors };
   })();
   return vectorsPromise;
 }

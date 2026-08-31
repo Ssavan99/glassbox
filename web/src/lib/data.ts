@@ -1,5 +1,6 @@
 import type {
   ArchitectureId,
+  ChunksArtifact,
   ChunkRecord,
   CodeExcerpts,
   EvalReport,
@@ -38,6 +39,7 @@ async function fetchJson<T>(path: string): Promise<T> {
 // Module-level memoization — these files don't change at runtime, and
 // several routes/components load the same one independently.
 let chunksPromise: Promise<ChunkRecord[]> | undefined;
+let chunksArtifactPromise: Promise<ChunksArtifact> | undefined;
 let evalPromise: Promise<EvalReport> | undefined;
 let graphPromise: Promise<GraphData> | undefined;
 let questionsPromise: Promise<Question[]> | undefined;
@@ -45,8 +47,15 @@ let codeExcerptsPromise: Promise<CodeExcerpts> | undefined;
 const tracePromises = new Map<string, Promise<Trace>>();
 
 export function loadChunks(): Promise<ChunkRecord[]> {
-  chunksPromise ??= fetchJson<ChunkRecord[]>("chunks.json");
+  chunksPromise ??= loadChunksArtifact().then((artifact) => artifact.chunks);
   return chunksPromise;
+}
+
+/** Loads the chunk records together with the content-derived build id shared
+ * by the retrieval artifact bundle. */
+export function loadChunksArtifact(): Promise<ChunksArtifact> {
+  chunksArtifactPromise ??= fetchJson<ChunksArtifact>("chunks.json");
+  return chunksArtifactPromise;
 }
 
 export function loadEval(): Promise<EvalReport> {

@@ -33,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import community as community_louvain
 import networkx as nx
 
+from engine.artifacts import read_chunks_artifact
 from engine.config import CHUNKS_PATH, CORPUS_DIR, GRAPH_PATH
 from engine.corpus import load_corpus
 from engine.graph_index import normalize_entity
@@ -53,9 +54,9 @@ def build_vocabulary(corpus_dir: Path) -> list[str]:
     return sorted(vocab)
 
 
-def load_chunks(chunks_path: Path) -> list[dict]:
-    chunks = json.loads(chunks_path.read_text(encoding="utf-8"))
-    return sorted(chunks, key=lambda c: c["chunk_id"])
+def load_chunks(chunks_path: Path) -> tuple[str, list[dict]]:
+    build_id, chunks = read_chunks_artifact(chunks_path)
+    return build_id, sorted(chunks, key=lambda c: c["chunk_id"])
 
 
 def _extraction_prompt(chunk: dict, vocabulary: list[str]) -> str:
@@ -146,7 +147,7 @@ def main() -> dict:
     vocabulary = build_vocabulary(CORPUS_DIR)
     vocab_set = set(vocabulary)
 
-    chunks = load_chunks(CHUNKS_PATH)
+    build_id, chunks = load_chunks(CHUNKS_PATH)
     chunk_text_by_id = {c["chunk_id"]: c["text"] for c in chunks}
 
     total_extracted = 0
@@ -217,6 +218,7 @@ def main() -> dict:
         )
 
     graph_payload = {
+        "build_id": build_id,
         "entities": entities_payload,
         "edges": accepted_edges,
         "communities": communities_payload,

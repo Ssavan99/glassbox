@@ -7,11 +7,10 @@ This is a pure-computation pass over the already-recorded
 artifacts/traces/*.json (re-walked via extract_retrieved_chunk_ids, same as
 the original run) and the already-recorded LLM-judge output already sitting
 in artifacts/eval.json's rows (faithfulness, reads_as_refusal,
-judge_reasoning, judge_backend -- reused as-is, never re-judged). See
-repo-plans/glassbox_PLAN.md's Phase 6.1 for why this exists: recall@5's
-k-truncation was diagnosed as an unfair lens on Graph's (and partially
-Agentic/Adaptive's) unranked retrieval, and this fix should not cost a
-second real LLM-judge sweep to apply.
+judge_reasoning, judge_backend -- reused as-is, never re-judged). It exists
+because recall@5's k-truncation is an unfair lens on Graph's (and partially
+Agentic/Adaptive's) unranked retrieval, and adding the fair companion metric
+should not require a second real LLM-judge sweep.
 
 Run scripts/record_traces.py + evaluation/run_eval.py again from scratch
 instead of this script only if the traces themselves need to change (e.g. an

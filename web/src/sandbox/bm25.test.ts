@@ -8,6 +8,7 @@ import { type Bm25Artifact, buildBm25Index, tokenize } from "./bm25";
  * means the TS implementation stopped matching the pipeline.
  */
 const FIXTURE: Bm25Artifact = {
+  build_id: "a".repeat(64),
   chunk_ids: ["doc0", "doc1", "doc2", "doc3", "doc4"],
   tokenized_texts: [
     ["the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"],

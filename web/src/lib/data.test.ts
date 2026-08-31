@@ -9,7 +9,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import type { ChunkRecord, CodeExcerpts, EvalReport, GraphData, Question, Trace } from "./types";
+import type { ChunksArtifact, CodeExcerpts, EvalReport, GraphData, Question, Trace } from "./types";
 import { ARCHITECTURE_IDS } from "./types";
 
 const DATA_DIR = resolve(__dirname, "../../public/data");
@@ -43,8 +43,13 @@ describe("questions.json matches Question[]", () => {
   });
 });
 
-describe("chunks.json matches ChunkRecord[]", () => {
-  const chunks = readJson<ChunkRecord[]>("chunks.json");
+describe("chunks.json matches ChunksArtifact", () => {
+  const artifact = readJson<ChunksArtifact>("chunks.json");
+  const chunks = artifact.chunks;
+
+  it("has a content-derived build id", () => {
+    expect(artifact.build_id).toMatch(/^[0-9a-f]{64}$/);
+  });
 
   it("is a non-empty array of real chunk records", () => {
     expect(Array.isArray(chunks)).toBe(true);
@@ -65,6 +70,7 @@ describe("graph.json matches GraphData", () => {
   const graph = readJson<GraphData>("graph.json");
 
   it("has entities, edges, and communities arrays", () => {
+    expect(graph.build_id).toMatch(/^[0-9a-f]{64}$/);
     expect(Array.isArray(graph.entities)).toBe(true);
     expect(Array.isArray(graph.edges)).toBe(true);
     expect(Array.isArray(graph.communities)).toBe(true);

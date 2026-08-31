@@ -332,6 +332,28 @@ def test_judge_answer_faithfulness_none_when_no_gold_points(monkeypatch):
     assert result["reads_as_refusal"] is True
 
 
+def test_judge_answer_treats_string_false_as_unsupported(monkeypatch):
+    import evaluation.metrics as metrics_mod
+
+    def _fake_complete(prompt, json_schema=None, **params):
+        return {
+            "text": "",
+            "json": {
+                "point_support": ["false"],
+                "reads_as_appropriate_refusal": False,
+                "reasoning": "schema-violating string",
+            },
+            "prompt_tokens": 1,
+            "completion_tokens": 1,
+            "backend": "ollama",
+        }
+
+    monkeypatch.setattr(metrics_mod, "complete", _fake_complete)
+
+    result = judge_answer("q", "answer", ["point a"])
+    assert result["faithfulness"] == 0.0
+
+
 def test_judge_answer_survives_malformed_json(monkeypatch):
     import evaluation.metrics as metrics_mod
 

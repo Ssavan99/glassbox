@@ -16,6 +16,8 @@ const EPSILON = 0.25;
 
 /** The shape of `public/data/bm25.json`, as written by scripts/export_web.py. */
 export interface Bm25Artifact {
+  /** Matches chunks.json and vectors.f32 for this retrieval generation. */
+  build_id: string;
   /** One chunk id per document, parallel to `tokenized_texts`. */
   chunk_ids: string[];
   /** The pre-tokenized corpus (already lowercased and whitespace-split). */

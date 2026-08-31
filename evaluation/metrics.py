@@ -282,10 +282,11 @@ def judge_answer(question: str, answer: str, gold_answer_points: list[str]) -> d
     point_support = parsed.get("point_support")
     if not isinstance(point_support, list):
         point_support = []
-    # Defensive: coerce to bool, tolerate a length mismatch from the model
-    # by only scoring against however many points it actually judged, up to
-    # the number of real gold_answer_points.
-    point_support = [bool(x) for x in point_support][: len(gold_answer_points)]
+    # Treat only JSON booleans as support. In particular, bool("false") is
+    # True in Python and would silently inflate faithfulness for malformed
+    # judge output. A length mismatch is still tolerated by scoring only the
+    # values the judge actually returned, up to the gold-point count.
+    point_support = [x is True for x in point_support][: len(gold_answer_points)]
 
     if not gold_answer_points:
         faithfulness = None

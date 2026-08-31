@@ -82,10 +82,10 @@ _ARCHITECTURE_MODULES = [
     adaptive_mod,
 ]
 
-# Adaptive's routing-accuracy rubric, per repo-plans/glassbox_PLAN.md's
-# decision log (2026-08-29) -- kept in sync with that entry, not re-derived
-# here. factual/multi_hop/keyword/unanswerable are the four question types
-# in evaluation/questions.yaml.
+# Adaptive's routing-accuracy rubric is deliberately fixed for this designed
+# evaluation set: factual/multi_hop/keyword/unanswerable are the four
+# question types in evaluation/questions.yaml, with the listed architectures
+# treated as acceptable routes for each type.
 ADAPTIVE_ROUTING_RUBRIC: dict[str, set[str]] = {
     "factual": {"naive", "hybrid"},
     "multi_hop": {"agentic", "graph"},

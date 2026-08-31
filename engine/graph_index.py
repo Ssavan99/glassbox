@@ -36,7 +36,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 
-from engine.config import GRAPH_MAX_HOP_CHUNKS, GRAPH_PATH
+from engine.artifacts import ArtifactIntegrityError, read_chunks_artifact
+from engine.config import CHUNKS_PATH, GRAPH_MAX_HOP_CHUNKS, GRAPH_PATH
+from engine.index import load_index
 
 
 def normalize_entity(name: str) -> str:
@@ -87,6 +89,21 @@ def load_graph() -> GraphData:
         )
 
     raw = json.loads(GRAPH_PATH.read_text())
+    graph_build_id = raw.get("build_id") if isinstance(raw, dict) else None
+    if not isinstance(graph_build_id, str):
+        raise ArtifactIntegrityError(
+            f"{GRAPH_PATH} is missing its retrieval build id; rebuild with python scripts/build_graph.py"
+        )
+    # Loading the index checks chunks/vectors/bm25 against one another before
+    # the graph can hand any of its chunk ids to the retrieval layer.
+    index_build_id, _ = read_chunks_artifact(CHUNKS_PATH)
+    load_index()
+    if graph_build_id != index_build_id:
+        raise ArtifactIntegrityError(
+            "Knowledge graph and retrieval index are out of sync: graph.json and chunks.json "
+            "have different build ids. Rebuild with python scripts/build_index.py and "
+            "python scripts/build_graph.py"
+        )
 
     entities = {
         e["id"]: GraphEntity(

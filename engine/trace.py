@@ -2,9 +2,8 @@
 
 A trace is a DAG of nodes. Loops are unrolled into distinct nodes with real
 parent edges, which is what lets one schema cover linear, branching, looping,
-and graph-traversal pipelines uniformly. See repo-plans/glassbox_PLAN.md §3.2
-for the full spec (the payload-shape-by-kind table lives there, not here,
-since it documents architecture code rather than validating it).
+and graph-traversal pipelines uniformly. Payload shapes are validated by the
+trace tests and consumed by every renderer that switches on ``kind``.
 
 Frozen after Phase 2. Changing NODE_KINDS or the Node/Trace shape means
 migrating every recorded trace under artifacts/traces/ and every frontend
