@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — validated with the dataviz skill's palette validator
+ * (node scripts/validate_palette.js) against this exact surface pair.
+ * Light mode: 3 of 7 architecture accents (hyde/corrective/graph) sit
+ * below 3:1 contrast on the light surface by design — the "relief rule"
+ * applies wherever they're used: always pair the accent with a visible
+ * text label, never rely on the color alone to carry identity.
+ */
+:root {
+  color-scheme: light;
+
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-raised: #ffffff;
+  --ink: #0b0b0b;
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+  --gridline: #e1e0d9;
+  --border: rgba(11, 11, 11, 0.1);
+
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+
+  /* Seven architectures, "start here" order (Naive -> Adaptive per Phase 9) */
+  --arch-naive: #2a78d6;
+  --arch-hybrid: #eb6834;
+  --arch-hyde: #1baf7a;
+  --arch-corrective: #eda100;
+  --arch-graph: #e87ba4;
+  --arch-agentic: #008300;
+  --arch-adaptive: #4a3aa7;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-raised: #232322;
+    --ink: #ffffff;
+    --ink-secondary: #c3c2b7;
+    --ink-muted: #898781;
+    --gridline: #2c2c2a;
+    --border: rgba(255, 255, 255, 0.1);
+
+    --status-good: #0ca30c;
+    --status-warning: #fab219;
+    --status-serious: #ec835a;
+    --status-critical: #d03b3b;
+
+    --arch-naive: #3987e5;
+    --arch-hybrid: #d95926;
+    --arch-hyde: #199e70;
+    --arch-corrective: #c98500;
+    --arch-graph: #d55181;
+    --arch-agentic: #008300;
+    --arch-adaptive: #9085e9;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-raised: #232322;
+  --ink: #ffffff;
+  --ink-secondary: #c3c2b7;
+  --ink-muted: #898781;
+  --gridline: #2c2c2a;
+  --border: rgba(255, 255, 255, 0.1);
+
+  --arch-naive: #3987e5;
+  --arch-hybrid: #d95926;
+  --arch-hyde: #199e70;
+  --arch-corrective: #c98500;
+  --arch-graph: #d55181;
+  --arch-agentic: #008300;
+  --arch-adaptive: #9085e9;
+}
+
+@theme {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-gridline: var(--gridline);
+  --color-border: var(--border);
+
+  --color-status-good: var(--status-good);
+  --color-status-warning: var(--status-warning);
+  --color-status-serious: var(--status-serious);
+  --color-status-critical: var(--status-critical);
+
+  --color-arch-naive: var(--arch-naive);
+  --color-arch-hybrid: var(--arch-hybrid);
+  --color-arch-hyde: var(--arch-hyde);
+  --color-arch-corrective: var(--arch-corrective);
+  --color-arch-graph: var(--arch-graph);
+  --color-arch-agentic: var(--arch-agentic);
+  --color-arch-adaptive: var(--arch-adaptive);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--arch-naive) 35%, transparent);
+}

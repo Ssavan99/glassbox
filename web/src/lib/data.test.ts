@@ -1,0 +1,155 @@
+/**
+ * Asserts the TS types in ./types.ts actually match the real, current shape
+ * of the exported artifacts (not just §3.2's original design sketch) --
+ * read directly off disk here via fs, not fetch, since this runs in Node
+ * under vitest rather than a browser. Run `python scripts/export_web.py`
+ * first if public/data/ is missing (a clean checkout won't have it, since
+ * it's gitignored -- generated from the already-committed artifacts/).
+ */
+import { readFileSync, readdirSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import type { ChunkRecord, EvalReport, GraphData, Trace } from "./types";
+import { ARCHITECTURE_IDS } from "./types";
+
+const DATA_DIR = resolve(__dirname, "../../public/data");
+
+function readJson<T>(name: string): T {
+  return JSON.parse(readFileSync(resolve(DATA_DIR, name), "utf-8")) as T;
+}
+
+describe("chunks.json matches ChunkRecord[]", () => {
+  const chunks = readJson<ChunkRecord[]>("chunks.json");
+
+  it("is a non-empty array of real chunk records", () => {
+    expect(Array.isArray(chunks)).toBe(true);
+    expect(chunks.length).toBeGreaterThan(0);
+  });
+
+  it("every chunk has the exact fields ChunkRecord declares", () => {
+    for (const chunk of chunks) {
+      expect(typeof chunk.chunk_id).toBe("string");
+      expect(typeof chunk.note_id).toBe("string");
+      expect(typeof chunk.text).toBe("string");
+      expect(chunk.heading === null || typeof chunk.heading === "string").toBe(true);
+    }
+  });
+});
+
+describe("graph.json matches GraphData", () => {
+  const graph = readJson<GraphData>("graph.json");
+
+  it("has entities, edges, and communities arrays", () => {
+    expect(Array.isArray(graph.entities)).toBe(true);
+    expect(Array.isArray(graph.edges)).toBe(true);
+    expect(Array.isArray(graph.communities)).toBe(true);
+    expect(graph.entities.length).toBeGreaterThan(0);
+    expect(graph.edges.length).toBeGreaterThan(0);
+  });
+
+  it("entities/edges/communities have the shape GraphEntity/GraphEdge/GraphCommunity declare", () => {
+    const entity = graph.entities[0];
+    expect(typeof entity.id).toBe("string");
+    expect(Array.isArray(entity.chunk_ids)).toBe(true);
+
+    const edge = graph.edges[0];
+    expect(typeof edge.src).toBe("string");
+    expect(typeof edge.rel).toBe("string");
+    expect(typeof edge.dst).toBe("string");
+    expect(typeof edge.chunk_id).toBe("string");
+
+    const community = graph.communities[0];
+    expect(typeof community.id).toBe("number");
+    expect(Array.isArray(community.entity_ids)).toBe(true);
+    expect(typeof community.summary).toBe("string");
+  });
+});
+
+describe("eval.json matches EvalReport", () => {
+  const report = readJson<EvalReport>("eval.json");
+
+  it("has the real top-level fields grown during Phase 6/6.1/6.2, not just §3.2's original sketch", () => {
+    expect(typeof report.llm_judge_caveat).toBe("string");
+    expect(typeof report.rank_metrics_caveat).toBe("string");
+    expect(typeof report.n_architectures).toBe("number");
+    expect(typeof report.n_questions).toBe("number");
+    expect(Array.isArray(report.rows)).toBe(true);
+    expect(report.rows.length).toBe(report.n_architectures * report.n_questions);
+  });
+
+  it("by_architecture covers exactly the seven known architectures with the real summary shape", () => {
+    expect(Object.keys(report.by_architecture).sort()).toEqual([...ARCHITECTURE_IDS].sort());
+    for (const id of ARCHITECTURE_IDS) {
+      const summary = report.by_architecture[id];
+      expect(typeof summary.n_questions).toBe("number");
+      expect(typeof summary.rank_metrics_note).toBe("string");
+      expect(typeof summary.backend_mix).toBe("object");
+      // recall_full/graph_tool_involved-derived fields added in Phase 6.1/6.2
+      expect("recall_full_mean" in summary).toBe(true);
+    }
+  });
+
+  it("every row has the real per-row fields (recall_full, graph_tool_involved) eval_one() writes", () => {
+    for (const row of report.rows) {
+      expect(ARCHITECTURE_IDS).toContain(row.architecture);
+      expect(typeof row.trace_id).toBe("string");
+      expect(typeof row.answer).toBe("string");
+      expect(Array.isArray(row.retrieved_chunk_ids)).toBe(true);
+      expect(Array.isArray(row.gold_chunk_ids)).toBe(true);
+      expect("recall_full" in row).toBe(true);
+      expect(typeof row.graph_tool_involved).toBe("boolean");
+      expect(typeof row.judge_backend).toBe("string");
+      expect(Array.isArray(row.backend_calls)).toBe(true);
+      if (row.architecture === "adaptive") {
+        expect(typeof row.adaptive_routed_to).toBe("string");
+      }
+    }
+  });
+
+  it("adaptive_routing and adaptive_routing_accuracy have the real shape", () => {
+    expect(Array.isArray(report.adaptive_routing)).toBe(true);
+    const acc = report.adaptive_routing_accuracy;
+    expect(typeof acc.correct).toBe("number");
+    expect(typeof acc.total).toBe("number");
+    expect(typeof acc.rubric).toBe("object");
+  });
+});
+
+describe("a real trace matches Trace/TraceNode", () => {
+  const files = readdirSync(resolve(DATA_DIR, "traces")).filter((f) => f.endsWith(".json"));
+
+  it("public/data/traces/ has real, recorded trace files", () => {
+    expect(files.length).toBeGreaterThan(0);
+  });
+
+  it("every node kind in a sample of real traces is one of §3.2's closed set, with the right payload keys", () => {
+    // Sample instead of all 189 for test speed -- every architecture is
+    // still covered, since filenames are `{architecture}__{question_id}.json`.
+    const sampleByArch = new Map<string, string>();
+    for (const f of files) {
+      const arch = f.split("__")[0];
+      if (!sampleByArch.has(arch)) sampleByArch.set(arch, f);
+    }
+    expect(sampleByArch.size).toBe(ARCHITECTURE_IDS.length);
+
+    for (const file of sampleByArch.values()) {
+      const trace = readJson<Trace>(`traces/${file}`);
+      expect(ARCHITECTURE_IDS).toContain(trace.architecture);
+      expect(typeof trace.answer).toBe("string");
+      expect(typeof trace.metrics.latency_ms).toBe("number");
+      expect(typeof trace.metrics.llm_calls).toBe("number");
+      expect(trace.nodes.length).toBeGreaterThan(0);
+
+      for (const node of trace.nodes) {
+        expect(typeof node.id).toBe("string");
+        expect(Array.isArray(node.parent_ids)).toBe(true);
+        expect(typeof node.explain).toBe("string");
+        expect(typeof node.payload).toBe("object");
+      }
+
+      // The trace must end in `generate` -- extract_retrieved_chunk_ids
+      // (Python side) relies on this invariant; the frontend will too.
+      expect(trace.nodes[trace.nodes.length - 1].kind).toBe("generate");
+    }
+  });
+});
