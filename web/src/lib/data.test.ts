@@ -51,6 +51,12 @@ describe("graph.json matches GraphData", () => {
     const entity = graph.entities[0];
     expect(typeof entity.id).toBe("string");
     expect(Array.isArray(entity.chunk_ids)).toBe(true);
+    expect(typeof entity.community).toBe("number");
+    // every entity's community must resolve to a real GraphCommunity.id
+    const communityIds = new Set(graph.communities.map((c) => c.id));
+    for (const e of graph.entities) {
+      expect(communityIds.has(e.community)).toBe(true);
+    }
 
     const edge = graph.edges[0];
     expect(typeof edge.src).toBe("string");
@@ -77,29 +83,56 @@ describe("eval.json matches EvalReport", () => {
     expect(report.rows.length).toBe(report.n_architectures * report.n_questions);
   });
 
+  function expectNumberOrNull(value: unknown) {
+    expect(value === null || typeof value === "number").toBe(true);
+  }
+
   it("by_architecture covers exactly the seven known architectures with the real summary shape", () => {
     expect(Object.keys(report.by_architecture).sort()).toEqual([...ARCHITECTURE_IDS].sort());
     for (const id of ARCHITECTURE_IDS) {
       const summary = report.by_architecture[id];
       expect(typeof summary.n_questions).toBe("number");
+      expectNumberOrNull(summary.recall_at_5_mean);
+      expectNumberOrNull(summary.mrr_at_10_mean);
+      expectNumberOrNull(summary.ndcg_at_10_mean);
+      expectNumberOrNull(summary.recall_full_mean);
       expect(typeof summary.rank_metrics_note).toBe("string");
+      expectNumberOrNull(summary.faithfulness_mean);
+      expectNumberOrNull(summary.refusal_correctness_rate);
+      expectNumberOrNull(summary.latency_ms_mean);
+      expectNumberOrNull(summary.llm_calls_mean);
+      expectNumberOrNull(summary.prompt_tokens_mean);
+      expectNumberOrNull(summary.completion_tokens_mean);
       expect(typeof summary.backend_mix).toBe("object");
-      // recall_full/graph_tool_involved-derived fields added in Phase 6.1/6.2
-      expect("recall_full_mean" in summary).toBe(true);
     }
   });
 
-  it("every row has the real per-row fields (recall_full, graph_tool_involved) eval_one() writes", () => {
+  it("every row has every field EvalRow declares, with the right type", () => {
     for (const row of report.rows) {
       expect(ARCHITECTURE_IDS).toContain(row.architecture);
+      expect(typeof row.question_id).toBe("string");
+      expect(["factual", "multi_hop", "keyword", "unanswerable"]).toContain(row.question_type);
       expect(typeof row.trace_id).toBe("string");
       expect(typeof row.answer).toBe("string");
       expect(Array.isArray(row.retrieved_chunk_ids)).toBe(true);
       expect(Array.isArray(row.gold_chunk_ids)).toBe(true);
-      expect("recall_full" in row).toBe(true);
+      expectNumberOrNull(row.recall_at_5);
+      expectNumberOrNull(row.mrr_at_10);
+      expectNumberOrNull(row.ndcg_at_10);
+      expectNumberOrNull(row.recall_full);
       expect(typeof row.graph_tool_involved).toBe("boolean");
-      expect(typeof row.judge_backend).toBe("string");
+      expectNumberOrNull(row.faithfulness);
+      expect(typeof row.reads_as_refusal).toBe("boolean");
+      expect(row.refusal_correctness === null || typeof row.refusal_correctness === "boolean").toBe(
+        true,
+      );
+      expect(typeof row.judge_reasoning).toBe("string");
+      expect(typeof row.latency_ms).toBe("number");
+      expect(typeof row.llm_calls).toBe("number");
+      expect(typeof row.prompt_tokens).toBe("number");
+      expect(typeof row.completion_tokens).toBe("number");
       expect(Array.isArray(row.backend_calls)).toBe(true);
+      expect(typeof row.judge_backend).toBe("string");
       if (row.architecture === "adaptive") {
         expect(typeof row.adaptive_routed_to).toBe("string");
       }

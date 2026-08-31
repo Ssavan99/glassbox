@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "python3 ../scripts/export_web.py",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "lint": "oxlint",

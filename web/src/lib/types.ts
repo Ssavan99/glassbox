@@ -183,12 +183,13 @@ export interface ChunkRecord {
 export interface GraphEntity {
   id: string;
   chunk_ids: string[];
+  /** Which GraphCommunity.id this entity belongs to. */
+  community: number;
 }
 
-export interface GraphEdge {
-  src: string;
-  rel: string;
-  dst: string;
+/** Same shape as `graph_expand`'s edges (GraphEdgeRef, above), plus which
+ * chunk the triple was extracted from. */
+export interface GraphEdge extends GraphEdgeRef {
   chunk_id: string;
 }
 

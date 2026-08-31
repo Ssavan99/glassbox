@@ -26,7 +26,11 @@ export function Home() {
           nChunks: chunks.length,
         });
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        // Surfaced in devtools even though the UI just shows "—" for each
+        // stat -- see data.ts's fetchJson for the most common cause
+        // (public/data/ missing in a fresh dev checkout).
+        console.error("failed to load stats data:", err);
         if (!cancelled) setStats("error");
       });
     return () => {
