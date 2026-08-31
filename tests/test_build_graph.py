@@ -19,7 +19,13 @@ from tests.conftest import live_backend_available
 
 
 @pytest.fixture(scope="module")
-def build_stats():
+def committed_graph_payload():
+    """The versioned release artifact, independent of live backend availability."""
+    return json.loads(GRAPH_PATH.read_text())
+
+
+@pytest.fixture(scope="module")
+def build_stats(committed_graph_payload):
     """Run the real build once for the whole module (expensive: ~140 LLM calls).
 
     A `pytest.mark.skipif` on a fixture doesn't propagate to skip the tests
@@ -34,8 +40,12 @@ def build_stats():
     # Ollama rebuild exercises the same pipeline but can legitimately extract
     # a sparser graph than the Groq-built artifact, so keep the two claims
     # distinct instead of making the fallback path falsely fail its tests.
-    committed_payload = json.loads(GRAPH_PATH.read_text())
-    return {"live": build_graph.main(), "committed": committed_payload}
+    try:
+        yield build_graph.main()
+    finally:
+        # Tests exercise a live rebuild but must never leave its provider-specific
+        # output in place of the tracked release artifact.
+        GRAPH_PATH.write_text(json.dumps(committed_graph_payload, indent=2), encoding="utf-8")
 
 
 def test_first_run_writes_graph_artifact(build_stats):
@@ -78,8 +88,8 @@ def test_live_graph_structure(build_stats):
     assert entity_ids == edge_touched_ids, "entities list contains ids with no edges, or vice versa"
 
 
-def test_committed_graph_acceptance_shape(build_stats):
-    payload = build_stats["committed"]
+def test_committed_graph_acceptance_shape(committed_graph_payload):
+    payload = committed_graph_payload
 
     assert len(payload["edges"]) >= 150, f"expected >=150 edges, got {len(payload['edges'])}"
     assert len(payload["communities"]) >= 5, (
