@@ -32,6 +32,17 @@ jobs:
       - name: Check web/ exists
         id: check
         run: echo "exists=$( [ -f web/package.json ] && echo true || echo false )" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.exists == 'true'
+        with:
+          python-version: "3.12"
+      - name: Export artifacts/ to web/public/data/
+        if: steps.check.outputs.exists == 'true'
+        # scripts/export_web.py only touches engine.config, which has zero
+        # third-party imports -- no `pip install` needed for this step.
+        # Needed here (not just in deploy.yml) because web/src/lib/data.test.ts
+        # reads the real exported JSON off disk.
+        run: python scripts/export_web.py
       - uses: actions/setup-node@v4
         if: steps.check.outputs.exists == 'true'
         with:
@@ -46,6 +57,10 @@ jobs:
         if: steps.check.outputs.exists == 'true'
         working-directory: web
         run: npx tsc --noEmit
+      - name: Test
+        if: steps.check.outputs.exists == 'true'
+        working-directory: web
+        run: npm run test
       - name: Build
         if: steps.check.outputs.exists == 'true'
         working-directory: web

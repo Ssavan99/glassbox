@@ -41,7 +41,10 @@ export function Nav() {
          * but it truncated "Eval" mid-word with only a faint scrollbar as
          * the sole hint that more links existed. A collapsible menu makes
          * every link fully visible and discoverable instead. */}
-        <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
+        <nav
+          aria-label="Primary"
+          className="hidden flex-1 items-center justify-center gap-1 md:flex"
+        >
           {LINKS.map((link) => (
             <NavLink
               key={link.to}
@@ -93,7 +96,10 @@ export function Nav() {
       </div>
 
       {open && (
-        <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden">
+        <nav
+          aria-label="Mobile"
+          className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden"
+        >
           {LINKS.map((link) => (
             <NavLink
               key={link.to}

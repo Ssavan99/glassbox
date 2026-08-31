@@ -1,6 +1,8 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+// vitest/config's defineConfig re-exports vite's, merged with the `test`
+// field's types -- plain 'vite' doesn't type-check a `test` key at all.
+import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,4 +13,7 @@ export default defineConfig({
   // stay correct without branching on `command`/`mode`.
   base: '/glassbox/',
   plugins: [react(), tailwindcss()],
+  test: {
+    setupFiles: ['./src/test-setup.ts'],
+  },
 })
