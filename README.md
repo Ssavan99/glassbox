@@ -92,9 +92,11 @@ ruff check .
 
 With the copied, empty `.env`, that architecture command runs end-to-end through the local Ollama fallback. To prefer Groq's free tier for offline generation/evaluation, set `GROQ_API_KEY=gsk_...` in `.env`; no other code changes are needed, and any missing/invalid/rate-limited Groq call falls back to Ollama automatically.
 
-Run the web app in a second terminal (with the Python environment still available):
+Run the web app in a second terminal:
 
 ```bash
+cd glassbox
+source .venv/bin/activate
 cd web
 npm ci
 npm run dev
