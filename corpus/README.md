@@ -2,8 +2,8 @@
 
 This corpus is the test fixture for the glassbox RAG architecture atlas: 60 markdown
 notes on AI/ML engineering, written not just to be *correct* but to be a
-deliberately instrumented stress test for retrieval, evaluation, and (later)
-knowledge-graph construction. If a note reads as slightly over-explained or
+deliberately instrumented stress test for retrieval, evaluation, and knowledge-graph
+construction. If a note reads as slightly over-explained or
 cross-references its neighbors more than a typical wiki page would, that is
 intentional — the connective tissue between notes is the point.
 
@@ -42,7 +42,7 @@ modes to actually be tested against.
 43 canonical entities appear in the frontmatter of 3 or more notes (target was
 40+; see `scripts/verify_corpus.py` output for the exact live count — rerun it
 after any future corpus edit, since counts here are a snapshot). This is what
-gives a future knowledge-graph pass real edges to traverse instead of a
+gives the shipped knowledge-graph pass real edges to traverse instead of a
 scatter of singleton concepts. The highest-frequency hub entities, which
 appear across most clusters and act as connective tissue:
 
@@ -69,7 +69,9 @@ appear across most clusters and act as connective tissue:
 | vector database | 6 | | |
 
 Run `python scripts/verify_corpus.py` for the full, current frequency table
-and the enforced thresholds (≥55 notes, ≥40 entities with ≥3 occurrences).
+and the enforced thresholds (≥55 notes, ≥40 entities with ≥3 occurrences). At the
+current committed state it reports 60 notes, 53 distinct entities, and 43 entities
+appearing in at least three notes.
 
 ## 2. Keyword-specific terms (exact strings a dense embedding model tends to fumble)
 
@@ -154,3 +156,13 @@ Generation Basics`) were expanded to the standard above, renamed to
 kebab-case, and folded into the entity/decoy/multi-hop structure rather than
 being replaced outright — they are the anchor notes for the retrieval,
 evaluation, agents, and prompting clusters respectively.
+
+## Current benchmark boundary
+
+This is a designed instructional corpus, not a scraped dataset or a claim about
+open-web RAG. The contrasts above are intentionally planted so a reader can see why a
+pipeline retrieved, rewrote, branched, or failed. The 27-question evaluation set uses
+10 factual, 7 keyword, 6 multi-hop, and 4 unanswerable questions; its current metrics
+live in `artifacts/eval.json`. The graph artifact is real, but Graph's degree-ordered
+gathered context means its rank-truncated metrics are not a fair retrieval score; use
+`recall_full` when comparing Graph or graph-tool-involved Agentic/Adaptive runs.
