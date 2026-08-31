@@ -38,11 +38,15 @@ jobs:
           python-version: "3.12"
       - name: Export artifacts/ to web/public/data/
         if: steps.check.outputs.exists == 'true'
-        # scripts/export_web.py only touches engine.config, which has zero
-        # third-party imports -- no `pip install` needed for this step.
-        # Needed here (not just in deploy.yml) because web/src/lib/data.test.ts
-        # reads the real exported JSON off disk.
-        run: python scripts/export_web.py
+        # scripts/export_web.py only touches engine.config plus pyyaml (to
+        # derive questions.json from evaluation/questions.yaml, added in
+        # Phase 8) -- pyyaml alone, not the full project, keeps this step
+        # fast since the rest of pyproject.toml's deps aren't needed here.
+        # Needed in this job (not just deploy.yml) because
+        # web/src/lib/data.test.ts reads the real exported JSON off disk.
+        run: |
+          pip install pyyaml
+          python scripts/export_web.py
       - uses: actions/setup-node@v4
         if: steps.check.outputs.exists == 'true'
         with:

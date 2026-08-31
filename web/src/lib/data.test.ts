@@ -9,7 +9,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import type { ChunkRecord, EvalReport, GraphData, Trace } from "./types";
+import type { ChunkRecord, EvalReport, GraphData, Question, Trace } from "./types";
 import { ARCHITECTURE_IDS } from "./types";
 
 const DATA_DIR = resolve(__dirname, "../../public/data");
@@ -17,6 +17,31 @@ const DATA_DIR = resolve(__dirname, "../../public/data");
 function readJson<T>(name: string): T {
   return JSON.parse(readFileSync(resolve(DATA_DIR, name), "utf-8")) as T;
 }
+
+describe("questions.json matches Question[]", () => {
+  const questions = readJson<Question[]>("questions.json");
+
+  it("is a non-empty array covering all four real question types", () => {
+    expect(questions.length).toBeGreaterThan(0);
+    const types = new Set(questions.map((q) => q.type));
+    expect(types).toEqual(new Set(["factual", "multi_hop", "keyword", "unanswerable"]));
+  });
+
+  it("every question has exactly id/question/type, no leaked evaluation-internal fields", () => {
+    for (const q of questions) {
+      expect(typeof q.id).toBe("string");
+      expect(typeof q.question).toBe("string");
+      expect(["factual", "multi_hop", "keyword", "unanswerable"]).toContain(q.type);
+      expect(Object.keys(q).sort()).toEqual(["id", "question", "type"]);
+    }
+  });
+
+  it("includes q11 (real, verified divergence /compare defaults to) and q21 (the other real, verified divergence -- Hybrid beats Naive on a paraphrased keyword question -- not the default, but still a real question this dataset needs to keep containing)", () => {
+    const ids = questions.map((q) => q.id);
+    expect(ids).toContain("q11"); // Agentic's documented multi-hop synthesis weakness -- /compare's actual default
+    expect(ids).toContain("q21"); // Hybrid beats Naive on a paraphrased keyword question
+  });
+});
 
 describe("chunks.json matches ChunkRecord[]", () => {
   const chunks = readJson<ChunkRecord[]>("chunks.json");

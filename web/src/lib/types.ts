@@ -206,6 +206,19 @@ export interface GraphData {
 }
 
 // ---------------------------------------------------------------------------
+// Questions (web/public/data/questions.json) — derived by
+// scripts/export_web.py from evaluation/questions.yaml, id/question/type
+// only (gold_chunk_ids/gold_answer_points are evaluation-internal, not
+// shipped to the frontend)
+// ---------------------------------------------------------------------------
+
+export interface Question {
+  id: string;
+  question: string;
+  type: QuestionType;
+}
+
+// ---------------------------------------------------------------------------
 // Evaluation report (artifacts/eval.json) — real shape as of Phase 6.2
 // ---------------------------------------------------------------------------
 

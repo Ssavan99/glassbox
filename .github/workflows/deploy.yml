@@ -26,9 +26,12 @@ jobs:
         with:
           python-version: "3.12"
       - name: Export artifacts/ to web/public/data/
-        # scripts/export_web.py only touches engine.config, which has zero
-        # third-party imports -- no `pip install` needed for this step.
-        run: python scripts/export_web.py
+        # scripts/export_web.py touches engine.config plus pyyaml (to derive
+        # questions.json from evaluation/questions.yaml, added in Phase 8) --
+        # pyyaml alone, not the full project, keeps this step fast.
+        run: |
+          pip install pyyaml
+          python scripts/export_web.py
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

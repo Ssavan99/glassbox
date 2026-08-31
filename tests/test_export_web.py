@@ -75,3 +75,48 @@ def test_raises_if_artifacts_dir_is_missing_entirely(tmp_path, monkeypatch):
 
     with pytest.raises(SystemExit, match="does not exist"):
         export_web_mod.main()
+
+
+def test_derives_questions_json_with_only_id_question_type(tmp_path, monkeypatch):
+    artifacts = _make_artifacts(tmp_path)
+    web_data = tmp_path / "web" / "public" / "data"
+    questions_path = tmp_path / "questions.yaml"
+    questions_path.write_text(
+        "- id: q01\n"
+        "  question: What does LoRA freeze?\n"
+        "  type: factual\n"
+        "  gold_chunk_ids: [lora::0]\n"
+        "  gold_answer_points: ['freezes the base model']\n"
+        "- id: q02\n"
+        "  question: What is a cross-encoder?\n"
+        "  type: keyword\n"
+        "  gold_chunk_ids: []\n"
+        "  gold_answer_points: []\n"
+    )
+    monkeypatch.setattr(export_web_mod, "ARTIFACTS_DIR", artifacts)
+    monkeypatch.setattr(export_web_mod, "WEB_DATA_DIR", web_data)
+    monkeypatch.setattr(export_web_mod, "QUESTIONS_PATH", questions_path)
+
+    export_web_mod.main()
+
+    questions = json.loads((web_data / "questions.json").read_text())
+    assert questions == [
+        {"id": "q01", "question": "What does LoRA freeze?", "type": "factual"},
+        {"id": "q02", "question": "What is a cross-encoder?", "type": "keyword"},
+    ]
+    # gold_chunk_ids/gold_answer_points are evaluation-internal, not shipped
+    assert "gold_chunk_ids" not in questions[0]
+    assert "gold_answer_points" not in questions[0]
+
+
+def test_skips_questions_json_when_questions_yaml_missing(tmp_path, monkeypatch, capsys):
+    artifacts = _make_artifacts(tmp_path)
+    web_data = tmp_path / "web" / "public" / "data"
+    monkeypatch.setattr(export_web_mod, "ARTIFACTS_DIR", artifacts)
+    monkeypatch.setattr(export_web_mod, "WEB_DATA_DIR", web_data)
+    monkeypatch.setattr(export_web_mod, "QUESTIONS_PATH", tmp_path / "does-not-exist.yaml")
+
+    export_web_mod.main()
+
+    assert not (web_data / "questions.json").exists()
+    assert "skipping questions.json" in capsys.readouterr().out
