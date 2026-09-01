@@ -43,7 +43,8 @@ class Index:
 def load_index() -> Index:
     if not CHUNKS_PATH.exists() or not VECTORS_PATH.exists() or not BM25_PATH.exists():
         raise FileNotFoundError(
-            f"Retrieval index not built: {CHUNKS_PATH}, {VECTORS_PATH}, and/or {BM25_PATH} don't exist. "
+            "Retrieval index not built: "
+            f"{CHUNKS_PATH}, {VECTORS_PATH}, and/or {BM25_PATH} don't exist. "
             "Run this first: python scripts/build_index.py"
         )
 

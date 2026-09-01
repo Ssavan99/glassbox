@@ -92,7 +92,8 @@ def load_graph() -> GraphData:
     graph_build_id = raw.get("build_id") if isinstance(raw, dict) else None
     if not isinstance(graph_build_id, str):
         raise ArtifactIntegrityError(
-            f"{GRAPH_PATH} is missing its retrieval build id; rebuild with python scripts/build_graph.py"
+            f"{GRAPH_PATH} is missing its retrieval build id; rebuild with "
+            "python scripts/build_graph.py"
         )
     # Loading the index checks chunks/vectors/bm25 against one another before
     # the graph can hand any of its chunk ids to the retrieval layer.

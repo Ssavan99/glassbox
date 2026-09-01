@@ -79,6 +79,12 @@ describe("buildBm25Index", () => {
     }
   });
 
+  it("rejects a BM25 artifact from a different retrieval generation", () => {
+    expect(() => buildBm25Index({ ...FIXTURE, build_id: "b".repeat(64) }, FIXTURE.build_id)).toThrow(
+      "bm25.json and chunks.json have different build ids",
+    );
+  });
+
   it("ranks by score descending, breaking ties by original document order", () => {
     const index = buildBm25Index(FIXTURE);
     const results = index.search("quick fox", 5);

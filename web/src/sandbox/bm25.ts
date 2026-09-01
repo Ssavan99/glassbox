@@ -1,3 +1,4 @@
+import { loadChunksArtifact } from "../lib/data";
 import type { RetrievalResult } from "../lib/types";
 
 /**
@@ -59,7 +60,13 @@ export function tokenize(text: string): string[] {
  * Ports `BM25Okapi.__init__` (including its `_calc_idf`) -- all the one-time
  * work -- so that `search()` is just the `get_scores` loop.
  */
-export function buildBm25Index(artifact: Bm25Artifact): Bm25Index {
+export function buildBm25Index(artifact: Bm25Artifact, expectedBuildId?: string): Bm25Index {
+  if (expectedBuildId !== undefined && artifact.build_id !== expectedBuildId) {
+    throw new Error(
+      "bm25.json and chunks.json have different build ids -- artifacts are out of sync, " +
+        "re-run scripts/export_web.py",
+    );
+  }
   const { chunk_ids: chunkIds, tokenized_texts: corpus, doc_freqs: nd } = artifact;
   const corpusSize = corpus.length;
 
@@ -158,6 +165,9 @@ async function fetchJson<T>(path: string): Promise<T> {
 let bm25Promise: Promise<Bm25Index> | undefined;
 
 export function loadBm25Index(): Promise<Bm25Index> {
-  bm25Promise ??= fetchJson<Bm25Artifact>("bm25.json").then(buildBm25Index);
+  bm25Promise ??= Promise.all([
+    fetchJson<Bm25Artifact>("bm25.json"),
+    loadChunksArtifact(),
+  ]).then(([artifact, chunksArtifact]) => buildBm25Index(artifact, chunksArtifact.build_id));
   return bm25Promise;
 }

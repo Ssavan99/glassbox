@@ -83,8 +83,9 @@ def test_load_index_rejects_partial_artifact_write_even_when_counts_match(tmp_pa
     new_build_id = "a" * 64
     stale_build_id = "b" * 64
     chunks_path.write_text(json.dumps({"build_id": new_build_id, "chunks": chunks}))
+    stale_vectors = np.zeros((1, EMBEDDING_DIM), dtype=np.float32).tobytes()
     vectors_path.write_bytes(
-        vector_artifact_bytes(new_build_id, np.zeros((1, EMBEDDING_DIM), dtype=np.float32).tobytes())
+        vector_artifact_bytes(new_build_id, stale_vectors)
     )
     bm25_path.write_text(json.dumps({"build_id": stale_build_id}))
 

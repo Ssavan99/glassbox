@@ -51,8 +51,8 @@ export function loadChunks(): Promise<ChunkRecord[]> {
   return chunksPromise;
 }
 
-/** Loads the chunk records together with the content-derived build id shared
- * by the retrieval artifact bundle. */
+/** Loads the chunk records together with the retrieval build id shared by the
+ * retrieval artifact bundle. */
 export function loadChunksArtifact(): Promise<ChunksArtifact> {
   chunksArtifactPromise ??= fetchJson<ChunksArtifact>("chunks.json");
   return chunksArtifactPromise;

@@ -11,6 +11,13 @@ import hashlib
 import re
 from pathlib import Path
 
+from engine.config import (
+    CHUNK_OVERLAP_TOKENS,
+    CHUNK_TARGET_TOKENS,
+    EMBEDDING_DIM,
+    EMBEDDING_MODEL,
+)
+
 BUILD_ID_KEY = "build_id"
 CHUNKS_KEY = "chunks"
 VECTOR_BUILD_ID_PREFIX = b"GLASSBOX_BUILD_ID:"
@@ -23,13 +30,26 @@ class ArtifactIntegrityError(ValueError):
     """Raised when retrieval artifacts are malformed or from different builds."""
 
 
-def corpus_build_id(corpus_dir: Path) -> str:
-    """Return a stable SHA-256 id for the complete source corpus contents."""
+def retrieval_build_id(corpus_dir: Path) -> str:
+    """Return a stable id for corpus content and retrieval-producing inputs.
+
+    Chunking settings and embedding configuration affect the serialized
+    artifacts even when the notes do not, so they must participate in the id
+    that protects a staged build from a same-count stale pairing.
+    """
     digest = hashlib.sha256()
     for path in sorted(corpus_dir.rglob("*.md")):
         digest.update(path.relative_to(corpus_dir).as_posix().encode("utf-8"))
         digest.update(b"\0")
         digest.update(path.read_bytes())
+        digest.update(b"\0")
+    for name, value in (
+        ("chunk_target_tokens", CHUNK_TARGET_TOKENS),
+        ("chunk_overlap_tokens", CHUNK_OVERLAP_TOKENS),
+        ("embedding_model", EMBEDDING_MODEL),
+        ("embedding_dim", EMBEDDING_DIM),
+    ):
+        digest.update(f"{name}={value}".encode("utf-8"))
         digest.update(b"\0")
     return digest.hexdigest()
 

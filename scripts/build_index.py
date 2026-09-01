@@ -21,8 +21,8 @@ from pathlib import Path
 # editable install resolves sys.path.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from engine.artifacts import retrieval_build_id, vector_artifact_bytes
 from engine.chunking import chunk_notes
-from engine.artifacts import corpus_build_id, vector_artifact_bytes
 from engine.config import ARTIFACTS_DIR, BM25_PATH, CHUNKS_PATH, CORPUS_DIR, VECTORS_PATH
 from engine.corpus import load_corpus
 from engine.embedding import embed_texts
@@ -87,7 +87,7 @@ def main() -> None:
 
     notes = load_corpus(CORPUS_DIR)
     chunks = chunk_notes(notes)
-    build_id = corpus_build_id(CORPUS_DIR)
+    build_id = retrieval_build_id(CORPUS_DIR)
 
     texts = [c.text for c in chunks]
     chunk_ids = [c.chunk_id for c in chunks]

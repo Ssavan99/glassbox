@@ -47,7 +47,7 @@ describe("chunks.json matches ChunksArtifact", () => {
   const artifact = readJson<ChunksArtifact>("chunks.json");
   const chunks = artifact.chunks;
 
-  it("has a content-derived build id", () => {
+  it("has a retrieval build id", () => {
     expect(artifact.build_id).toMatch(/^[0-9a-f]{64}$/);
   });
 
