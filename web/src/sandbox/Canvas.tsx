@@ -14,7 +14,7 @@ import {
   type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useMemo, useRef, type DragEvent, type JSX } from "react";
+import { useCallback, useMemo, useRef, type CSSProperties, type DragEvent, type JSX } from "react";
 import { PALETTE, PALETTE_ORDER } from "./palette";
 import type { SandboxEdge, SandboxGraph, SandboxNode, SandboxNodeKind } from "./types";
 import type { ValidationError } from "./validate";
@@ -91,14 +91,12 @@ function SandboxNodeCard({ id, data }: NodeProps<SandboxFlowNode>) {
         borderColor: hasError ? "var(--status-critical)" : "var(--border)",
         boxShadow: ring,
       }}
-      className="flex flex-col gap-1.5 rounded-lg border-2 bg-surface px-3 py-2 text-left"
+      className="trace-node-card flex flex-col gap-2 bg-surface px-3 py-3 text-left"
     >
       <Handle type="target" position={Position.Top} style={{ width: 10, height: 10 }} />
 
       <div className="flex items-start gap-2">
-        <span aria-hidden="true" className="text-sm text-ink-secondary">
-          {entry.glyph}
-        </span>
+        <span aria-hidden="true" className="icon-badge" style={{ "--accent": hasError ? "var(--status-critical)" : "var(--arch-naive)" } as CSSProperties}><span>{entry.glyph}</span></span>
         <span className="flex-1 text-xs font-semibold text-ink">{entry.label}</span>
         {data.isSelected ? (
           <button
@@ -108,7 +106,7 @@ function SandboxNodeCard({ id, data }: NodeProps<SandboxFlowNode>) {
               e.stopPropagation();
               data.onDelete(id);
             }}
-            className="nodrag -my-1 -mr-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border text-ink-secondary hover:border-status-critical hover:text-status-critical"
+            className="nodrag pill-button sticker-interactive -my-1 -mr-1 flex h-8 w-8 shrink-0 items-center justify-center p-0 text-ink-secondary hover:border-status-critical hover:text-status-critical"
           >
             ×
           </button>
@@ -358,11 +356,9 @@ function SandboxCanvasInner({
                 onClick={() => addNode(kind, nextPosition())}
                 aria-label={`Add ${entry.label}`}
                 title={entry.description}
-                className="flex min-h-9 w-40 shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-2 text-left transition-colors hover:border-arch-naive lg:w-full"
+                className="palette-item sticker-interactive flex w-44 shrink-0 cursor-pointer items-center gap-3 px-3 py-2 text-left lg:w-full"
               >
-                <span aria-hidden="true" className="text-sm text-ink-secondary">
-                  {entry.glyph}
-                </span>
+                <span aria-hidden="true" className="icon-badge"><span>{entry.glyph}</span></span>
                 <span className="flex flex-1 flex-col gap-1">
                   <span className="text-xs font-medium text-ink">{entry.label}</span>
                   <LiveBadge kind={kind} />
@@ -394,7 +390,7 @@ function SandboxCanvasInner({
               if (selectedNodeId) deleteNode(selectedNodeId);
             }}
             disabled={!selectedNodeId}
-            className="min-h-9 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink-secondary transition-colors enabled:hover:border-status-critical enabled:hover:text-status-critical disabled:opacity-40"
+            className="pill-button sticker-interactive px-4 py-1.5 text-xs font-bold text-ink-secondary enabled:hover:border-status-critical enabled:hover:text-status-critical disabled:opacity-40"
           >
             Delete selected step
           </button>
@@ -407,7 +403,7 @@ function SandboxCanvasInner({
           ref={wrapperRef}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="h-[420px] overflow-hidden rounded-lg border border-border bg-surface lg:h-[600px]"
+          className="sandbox-canvas h-[420px] overflow-hidden bg-surface lg:h-[600px]"
         >
           <ReactFlow
             nodes={flowNodes}

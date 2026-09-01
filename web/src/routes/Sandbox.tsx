@@ -122,11 +122,11 @@ export function Sandbox() {
   const selectedKind = selectedNodeId ? graph.nodes.find((n) => n.id === selectedNodeId)?.kind : undefined;
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-2">
+    <div className="flex flex-col gap-10">
+      <header className="reveal-up flex flex-col gap-3">
         <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">Sandbox</span>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Build your own pipeline</h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-ink-secondary">
+        <h1 className="display-type text-4xl sm:text-5xl">Build your own pipeline</h1>
+        <p className="max-w-3xl text-base leading-relaxed text-ink-secondary">
           Drag steps onto the canvas, wire them together, type your own question, and run it. Retrieval
           is genuinely live -- a real embedding model runs in your browser and searches the real corpus.
           Generation is not: this site never calls a live LLM, so outside the three presets below, the
@@ -134,7 +134,7 @@ export function Sandbox() {
         </p>
       </header>
 
-      <section aria-label="Presets" className="flex flex-wrap items-center gap-2">
+      <section aria-label="Presets" className="sticker-surface flex flex-wrap items-center gap-3 bg-surface p-5">
         <span className="text-xs font-medium text-ink-muted">Load a real preset:</span>
         {PRESETS.map((preset) => (
           <button
@@ -142,7 +142,7 @@ export function Sandbox() {
             type="button"
             onClick={() => loadPreset(preset)}
             aria-pressed={activePresetId === preset.id}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`pill-button sticker-interactive px-4 py-1.5 text-xs font-bold ${
               activePresetId === preset.id
                 ? "border-ink bg-ink text-page"
                 : "border-border text-ink-secondary hover:text-ink"
@@ -159,7 +159,7 @@ export function Sandbox() {
         )}
       </section>
 
-      <section className="flex flex-col gap-2">
+      <section className="flex flex-col gap-3">
         <label htmlFor="sandbox-query" className="text-xs font-medium text-ink-muted">
           Your question
         </label>
@@ -169,7 +169,7 @@ export function Sandbox() {
           onChange={(e) => updateQueryText(e.target.value)}
           placeholder="Type any question -- retrieval runs live against the real corpus either way."
           rows={2}
-          className="rounded-lg border border-border bg-surface p-3 text-sm text-ink placeholder:text-ink-muted focus:border-arch-naive focus:outline-none"
+          className="text-input bg-surface p-4 text-sm text-ink placeholder:text-ink-muted"
         />
       </section>
 
@@ -186,7 +186,7 @@ export function Sandbox() {
           type="button"
           onClick={handleRun}
           disabled={!validation.valid || queryText.trim().length === 0 || running}
-          className="min-h-9 rounded-md bg-arch-naive px-4 py-1.5 text-sm font-medium text-white transition-opacity enabled:hover:opacity-90 disabled:opacity-40"
+          className="pill-button sticker-interactive bg-arch-naive px-5 py-2 text-sm font-bold text-white disabled:opacity-40"
         >
           {running ? "Running…" : "Run"}
         </button>
@@ -213,7 +213,7 @@ export function Sandbox() {
       )}
 
       {(selectedResult || selectedKind) && (
-        <section className="rounded-lg border border-border bg-surface p-4">
+        <section className="inspector-surface bg-surface p-5">
           {selectedResult ? (
             selectedResult.kind === "chunk" ? (
               <div className="flex flex-col gap-1">

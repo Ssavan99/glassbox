@@ -4,23 +4,14 @@ type Theme = "light" | "dark";
 
 const STORAGE_KEY = "glassbox-theme";
 
-function systemPrefersDark(): boolean {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
-function applyTheme(theme: Theme | null) {
-  if (theme) {
-    document.documentElement.dataset.theme = theme;
-  } else {
-    delete document.documentElement.dataset.theme;
-  }
+function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
 }
 
 export function ThemeToggle() {
-  // null = following system preference (no explicit override yet)
-  const [theme, setTheme] = useState<Theme | null>(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored === "light" || stored === "dark" ? stored : null;
+    return stored === "light" || stored === "dark" ? stored : "light";
   });
 
   useEffect(() => {
@@ -28,12 +19,12 @@ export function ThemeToggle() {
   }, [theme]);
 
   function toggle() {
-    const next: Theme = (theme ?? (systemPrefersDark() ? "dark" : "light")) === "dark" ? "light" : "dark";
+    const next: Theme = theme === "dark" ? "light" : "dark";
     setTheme(next);
     localStorage.setItem(STORAGE_KEY, next);
   }
 
-  const isDark = theme === "dark" || (theme === null && systemPrefersDark());
+  const isDark = theme === "dark";
 
   return (
     <button
@@ -41,7 +32,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       title={isDark ? "Switch to light theme" : "Switch to dark theme"}
-      className="rounded-full border border-border p-2 text-ink-secondary transition-colors hover:border-arch-naive hover:text-ink"
+      className="pill-button sticker-interactive p-2 text-ink-secondary hover:border-arch-naive hover:text-ink"
     >
       {isDark ? (
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

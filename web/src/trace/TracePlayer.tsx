@@ -8,7 +8,7 @@ import {
   type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { architectureColor } from "../lib/architectures";
 import type { ChunkRecord, GraphData, Trace, TraceNode } from "../lib/types";
 import { layoutNodes, NODE_HEIGHT, NODE_WIDTH } from "./layout";
@@ -32,15 +32,15 @@ function TraceNodeCard({ data }: NodeProps<FlowNode<FlowNodeData>>) {
         width: NODE_WIDTH,
         height: NODE_HEIGHT,
         borderColor: reached ? color : "var(--border)",
-        boxShadow: active ? `0 0 0 3px color-mix(in oklab, ${color} 35%, transparent)` : undefined,
+        boxShadow: active ? `5px 5px 0 color-mix(in oklab, ${color} 58%, var(--shadow-ink))` : undefined,
       }}
-      className={`flex h-full w-full flex-col justify-center gap-0.5 rounded-lg border-2 bg-surface px-3 py-1.5 text-left transition-all ${
+      className={`trace-node-card flex h-full w-full flex-col justify-center gap-1 bg-surface px-3 py-2 text-left ${
         reached ? "opacity-100" : "opacity-40"
       }`}
     >
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-      <div className="flex items-center gap-1.5 text-xs font-medium" style={{ color }}>
-        <span aria-hidden="true">{KIND_GLYPH[traceNode.kind]}</span>
+      <div className="flex items-center gap-2 text-xs font-bold" style={{ color }}>
+        <span aria-hidden="true" className="icon-badge" style={{ "--accent": color } as CSSProperties}><span>{KIND_GLYPH[traceNode.kind]}</span></span>
         <span className="truncate">{traceNode.label}</span>
       </div>
       {traceNode.duration_ms > 0 && (
@@ -117,13 +117,13 @@ export function TracePlayer({ trace, chunkIndex, graphData }: TracePlayerProps) 
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3">
+    <div className="flex flex-col gap-6">
+      <div className="control-surface flex flex-wrap items-center gap-4 bg-surface px-5 py-4">
         <button
           type="button"
           onClick={() => setPlaying((p) => !p)}
           aria-label={playing ? "Pause" : "Play"}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90"
+          className="pill-button sticker-interactive flex h-11 w-11 shrink-0 items-center justify-center border-none text-white"
           style={{ background: color }}
         >
           {playing ? "❚❚" : "▶"}
@@ -136,7 +136,7 @@ export function TracePlayer({ trace, chunkIndex, graphData }: TracePlayerProps) 
           }}
           disabled={stepIndex === 0}
           aria-label="Previous step"
-          className="rounded-md border border-border px-2 py-1 text-sm text-ink-secondary disabled:opacity-30"
+          className="pill-button sticker-interactive px-3 py-1 text-sm font-bold text-ink-secondary disabled:opacity-30"
         >
           ◀
         </button>
@@ -160,7 +160,7 @@ export function TracePlayer({ trace, chunkIndex, graphData }: TracePlayerProps) 
           }}
           disabled={stepIndex === trace.nodes.length - 1}
           aria-label="Next step"
-          className="rounded-md border border-border px-2 py-1 text-sm text-ink-secondary disabled:opacity-30"
+          className="pill-button sticker-interactive px-3 py-1 text-sm font-bold text-ink-secondary disabled:opacity-30"
         >
           ▶
         </button>
@@ -169,8 +169,8 @@ export function TracePlayer({ trace, chunkIndex, graphData }: TracePlayerProps) 
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
-        <div className="h-[420px] overflow-hidden rounded-lg border border-border bg-surface lg:h-[600px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
+        <div className="sandbox-canvas h-[420px] overflow-hidden bg-surface lg:h-[600px]">
           <ReactFlow
             nodes={flowNodes}
             edges={flowEdges}
@@ -186,7 +186,7 @@ export function TracePlayer({ trace, chunkIndex, graphData }: TracePlayerProps) 
           </ReactFlow>
         </div>
 
-        <div className="h-[420px] overflow-y-auto rounded-lg border border-border bg-surface p-4 lg:h-[600px]">
+        <div className="inspector-surface h-[420px] overflow-y-auto bg-surface p-5 lg:h-[600px]">
           <NodeInspector node={activeNode} chunkIndex={chunkIndex} graphData={graphData} />
         </div>
       </div>

@@ -16,21 +16,4 @@ if (typeof window !== "undefined") {
   afterEach(() => {
     cleanup();
   });
-
-  // jsdom doesn't implement matchMedia -- ThemeToggle (rendered as part of
-  // Nav) reads window.matchMedia("(prefers-color-scheme: dark)") on every
-  // render, so any component test that mounts Nav needs this polyfilled.
-  if (!window.matchMedia) {
-    window.matchMedia = (query: string) =>
-      ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: () => {},
-        removeListener: () => {},
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        dispatchEvent: () => false,
-      }) as MediaQueryList;
-  }
 }

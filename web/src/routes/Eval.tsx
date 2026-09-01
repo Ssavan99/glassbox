@@ -169,15 +169,15 @@ export function Eval() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-2">
+    <div className="flex flex-col gap-12">
+      <header className="reveal-up flex flex-col gap-3">
         <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">
           Evaluation
         </span>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h1 className="display-type text-4xl sm:text-5xl">
           How the seven architectures actually scored
         </h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-ink-secondary">
+        <p className="max-w-3xl text-base leading-relaxed text-ink-secondary">
           {report
             ? `${report.n_architectures} architectures × ${report.n_questions} questions = ${report.rows.length} recorded runs, scored offline. Read the two methodology notes below before reading the table — some of these numbers mean less than they look like they do.`
             : "Real, offline evaluation runs scored across every architecture and question."}
@@ -206,9 +206,9 @@ export function Eval() {
 
       {report && (
         <section aria-label="Metrics" className="flex flex-col gap-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-semibold tracking-tight">Metrics by architecture</h2>
+              <h2 className="section-heading text-2xl">Metrics by architecture</h2>
               <p className="text-xs text-ink-muted">
                 Click a column header to sort. Every value is a mean over the questions in view.
               </p>
@@ -236,7 +236,7 @@ export function Eval() {
 
           {/* Wide content scrolls inside its own container so the page body
            * never scrolls horizontally at 375px. */}
-          <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+          <div className="sticker-surface overflow-x-auto bg-surface">
             <table className="w-full min-w-[64rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-border bg-page align-bottom">
@@ -351,7 +351,7 @@ export function Eval() {
 
 function Callout({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-status-warning/40 bg-status-warning/10 p-4">
+    <div className="sticker-surface border-status-warning bg-status-warning/10 p-5">
       <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-status-warning">
         {title}
       </div>

@@ -13,26 +13,39 @@ const LINKS = [
 
 function linkClasses(isActive: boolean): string {
   return [
-    "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-    isActive ? "bg-arch-naive/15 text-arch-naive" : "text-ink-secondary hover:text-ink",
+    "nav-link px-3 py-1.5 text-sm font-semibold sticker-interactive",
+    isActive ? "nav-link--active bg-arch-naive/15 text-arch-naive" : "text-ink-secondary hover:text-ink",
   ].join(" ");
+}
+
+function PipelineMark() {
+  return (
+    <span aria-hidden="true" className="logo-mark ambient-mark">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M8 11h16M10.5 17h11M16 17v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="8" cy="11" r="2.4" fill="var(--arch-naive)" />
+        <circle cx="16" cy="11" r="2.4" fill="var(--arch-hybrid)" />
+        <circle cx="24" cy="11" r="2.4" fill="var(--arch-hyde)" />
+        <circle cx="10.5" cy="17" r="2.4" fill="var(--arch-corrective)" />
+        <circle cx="16" cy="17" r="2.4" fill="var(--arch-graph)" />
+        <circle cx="21.5" cy="17" r="2.4" fill="var(--arch-agentic)" />
+        <circle cx="16" cy="24" r="2.7" fill="var(--arch-adaptive)" />
+      </svg>
+    </span>
+  );
 }
 
 export function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-surface/85 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <header className="nav-shell sticky top-0 z-20 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <NavLink
           to="/"
-          className="flex shrink-0 items-center gap-2 text-base font-semibold tracking-tight"
+          className="flex shrink-0 items-center gap-2 text-base font-bold tracking-tight"
         >
-          <span
-            aria-hidden="true"
-            className="inline-block h-3 w-3 rounded-full"
-            style={{ background: "var(--arch-naive)" }}
-          />
+          <PipelineMark />
           glassbox
         </NavLink>
 
@@ -62,7 +75,7 @@ export function Nav() {
             href="https://github.com/Ssavan99/glassbox"
             target="_blank"
             rel="noreferrer"
-            className="hidden text-sm text-ink-secondary hover:text-ink md:inline"
+            className="hidden text-sm font-semibold text-ink-secondary transition-colors hover:text-ink md:inline"
           >
             GitHub
           </a>
@@ -72,7 +85,7 @@ export function Nav() {
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
-            className="rounded-full border border-border p-2 text-ink-secondary transition-colors hover:border-arch-naive hover:text-ink md:hidden"
+            className="pill-button sticker-interactive p-2 text-ink-secondary hover:border-arch-naive hover:text-ink md:hidden"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               {open ? (
@@ -98,7 +111,7 @@ export function Nav() {
       {open && (
         <nav
           aria-label="Mobile"
-          className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden"
+          className="flex flex-col gap-2 border-t-2 border-border px-4 py-4 md:hidden"
         >
           {LINKS.map((link) => (
             <NavLink
@@ -115,7 +128,7 @@ export function Nav() {
             href="https://github.com/Ssavan99/glassbox"
             target="_blank"
             rel="noreferrer"
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-ink-secondary hover:text-ink"
+            className="nav-link px-3 py-1.5 text-sm font-semibold text-ink-secondary sticker-interactive hover:text-ink"
           >
             GitHub
           </a>
