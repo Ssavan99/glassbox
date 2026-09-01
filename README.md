@@ -106,7 +106,6 @@ Open the printed local URL with the `/glassbox/` base path. `predev` exports the
 
 ## Limitations and honest boundaries
 
-- **Seven, not eight.** Multimodal RAG was considered and deliberately cut: this is a text corpus, and adding a ~150 MB browser CLIP model would have invented an image use case instead of teaching a meaningful contrast.
 - **Corrective is not full CRAG.** Its web-search fallback is intentionally omitted. When retrieval is poor, it rewrites and re-retrieves at most twice; no paid/signup search API is hidden behind the name.
 - **The corpus is designed, not scraped.** Its recurring entities, exact-keyword traps, multi-hop splits, and near-miss decoys were planted to expose behaviors. That makes it an instructional benchmark, not a claim about open-web retrieval.
 - **One embedding model.** Both Python and browser retrieval use `all-MiniLM-L6-v2` (384 dimensions). Results do not establish that the rankings generalize across embedding models or domains.
