@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ARCHITECTURE_ORDER, ARCHITECTURES, architectureColor } from "../lib/architectures";
 import { splitAnswerCitations } from "../lib/citations";
@@ -118,21 +118,21 @@ export function Compare() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Compare</h1>
-        <p className="mt-1 text-sm text-ink-secondary">
+    <div className="flex flex-col gap-10">
+      <div className="reveal-up">
+        <h1 className="display-type text-4xl sm:text-5xl">Compare</h1>
+        <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-secondary">
           One question, all seven architectures side by side — the same corpus, the same
           evaluation run. Where they retrieved different evidence, and where that changed the
           answer.
         </p>
       </div>
 
-      <section className="flex flex-col gap-3">
+      <section className="sticker-surface flex flex-col gap-4 bg-surface p-5">
         <select
           value={questionId}
           onChange={(e) => setQuestionId(e.target.value)}
-          className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+          className="question-select w-full bg-page px-4 py-2 text-sm"
           aria-label="Choose a question to compare"
         >
           {questionsByType &&
@@ -148,8 +148,8 @@ export function Compare() {
         </select>
 
         {question && (
-          <div className="rounded-md border border-border bg-surface p-3">
-            <div className="mb-1 text-xs font-medium uppercase tracking-wide text-ink-muted">
+          <div className="rounded-xl border-2 border-border bg-page p-4">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-muted">
               {question.id} · {TYPE_LABEL[question.type] ?? question.type}
             </div>
             <p className="text-base leading-snug text-ink">{question.question}</p>
@@ -176,8 +176,8 @@ export function Compare() {
       )}
 
       {rows && chunkIndex && faithfulnessSpread && (
-        <section className="rounded-md border border-border bg-surface p-3">
-          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-muted">
+        <section className="sticker-surface bg-surface p-5">
+          <div className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-muted">
             The divergence on this question
           </div>
           <p className="text-sm leading-relaxed text-ink">
@@ -205,7 +205,7 @@ export function Compare() {
 
       {rows && chunkIndex && architectureCount > 0 && (
         <>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-muted">
             <span className="inline-flex items-center gap-1.5">
               <span
                 aria-hidden="true"
@@ -221,8 +221,8 @@ export function Compare() {
             </span>
             <span className="md:hidden">Scroll sideways to compare all seven →</span>
           </div>
-          <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6">
-            <div className="flex min-w-max gap-3">
+          <div className="-mx-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6">
+            <div className="reveal-grid flex min-w-max gap-6">
               {ARCHITECTURE_ORDER.map((id) => (
                 <ArchitectureColumn
                   key={id}
@@ -276,18 +276,18 @@ function ArchitectureColumn({
   const accent = architectureColor(architecture);
 
   return (
-    <section className="flex w-[300px] min-w-[300px] flex-col gap-3 rounded-md border border-border bg-surface p-3">
-      <header className="flex flex-col gap-1 border-b border-border pb-2">
+    <section className="compare-column flex flex-col gap-5 bg-surface">
+      <header className="flex flex-col gap-2 border-b-2 border-border pb-3">
         <div className="flex items-center gap-2">
           {/* Colour is never the only identity signal -- 3 of the 7 accents
            * fail 3:1 on the light surface by design, so the name always
            * rides alongside the swatch. */}
           <span
             aria-hidden="true"
-            className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-            style={{ background: accent }}
-          />
-          <h2 className="text-sm font-semibold text-ink">{meta.name}</h2>
+            className="icon-badge"
+            style={{ "--accent": accent } as CSSProperties}
+          ><span>{ARCHITECTURE_ORDER.indexOf(architecture) + 1}</span></span>
+          <h2 className="text-lg font-bold text-ink">{meta.name}</h2>
         </div>
         <Link
           to={`/explore?arch=${architecture}&q=${questionId}`}
@@ -302,7 +302,7 @@ function ArchitectureColumn({
       ) : (
         <>
           {row.architecture === "adaptive" && (
-            <div className="rounded border border-border bg-page px-2 py-1 text-xs text-ink-secondary">
+            <div className="rounded-xl border-2 border-border bg-page px-3 py-2 text-xs text-ink-secondary">
               Routed to{" "}
               <span className="font-medium text-ink">
                 {row.adaptive_routed_to ? ARCHITECTURES[row.adaptive_routed_to].name : "—"}
@@ -316,7 +316,7 @@ function ArchitectureColumn({
           </div>
 
           {row.reads_as_refusal && (
-            <span className="w-fit rounded-full border border-status-warning/40 px-2 py-0.5 text-[10px] font-medium uppercase text-status-warning">
+            <span className="meta-pill w-fit border-status-warning bg-status-warning/10 px-3 py-1 text-[10px] font-bold uppercase text-status-warning">
               Reads as a refusal
             </span>
           )}
@@ -414,7 +414,7 @@ function ChunkRow({
   const rare = count * 2 < architectureCount;
   return (
     <li
-      className={`rounded border px-2 py-1 ${
+      className={`rounded-xl border-2 px-3 py-2 ${
         rare ? "border-status-warning/60 bg-status-warning/10" : "border-border bg-page"
       }`}
     >
@@ -447,7 +447,7 @@ function ChunkRow({
 
 function Metric({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <div className="flex flex-col rounded border border-border bg-page px-2 py-1">
+    <div className="flex flex-col rounded-xl border-2 border-border bg-page px-3 py-2">
       <span className="text-[10px] uppercase tracking-wide text-ink-muted">{label}</span>
       <span className={`text-sm font-semibold tabular-nums ${tone}`}>{value}</span>
     </div>

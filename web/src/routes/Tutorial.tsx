@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { CodeBlock } from "../components/CodeBlock";
 import { ARCHITECTURES, ARCHITECTURE_ORDER, architectureColor } from "../lib/architectures";
@@ -58,19 +58,19 @@ function TutorialPage({ archId }: { archId: ArchitectureId }) {
   const ordinal = ARCHITECTURE_ORDER.indexOf(archId) + 1;
 
   return (
-    <div className="flex flex-col gap-10">
-      <header className="flex flex-col gap-3">
+    <div className="flex flex-col gap-14 sm:gap-16">
+      <header className="reveal-up flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
-            style={{ borderColor: `color-mix(in oklab, ${color} 40%, transparent)`, color }}
+            className="meta-pill inline-flex w-fit items-center gap-1.5 bg-surface px-4 py-1.5 text-xs font-bold"
+            style={{ borderColor: color, color }}
           >
             <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full" style={{ background: color }} />
             {ordinal} of {ARCHITECTURE_ORDER.length} — start here order
           </span>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{meta.name}</h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-ink-secondary sm:text-base">{meta.tagline}</p>
+        <h1 className="display-type text-4xl sm:text-5xl">{meta.name}</h1>
+        <p className="max-w-2xl text-base leading-relaxed text-ink-secondary">{meta.tagline}</p>
       </header>
 
       <Section title="The problem it solves">
@@ -147,9 +147,9 @@ function TutorialPage({ archId }: { archId: ArchitectureId }) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-      <div className="flex flex-col gap-3">{children}</div>
+    <section className="flex flex-col gap-5">
+      <h2 className="section-heading text-2xl">{title}</h2>
+      <div className="flex flex-col gap-4">{children}</div>
     </section>
   );
 }
@@ -188,19 +188,19 @@ function Callout({
  * render (that's /explore's job, against real recorded data). */
 function StepDiagram({ steps, color }: { steps: TutorialStep[]; color: string }) {
   return (
-    <div className="flex flex-wrap items-stretch gap-2" role="list" aria-label="Pipeline steps">
+    <div className="reveal-grid flex flex-wrap items-stretch gap-5" role="list" aria-label="Pipeline steps">
       {steps.map((step, i) => (
         <div key={i} className="flex items-stretch gap-2">
           <div
             role="listitem"
-            className={`flex w-56 flex-col gap-1 rounded-lg border bg-surface p-3 ${
+            className={`pipeline-step sticker-interactive flex flex-col gap-2 bg-surface ${
               step.repeat ? "border-dashed" : "border-solid"
             }`}
-            style={{ borderColor: `color-mix(in oklab, ${color} 45%, var(--border))` }}
+            style={{ borderColor: color }}
           >
             <div className="flex items-center justify-between gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-medium" style={{ color }}>
-                <span aria-hidden="true">{KIND_GLYPH[step.kind]}</span>
+              <span className="flex items-center gap-2 text-xs font-bold" style={{ color }}>
+                <span aria-hidden="true" className="icon-badge" style={{ "--accent": color } as CSSProperties}><span>{KIND_GLYPH[step.kind]}</span></span>
                 {KIND_NAME[step.kind]}
               </span>
               {step.repeat && (
@@ -209,11 +209,11 @@ function StepDiagram({ steps, color }: { steps: TutorialStep[]; color: string })
                 </span>
               )}
             </div>
-            <div className="text-sm font-medium text-ink">{step.label}</div>
+            <div className="text-sm font-bold text-ink">{step.label}</div>
             <p className="text-xs leading-snug text-ink-muted">{step.note}</p>
           </div>
           {i < steps.length - 1 && (
-            <span aria-hidden="true" className="flex items-center text-ink-muted">
+            <span aria-hidden="true" className="flex items-center text-lg font-bold text-ink-muted">
               →
             </span>
           )}
@@ -226,7 +226,7 @@ function StepDiagram({ steps, color }: { steps: TutorialStep[]; color: string })
 function EvalRowSummary({ archId, summary }: { archId: ArchitectureId; summary: ArchitectureSummary }) {
   const tone = noteTone(summary.rank_metrics_note);
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
+    <div className="sticker-surface flex flex-col gap-4 bg-surface p-5">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="recall_full" sub="rank-insensitive" value={formatRatio(summary.recall_full_mean)} />
         <Stat label="faithfulness" sub="LLM judge" value={formatRatio(summary.faithfulness_mean)} />
@@ -254,7 +254,7 @@ function EvalRowSummary({ archId, summary }: { archId: ArchitectureId; summary: 
 function RoutingAccuracy({ accuracy }: { accuracy: AdaptiveRoutingAccuracy }) {
   const { correct, total, accuracy: rate } = accuracy;
   return (
-    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-lg border border-border bg-surface p-4">
+    <div className="sticker-surface flex flex-wrap items-baseline gap-x-3 gap-y-1 bg-surface p-5">
       <span className="text-xs font-medium text-ink-muted">Real routing accuracy:</span>
       <span className="font-mono text-lg font-semibold tabular-nums text-ink">
         {rate === null ? "—" : `${(rate * 100).toFixed(1)}%`}
@@ -311,11 +311,11 @@ function TutorialNav({ current }: { current: ArchitectureId }) {
   const next = idx < ARCHITECTURE_ORDER.length - 1 ? ARCHITECTURE_ORDER[idx + 1] : null;
 
   return (
-    <nav aria-label="Tutorial navigation" className="flex items-stretch justify-between gap-3 border-t border-border pt-6">
+    <nav aria-label="Tutorial navigation" className="flex items-stretch justify-between gap-4 border-t-2 border-border pt-8">
       {prev ? (
         <Link
           to={`/tutorial/${prev}`}
-          className="flex flex-1 flex-col gap-0.5 rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:border-ink/30 sm:flex-initial sm:min-w-[12rem]"
+          className="sticker-surface sticker-interactive flex flex-1 flex-col gap-1 bg-surface p-4 text-left sm:flex-initial sm:min-w-[12rem]"
         >
           <span className="text-[10px] uppercase tracking-wide text-ink-muted">← Previous</span>
           <span className="text-sm font-medium text-ink">{ARCHITECTURES[prev].name}</span>
@@ -326,7 +326,7 @@ function TutorialNav({ current }: { current: ArchitectureId }) {
       {next ? (
         <Link
           to={`/tutorial/${next}`}
-          className="flex flex-1 flex-col items-end gap-0.5 rounded-lg border border-border bg-surface p-3 text-right transition-colors hover:border-ink/30 sm:flex-initial sm:min-w-[12rem]"
+          className="sticker-surface sticker-interactive flex flex-1 flex-col items-end gap-1 bg-surface p-4 text-right sm:flex-initial sm:min-w-[12rem]"
         >
           <span className="text-[10px] uppercase tracking-wide text-ink-muted">Next →</span>
           <span className="text-sm font-medium text-ink">{ARCHITECTURES[next].name}</span>
@@ -334,7 +334,7 @@ function TutorialNav({ current }: { current: ArchitectureId }) {
       ) : (
         <Link
           to="/compare"
-          className="flex flex-1 flex-col items-end gap-0.5 rounded-lg border border-border bg-surface p-3 text-right transition-colors hover:border-ink/30 sm:flex-initial sm:min-w-[12rem]"
+          className="sticker-surface sticker-interactive flex flex-1 flex-col items-end gap-1 bg-surface p-4 text-right sm:flex-initial sm:min-w-[12rem]"
         >
           <span className="text-[10px] uppercase tracking-wide text-ink-muted">All seven read →</span>
           <span className="text-sm font-medium text-ink">See them compared</span>

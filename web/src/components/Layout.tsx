@@ -5,10 +5,10 @@ export function Layout() {
   return (
     <div className="flex min-h-full flex-col bg-page text-ink">
       <Nav />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-14 sm:px-6 sm:py-20">
         <Outlet />
       </main>
-      <footer className="border-t border-border px-4 py-6 text-center text-xs text-ink-muted sm:px-6">
+      <footer className="border-t-2 border-border px-4 py-8 text-center text-xs text-ink-muted sm:px-6">
         Seven RAG architectures, run for real, recorded and replayed — never live-called from this
         page.{" "}
         <a

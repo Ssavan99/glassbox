@@ -16,12 +16,12 @@ interface NodeInspectorProps {
 
 export function NodeInspector({ node, chunkIndex, graphData }: NodeInspectorProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <header className="flex flex-col gap-1">
+    <div className="flex flex-col gap-5">
+      <header className="flex flex-col gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">
           {KIND_NAME[node.kind]}
         </span>
-        <h3 className="text-base font-semibold leading-snug">{node.label}</h3>
+        <h3 className="section-heading text-xl leading-snug">{node.label}</h3>
       </header>
 
       {/* The explain sentence is the actual teaching content this site
@@ -30,7 +30,7 @@ export function NodeInspector({ node, chunkIndex, graphData }: NodeInspectorProp
        * frontend doesn't need to duplicate in code (e.g. Agentic's `route`
        * vs Adaptive's `route` explain very differently what the same node
        * kind means in each context). */}
-      <p className="rounded-md border border-border bg-page p-3 text-sm leading-relaxed text-ink">
+      <p className="rounded-xl border-2 border-border bg-page p-4 text-sm leading-relaxed text-ink">
         {node.explain}
       </p>
 

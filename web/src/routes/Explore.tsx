@@ -99,17 +99,17 @@ export function Explore() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Explore</h1>
-        <p className="mt-1 text-sm text-ink-secondary">
+    <div className="flex flex-col gap-10">
+      <div className="reveal-up">
+        <h1 className="display-type text-4xl sm:text-5xl">Explore</h1>
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-secondary">
           Pick an architecture and a question, then scrub through exactly what it did, step by
           step.
         </p>
       </div>
 
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-wrap gap-2">
+      <section className="sticker-surface flex flex-col gap-5 bg-surface p-5">
+        <div className="flex flex-wrap gap-3">
           {ARCHITECTURE_ORDER.map((id) => {
             const meta = ARCHITECTURES[id];
             const active = id === architecture;
@@ -118,7 +118,7 @@ export function Explore() {
                 key={id}
                 type="button"
                 onClick={() => setArchitecture(id)}
-                className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors"
+                className="pill-button sticker-interactive flex items-center gap-2 px-4 py-1.5 text-sm font-bold"
                 style={
                   active
                     ? { borderColor: architectureColor(id), color: architectureColor(id) }
@@ -139,7 +139,7 @@ export function Explore() {
         <select
           value={questionId}
           onChange={(e) => setQuestionId(e.target.value)}
-          className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+          className="question-select w-full bg-page px-4 py-2 text-sm"
           aria-label="Choose a question"
         >
           {questionsByType &&
