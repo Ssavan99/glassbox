@@ -12,3 +12,4 @@ web/public/data/
 .llm_cache/
 .env
 *.egg-info/
+graphify-out/
