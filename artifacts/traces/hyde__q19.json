@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q19",
+  "architecture": "hyde",
+  "question": "What embedding model name and output dimension constant does this engine's config use?",
+  "answer": "This engine uses `all-MiniLM-L6-v2`, a compact model with `EMBEDDING_DIM = 384`. This information is cited from [embedding-dimension-and-model-size-tradeoffs::0].",
+  "metrics": {
+    "latency_ms": 24.860375000571366,
+    "llm_calls": 2,
+    "prompt_tokens": 1560,
+    "completion_tokens": 94
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "The engine is configured to use the \"TextModel_7B\" embedding model, which outputs vectors of 256 dimensions. This setup balances computational efficiency with a reasonable trade-off in performance accuracy for our specific application needs.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 159
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.015870636329054832,
+          -0.09041439741849899,
+          -0.0399702787399292,
+          0.014249595813453197,
+          -0.017221150919795036,
+          0.04332222789525986,
+          -0.1323738396167755,
+          0.011125186458230019
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.6165706515312195,
+            "rank": 1
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.5811687111854553,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.5281944870948792,
+            "rank": 3
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.4635244309902191,
+            "rank": 4
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.4544444680213928,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "This engine uses `all-MiniLM-L6-v2`, a compact model with `EMBEDDING_DIM = 384`. This information is cited from [embedding-dimension-and-model-size-tradeoffs::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1495
+      }
+    }
+  ]
+}

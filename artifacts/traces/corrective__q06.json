@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q06",
+  "architecture": "corrective",
+  "question": "Why does deduplication matter differently for fine-tuning data versus a retrieval corpus?",
+  "answer": "Deduplication matters differently for fine-tuning data versus a retrieval corpus due to the distinct impacts on model training and retrieval performance. For fine-tuning data, duplicated examples can increase their weight disproportionately during training, leading to bias towards overrepresented patterns [deduplication-in-training-and-corpus-data::0]. In contrast, in a retrieval corpus, near-duplicate notes can crowd out other relevant chunks for top-k retrieval slots, reducing recall@k metrics and overall retrieval quality [deduplication-in-training-and-corpus-data::0].",
+  "metrics": {
+    "latency_ms": 6.295999999565538,
+    "llm_calls": 2,
+    "prompt_tokens": 2236,
+    "completion_tokens": 378
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.07126396149396896,
+          -0.06389836221933365,
+          0.03678726404905319,
+          -0.0075357770547270775,
+          -0.008922397159039974,
+          -0.014588410966098309,
+          0.02287270314991474,
+          -0.017656980082392693
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.7692570090293884,
+            "rank": 1
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 0.7500419020652771,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.5824466943740845,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.5655645728111267,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.5620624423027039,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "verdict": "correct",
+            "reason": "Directly explains how deduplication matters differently for fine-tuning data versus a retrieval corpus."
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "verdict": "correct",
+            "reason": "Further elaborates on the issues caused by duplicates in both fine-tuning data and retrieval corpora."
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "verdict": "ambiguous",
+            "reason": "While related, it focuses more on chunk overlap rather than deduplication's impact on fine-tuning data versus a retrieval corpus."
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "verdict": "incorrect",
+            "reason": "Discusses evaluation methods but does not directly address the relevance of deduplication to fine-tuning data and retrieval corpora."
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "verdict": "incorrect",
+            "reason": "Describes hybrid search techniques without addressing deduplication's impact on fine-tuning data versus a retrieval corpus."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "Deduplication matters differently for fine-tuning data versus a retrieval corpus due to the distinct impacts on model training and retrieval performance. For fine-tuning data, duplicated examples can increase their weight disproportionately during training, leading to bias towards overrepresented patterns [deduplication-in-training-and-corpus-data::0]. In contrast, in a retrieval corpus, near-duplicate notes can crowd out other relevant chunks for top-k retrieval slots, reducing recall@k metrics and overall retrieval quality [deduplication-in-training-and-corpus-data::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 932
+      }
+    }
+  ]
+}

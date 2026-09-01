@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q25",
+  "architecture": "hyde",
+  "question": "Does fine-tuning a model with LoRA reduce a RAG pipeline's exposure to prompt injection attacks?",
+  "answer": "The context provided does not contain specific information about how using LoRA affects a RAG pipeline's susceptibility to prompt injection attacks. Therefore, I cannot provide a direct answer based on the given chunks.\n\nHowever, it can be inferred that since LoRA involves freezing most of the model weights and only training small added matrices, this could potentially reduce the attack surface by limiting the number of parameters that are actively being modified during fine-tuning. This might make it harder for an attacker to influence the behavior of the model through prompt injection if fewer parameters are involved in the decision-making process.\n\nBut without specific details from the given context, I cannot definitively state whether LoRA reduces RAG pipeline exposure to prompt injection attacks or how much it mitigates such risks.",
+  "metrics": {
+    "latency_ms": 10938.029290999111,
+    "llm_calls": 2,
+    "prompt_tokens": 1570,
+    "completion_tokens": 232
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "Fine-tuning a model with Low-Rank Adaptation (LoRA) can help mitigate some forms of vulnerability by focusing on specific aspects of the model, potentially reducing the risk of prompt injection attacks in a Retrieval-Augmented Generation (RAG) pipeline. However, it is crucial to ensure that overall security practices are maintained, including regular updates and thorough testing, to fully protect against such attacks.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 199
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.07352405041456223,
+          -0.00151334167458117,
+          -0.004231638740748167,
+          0.02596011385321617,
+          -0.02808738686144352,
+          0.004551745485514402,
+          -0.031249048188328743,
+          -0.016620226204395294
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.5599558353424072,
+            "rank": 1
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.542706310749054,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.49513009190559387,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.47582948207855225,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.47042277455329895,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The context provided does not contain specific information about how using LoRA affects a RAG pipeline's susceptibility to prompt injection attacks. Therefore, I cannot provide a direct answer based on the given chunks.\n\nHowever, it can be inferred that since LoRA involves freezing most of the model weights and only training small added matrices, this could potentially reduce the attack surface by limiting the number of parameters that are actively being modified during fine-tuning. This might make it harder for an attacker to influence the behavior of the model through prompt injection if fewer parameters are involved in the decision-making process.\n\nBut without specific details from the given context, I cannot definitively state whether LoRA reduces RAG pipeline exposure to prompt injection attacks or how much it mitigates such risks.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1603
+      }
+    }
+  ]
+}

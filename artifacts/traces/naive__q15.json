@@ -1,0 +1,90 @@
+{
+  "trace_id": "naive::q15",
+  "architecture": "naive",
+  "question": "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost \u2014 given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?",
+  "answer": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
+  "metrics": {
+    "latency_ms": 48.85216700495221,
+    "llm_calls": 1,
+    "prompt_tokens": 1393,
+    "completion_tokens": 99
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.028044944629073143,
+          0.045588117092847824,
+          -0.015548923052847385,
+          0.03590899333357811,
+          -0.06443866342306137,
+          -0.003807778237387538,
+          -0.06403370201587677,
+          0.009320821613073349
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.7388319969177246,
+            "rank": 1
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.6317634582519531,
+            "rank": 2
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.5515793561935425,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.5514694452285767,
+            "rank": 4
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.5498610734939575,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1492
+      }
+    }
+  ]
+}

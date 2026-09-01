@@ -1,0 +1,174 @@
+{
+  "trace_id": "graph::q07",
+  "architecture": "graph",
+  "question": "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?",
+  "answer": "The core privacy risk that PII redaction is meant to prevent in a fine-tuned model is that unredacted personally identifiable information (PII) can become memorized and later reproduced verbatim by the model when prompted, even for users who have no legitimate reason to see that information. This occurs because:\n\n- In fine-tuning, PII gets diffused into the model's weights themselves.\n- It is extremely difficult to audit or selectively delete this embedded PII without retraining the entire model.\n- The PII can resurface unpredictably in response to queries that weren't even related to the sensitive information originally. (Chunk IDs: [pii-redaction-in-training-data::0], [pii-redaction-in-training-data::1])",
+  "metrics": {
+    "latency_ms": 0.6381249986588955,
+    "llm_calls": 1,
+    "prompt_tokens": 2050,
+    "completion_tokens": 151
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "Graph RAG finds a completely different entry point than embedding-based retrieval: instead of measuring semantic similarity between a query vector and chunk vectors, it matches literal entity mentions in the question against the pre-built knowledge graph's vocabulary to jump straight to a set of graph nodes. This is a pure string-matching heuristic with no LLM call \u2014 the corpus was already mined for entities and relations offline when the graph was built.",
+      "payload": {
+        "entities": [
+          "pii redaction"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (35 chunks)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Two-hop traversal from the seed entities can surface facts connected to the question's topic that never share a chunk with it at all \u2014 a fact only reachable by walking src -> rel -> dst -> rel -> dst through the graph. This is the opposite failure mode from embedding-based retrieval, which can only find chunks that are textually or semantically close to the query itself, not ones connected to it only through an intermediate entity.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "deduplication",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "is a",
+            "dst": "guardrails"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "contrasts with",
+            "dst": "deduplication"
+          },
+          {
+            "src": "pii redaction",
+            "rel": "is",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          }
+        ],
+        "chunk_ids": [
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0",
+          "ai-agents-and-tool-use::1",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "multi-agent-systems-and-handoffs::0",
+          "multi-agent-systems-and-handoffs::1",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "planning-loops-in-agents::1",
+          "prompt-injection-attacks-explained::1",
+          "rate-limits-and-retry-storms::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "context-window-overflow-and-truncation::1",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "hallucination-from-prompt-injection::0",
+          "hallucination-from-prompt-injection::1",
+          "prompt-engineering-as-interface-design::1",
+          "retrieval-augmented-generation-basics::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "guardrails-for-autonomous-actions::1",
+          "instruction-tuning-basics::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "deduplication-in-training-and-corpus-data::1",
+          "embedding-dimension-and-model-size-tradeoffs::0",
+          "reciprocal-rank-fusion-explained::0",
+          "reranking-with-cross-encoders::0",
+          "reranking-with-cross-encoders::1",
+          "pii-redaction-in-training-data::1",
+          "prompt-injection-attacks-explained::0",
+          "pii-redaction-in-training-data::0"
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The chunks gathered from graph expansion, plus the community summaries for any communities the touched entities belong to, are stuffed into a single prompt and handed to the LLM in one shot \u2014 the only LLM call this architecture makes online, since seeding and expansion are both pure graph traversal.",
+      "payload": {
+        "output": "The core privacy risk that PII redaction is meant to prevent in a fine-tuned model is that unredacted personally identifiable information (PII) can become memorized and later reproduced verbatim by the model when prompted, even for users who have no legitimate reason to see that information. This occurs because:\n\n- In fine-tuning, PII gets diffused into the model's weights themselves.\n- It is extremely difficult to audit or selectively delete this embedded PII without retraining the entire model.\n- The PII can resurface unpredictably in response to queries that weren't even related to the sensitive information originally. (Chunk IDs: [pii-redaction-in-training-data::0], [pii-redaction-in-training-data::1])",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2201
+      }
+    }
+  ]
+}

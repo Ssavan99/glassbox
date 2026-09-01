@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q16",
+  "architecture": "hyde",
+  "question": "This engine's chunking uses a specific target size and a specific overlap size that add up to a 20% overlap ratio \u2014 what are the two exact numbers, and why isn't cranking that ratio up simply a free way to guarantee boundary-spanning facts are retrievable?",
+  "answer": "This engine's default chunking configuration uses a target chunk size of `CHUNK_TARGET_TOKENS = 250` tokens with `CHUNK_OVERLAP_TOKENS = 50` tokens of overlap between consecutive chunks \u2014 a 20% overlap ratio. \n\nThe reason cranking the overlap ratio up isn't simply a free way to guarantee boundary-spanning facts are retrievable involves storage and retrieval quality trade-offs. According to [chunk-overlap-and-why-it-matters::0], pushing overlap too high makes the corpus balloon, leading to more redundant near-duplicate hits that can crowd out other genuinely relevant material in ranked results. Thus, increasing overlap doesn't come without costs.",
+  "metrics": {
+    "latency_ms": 24.350708998099435,
+    "llm_calls": 2,
+    "prompt_tokens": 1605,
+    "completion_tokens": 210
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "In this engine, chunking utilizes a target size of 4KB and an overlap size of 800 bytes. While increasing the overlap ratio could potentially enhance retrieval of boundary-spanning facts, doing so may also lead to redundant processing and increased computational overhead, which can impact overall efficiency without necessarily improving performance in a linear manner.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 222
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.03897416964173317,
+          0.04732642322778702,
+          -0.02490031160414219,
+          -0.04035155847668648,
+          0.03900446742773056,
+          -0.10813163220882416,
+          -0.06558511406183243,
+          -0.016448255628347397
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.7879493236541748,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.7429249286651611,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.6935737729072571,
+            "rank": 3
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.6879233121871948,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::1",
+            "score": 0.5505740642547607,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "This engine's default chunking configuration uses a target chunk size of `CHUNK_TARGET_TOKENS = 250` tokens with `CHUNK_OVERLAP_TOKENS = 50` tokens of overlap between consecutive chunks \u2014 a 20% overlap ratio. \n\nThe reason cranking the overlap ratio up isn't simply a free way to guarantee boundary-spanning facts are retrievable involves storage and retrieval quality trade-offs. According to [chunk-overlap-and-why-it-matters::0], pushing overlap too high makes the corpus balloon, leading to more redundant near-duplicate hits that can crowd out other genuinely relevant material in ranked results. Thus, increasing overlap doesn't come without costs.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1593
+      }
+    }
+  ]
+}

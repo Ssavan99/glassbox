@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q10",
+  "architecture": "hyde",
+  "question": "Why does a golden dataset need to stay fixed rather than being regenerated each time a system is evaluated?",
+  "answer": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions [building-a-golden-dataset-for-rag-evaluation::0]. The entire value of a golden dataset comes from being fixed, forcing a human author to read the corpus closely and surface ambiguities and missing coverage before any retrieval code runs [building-a-golden-dataset-for-rag-evaluation::0].",
+  "metrics": {
+    "latency_ms": 24.831082999298815,
+    "llm_calls": 2,
+    "prompt_tokens": 1512,
+    "completion_tokens": 300
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "A golden dataset serves as a stable reference point, so its contents must remain unchanged to guarantee that performance metrics are comparable across different runs, models, and research groups. Regenerating the dataset each time would introduce variability in the input distribution, making it impossible to attribute changes in scores to the system under test rather than to the data itself. By keeping the golden set fixed, evaluators can isolate the effect of algorithmic improvements and ensure reproducibility of results.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 343
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.030946018174290657,
+          -0.016843540593981743,
+          -0.020755793899297714,
+          0.06002558767795563,
+          0.04157763347029686,
+          -0.019253548234701157,
+          -0.013389873318374157,
+          -0.04444865882396698
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.656085729598999,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.531098484992981,
+            "rank": 2
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.4623342752456665,
+            "rank": 3
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.4608924984931946,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.45231708884239197,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions [building-a-golden-dataset-for-rag-evaluation::0]. The entire value of a golden dataset comes from being fixed, forcing a human author to read the corpus closely and surface ambiguities and missing coverage before any retrieval code runs [building-a-golden-dataset-for-rag-evaluation::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1469
+      }
+    }
+  ]
+}

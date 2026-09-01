@@ -1,0 +1,43 @@
+{
+  "name": "glassbox-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "python3 ../scripts/export_web.py && python3 ../scripts/extract_code_excerpts.py",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && npm run copy404",
+    "copy404": "cp dist/index.html dist/404.html",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "test": "tsc -p tsconfig.test.json --noEmit && vitest run"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "^3.1.1",
+    "@xenova/transformers": "^2.17.2",
+    "@xyflow/react": "^12.11.5",
+    "d3-force": "^3.0.0",
+    "highlight.js": "^11.12.0",
+    "motion": "^13.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.6",
+    "@types/d3-force": "^3.0.10",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "jsdom": "^29.1.1",
+    "oxlint": "^1.79.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}

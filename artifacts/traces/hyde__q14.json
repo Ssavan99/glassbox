@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q14",
+  "architecture": "hyde",
+  "question": "A needle-in-a-haystack test can score perfectly on recall@k while the assembled answer is still wrong \u2014 what's the mechanism behind that gap, and where in the pipeline does the actual fix belong?",
+  "answer": "The mechanism behind this gap is that a needle-in-a-haystack test specifically assesses precision rather than recall. A system can retrieve all relevant chunks (perfecting recall@k) but fail to use them correctly within the model's prompt template [needle-in-a-haystack-evaluation::0]. The actual fix would belong in how the retrieved evidence is ordered and utilized by the prompt template, as this stage determines whether the correct chunk influences the final answer despite being correctly retrieved [retrieval-failures-lost-in-the-middle::0].\n\nCitation: [needle-in-a-haystack-evaluation::0], [retrieval-failures-lost-in-the-middle::0]",
+  "metrics": {
+    "latency_ms": 24.95470899884822,
+    "llm_calls": 2,
+    "prompt_tokens": 1572,
+    "completion_tokens": 241
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "In a needle-in-a-haystack scenario, perfect recall@k means the model has identified all relevant items correctly but may have generated irrelevant or nonsensical answers to fill out the top-k results. This gap arises when the model's retrieval mechanism is highly effective at finding true positives but its generation mechanism lacks constraints to produce coherent and accurate responses. The fix typically belongs in both the retrieval and generation pipelines, with emphasis on improving the coherence of generated outputs while maintaining or enhancing recall performance.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 238
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.03991902992129326,
+          -0.01297348365187645,
+          -0.050675999373197556,
+          0.06070943549275398,
+          0.040793277323246,
+          0.047826480120420456,
+          -0.0059844073839485645,
+          -0.01003335416316986
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.6117157936096191,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.6002966165542603,
+            "rank": 2
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.5870906114578247,
+            "rank": 3
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.5859693288803101,
+            "rank": 4
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.5826982259750366,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The mechanism behind this gap is that a needle-in-a-haystack test specifically assesses precision rather than recall. A system can retrieve all relevant chunks (perfecting recall@k) but fail to use them correctly within the model's prompt template [needle-in-a-haystack-evaluation::0]. The actual fix would belong in how the retrieved evidence is ordered and utilized by the prompt template, as this stage determines whether the correct chunk influences the final answer despite being correctly retrieved [retrieval-failures-lost-in-the-middle::0].\n\nCitation: [needle-in-a-haystack-evaluation::0], [retrieval-failures-lost-in-the-middle::0]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1575
+      }
+    }
+  ]
+}

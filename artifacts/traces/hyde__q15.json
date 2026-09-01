@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q15",
+  "architecture": "hyde",
+  "question": "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost \u2014 given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?",
+  "answer": "The KV cache management is intrinsically linked to the effectiveness of continuous batching due to the need for per-request tracking and freeing of cache states. If a scheduler had to reshuffle or recompute cache state on every batch change, it would negate much of the latency benefit continuous batching aims to provide. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own independent cache state as requests join and leave the batch. Therefore, treating continuous batching as an independent scheduling optimization without considering how the cache is managed would undermine its benefits.\n\nCiting chunk ids: [kv-cache-and-why-it-matters-for-serving::1] [continuous-batching-and-throughput::1]",
+  "metrics": {
+    "latency_ms": 8466.817749998881,
+    "llm_calls": 2,
+    "prompt_tokens": 1530,
+    "completion_tokens": 386
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "The KV cache ties each token\u2019s attention keys and values to the specific position they occupy in the model\u2019s internal state, so the cost of generating a new token depends on how many previous tokens are retained in the cache. Because a continuous\u2011batch scheduler must decide when to flush, truncate, or share cache entries across requests, its decisions directly affect cache hit\u2011rate, memory pressure, and the linear\u2011vs\u2011quadratic trade\u2011off. Consequently, batching cannot be treated as a purely independent scheduling problem; the cache\u2011management policy and the batch\u2011formation logic must be coordinated to preserve the cache\u2019s linear\u2011time advantage.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 426
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.0014377719489857554,
+          -0.004020861815661192,
+          -0.008982143364846706,
+          0.05727392062544823,
+          -0.038125328719615936,
+          -0.005787828471511602,
+          -0.04945525527000427,
+          -9.8323384008836e-05
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.7523195743560791,
+            "rank": 1
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.6469377279281616,
+            "rank": 2
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.6304497718811035,
+            "rank": 3
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.5979326963424683,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.5489717721939087,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The KV cache management is intrinsically linked to the effectiveness of continuous batching due to the need for per-request tracking and freeing of cache states. If a scheduler had to reshuffle or recompute cache state on every batch change, it would negate much of the latency benefit continuous batching aims to provide. Continuous batching requires efficient per-request KV cache management because each request in a dynamically changing batch needs its own independent cache state as requests join and leave the batch. Therefore, treating continuous batching as an independent scheduling optimization without considering how the cache is managed would undermine its benefits.\n\nCiting chunk ids: [kv-cache-and-why-it-matters-for-serving::1] [continuous-batching-and-throughput::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1490
+      }
+    }
+  ]
+}

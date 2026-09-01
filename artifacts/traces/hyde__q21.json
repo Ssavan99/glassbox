@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q21",
+  "architecture": "hyde",
+  "question": "What sampling flag and value should be set when running the golden dataset so evaluation scores stay comparable across runs?",
+  "answer": "Set the temperature sampling flag to a near\u2011zero value\u2014e.g., run the evaluation with `--temperature 0.0` (or its equivalent). Using a fixed, zero\u2011temperature setting keeps the model\u2019s output deterministic, so scores on the golden dataset remain comparable across runs. \u3010temperature-and-sampling-controls::1\u3011",
+  "metrics": {
+    "latency_ms": 24.28899999722489,
+    "llm_calls": 2,
+    "prompt_tokens": 1590,
+    "completion_tokens": 407
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "When running the golden dataset you should enable deterministic sampling by setting the `--sampling` flag to **`deterministic`** (or equivalently `--sampling=0` in legacy configurations). In addition, fix the random seed to a constant value\u2014commonly `--seed=42`\u2014so that the same subset of examples is selected on every run, ensuring that evaluation scores remain comparable across experiments.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 366
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.05040343478322029,
+          -0.06466320157051086,
+          0.04015323892235756,
+          0.02383124642074108,
+          0.03828486427664757,
+          -0.03962321579456329,
+          0.0014298023888841271,
+          -0.026183729991316795
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.5524559020996094,
+            "rank": 1
+          },
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::1",
+            "score": 0.4085007309913635,
+            "rank": 2
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.36155417561531067,
+            "rank": 3
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.3527781665325165,
+            "rank": 4
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.3260146677494049,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "Set the temperature sampling flag to a near\u2011zero value\u2014e.g., run the evaluation with `--temperature 0.0` (or its equivalent). Using a fixed, zero\u2011temperature setting keeps the model\u2019s output deterministic, so scores on the golden dataset remain comparable across runs. \u3010temperature-and-sampling-controls::1\u3011",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1631
+      }
+    }
+  ]
+}

@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q06",
+  "architecture": "hybrid",
+  "question": "Why does deduplication matter differently for fine-tuning data versus a retrieval corpus?",
+  "answer": "Deduplication has two distinct impacts depending on where the data lives:\n\n* **Fine\u2011tuning data** \u2013 When the same example appears many times, the model sees that example with a higher effective weight than intended.\u202fThis over\u2011represents certain phrases or facts, can bias the fine\u2011tuned model toward those patterns, and can even cause the model to memorise and later regurgitate the duplicated passages verbatim instead of learning to generalise\u202f[deduplication-in-training-and-corpus-data::0].\n\n* **Retrieval corpus** \u2013 In a corpus, near\u2011duplicate notes compete for the same top\u2011k retrieval slots.\u202fBecause several duplicates occupy the same slot, they crowd out other distinct, relevant chunks, lowering recall@k and giving the model repeated evidence rather than a variety of evidence\u202f[deduplication-in-training-and-corpus-data::0].\n\nThus, for fine\u2011tuning duplicates distort training dynamics, while for retrieval they waste space and hurt the ability to surface diverse, relevant evidence.",
+  "metrics": {
+    "latency_ms": 101.81654199914192,
+    "llm_calls": 1,
+    "prompt_tokens": 1395,
+    "completion_tokens": 525
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.07126396149396896,
+          -0.06389836221933365,
+          0.03678726404905319,
+          -0.0075357770547270775,
+          -0.008922397159039974,
+          -0.014588410966098309,
+          0.02287270314991474,
+          -0.017656980082392693
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.7692570090293884,
+            "rank": 1
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 0.7500419020652771,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.5824466943740845,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.5655645728111267,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.5620624423027039,
+            "rank": 5
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.556308925151825,
+            "rank": 6
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.527894139289856,
+            "rank": 7
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 0.5261397361755371,
+            "rank": 8
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.5221362709999084,
+            "rank": 9
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.5200448632240295,
+            "rank": 10
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.5147110819816589,
+            "rank": 11
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.5110516548156738,
+            "rank": 12
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 0.5050869584083557,
+            "rank": 13
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.5009151697158813,
+            "rank": 14
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.499972403049469,
+            "rank": 15
+          },
+          {
+            "chunk_id": "source-freshness-and-recency-weighting::0",
+            "score": 0.49648556113243103,
+            "rank": 16
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.49608859419822693,
+            "rank": 17
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.4944143295288086,
+            "rank": 18
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.4897941052913666,
+            "rank": 19
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::0",
+            "score": 0.4794173240661621,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 14.325293641716382,
+            "rank": 1
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 11.421275287400588,
+            "rank": 2
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 10.648265688033666,
+            "rank": 3
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 10.240766281243472,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 10.200878781760347,
+            "rank": 5
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 10.04416259018392,
+            "rank": 6
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 9.6891277337675,
+            "rank": 7
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 9.49708761820172,
+            "rank": 8
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 8.677422925815165,
+            "rank": 9
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 8.233414816718685,
+            "rank": 10
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 8.052506036592803,
+            "rank": 11
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 7.840982663703052,
+            "rank": 12
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 7.762334606279495,
+            "rank": 13
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 7.611825949534094,
+            "rank": 14
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "score": 7.489103812783962,
+            "rank": 15
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 6.832213949170002,
+            "rank": 16
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 6.75222605354465,
+            "rank": 17
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1",
+            "score": 6.6289971359929005,
+            "rank": 18
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 6.544331228431535,
+            "rank": 19
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 6.51360807398802,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 0.031754032258064516,
+            "rank": 2
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.02946912242686891,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.029236022193768675,
+            "rank": 4
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.02782608695652174,
+            "rank": 5
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 0.01639344262295082,
+            "rank": 6
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.015873015873015872,
+            "rank": 7
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.015873015873015872,
+            "rank": 8
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.015625,
+            "rank": 9
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.015384615384615385,
+            "rank": 10
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.013888888888888888,
+            "rank": 19
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.03252247488101534,
+            "rank": 1
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 0.031754032258064516,
+            "rank": 2
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.02946912242686891,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.029236022193768675,
+            "rank": 4
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.02782608695652174,
+            "rank": 5
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 0.01639344262295082,
+            "rank": 6
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.015873015873015872,
+            "rank": 7
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.015873015873015872,
+            "rank": 8
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.015625,
+            "rank": 9
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.015384615384615385,
+            "rank": 10
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.014925373134328358,
+            "rank": 13
+          },
+          {
+            "chunk_id": "caching-retrieval-results::1",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.014285714285714285,
+            "rank": 18
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.013888888888888888,
+            "rank": 19
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 6.650702476501465,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 3.980433464050293,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 1.8683490753173828,
+            "rank": 3
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::1",
+            "score": 1.6500303745269775,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": -0.17480997741222382,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "Deduplication has two distinct impacts depending on where the data lives:\n\n* **Fine\u2011tuning data** \u2013 When the same example appears many times, the model sees that example with a higher effective weight than intended.\u202fThis over\u2011represents certain phrases or facts, can bias the fine\u2011tuned model toward those patterns, and can even cause the model to memorise and later regurgitate the duplicated passages verbatim instead of learning to generalise\u202f[deduplication-in-training-and-corpus-data::0].\n\n* **Retrieval corpus** \u2013 In a corpus, near\u2011duplicate notes compete for the same top\u2011k retrieval slots.\u202fBecause several duplicates occupy the same slot, they crowd out other distinct, relevant chunks, lowering recall@k and giving the model repeated evidence rather than a variety of evidence\u202f[deduplication-in-training-and-corpus-data::0].\n\nThus, for fine\u2011tuning duplicates distort training dynamics, while for retrieval they waste space and hurt the ability to surface diverse, relevant evidence.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1920
+      }
+    }
+  ]
+}

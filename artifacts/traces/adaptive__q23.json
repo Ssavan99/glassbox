@@ -1,0 +1,565 @@
+{
+  "trace_id": "adaptive::q23",
+  "architecture": "adaptive",
+  "question": "What two named config constants define this engine's default chunk size and chunk overlap in tokens?",
+  "answer": "The engine\u2019s defaults are set by the constants **`CHUNK_TARGET_TOKENS`** (the target chunk size) and **`CHUNK_OVERLAP_TOKENS`** (the amount of overlap)\u202f\u2014\u202fset to 250 and 50 tokens respectively\u3010chunk-overlap-and-why-it-matters::0\u3011.",
+  "metrics": {
+    "latency_ms": 73.88008300040383,
+    "llm_calls": 2,
+    "prompt_tokens": 2055,
+    "completion_tokens": 498
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "route",
+      "label": "Route question to hybrid",
+      "parent_ids": [],
+      "duration_ms": 0.6121250007709023,
+      "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
+      "payload": {
+        "chosen": "hybrid",
+        "scores": {
+          "naive": 0.12,
+          "hybrid": 0.93,
+          "hyde": 0.04,
+          "corrective": 0.07,
+          "graph": 0.02,
+          "agentic": 0.02
+        },
+        "reason": "The query seeks the exact names of two configuration constants (exact identifiers). Hybrid retrieval (dense + BM25 with reranking) is optimized for retrieving precise verbatim strings, matching the pattern of 'exact config value' requests."
+      }
+    },
+    {
+      "id": "hybrid::n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.11867251247167587,
+          0.012420976534485817,
+          -0.04280388355255127,
+          -0.014756983146071434,
+          -0.007093341555446386,
+          -0.06538655608892441,
+          -0.039134323596954346,
+          0.07989594340324402
+        ]
+      }
+    },
+    {
+      "id": "hybrid::n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "hybrid::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.48708170652389526,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.4862399697303772,
+            "rank": 2
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.4318699240684509,
+            "rank": 3
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.39237529039382935,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::1",
+            "score": 0.3897109925746918,
+            "rank": 5
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.37423890829086304,
+            "rank": 6
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.36389434337615967,
+            "rank": 7
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.3358032703399658,
+            "rank": 8
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.3185814619064331,
+            "rank": 9
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.3090493977069855,
+            "rank": 10
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.288423627614975,
+            "rank": 11
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.27117687463760376,
+            "rank": 12
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.26626425981521606,
+            "rank": 13
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.2516254484653473,
+            "rank": 14
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 0.24682706594467163,
+            "rank": 15
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.23180602490901947,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.2302245795726776,
+            "rank": 17
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.22841890156269073,
+            "rank": 18
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::0",
+            "score": 0.22597616910934448,
+            "rank": 19
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.22329598665237427,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "hybrid::n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "hybrid::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 22.42723739577301,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 17.939438711082495,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 15.890157107551758,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 13.294314169340351,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 11.075834239073481,
+            "rank": 5
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 10.70382074171853,
+            "rank": 6
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 10.602691825636644,
+            "rank": 7
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 10.542051144109795,
+            "rank": 8
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 9.193148265635982,
+            "rank": 9
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::0",
+            "score": 9.149641277552574,
+            "rank": 10
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 8.876942030121832,
+            "rank": 11
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::1",
+            "score": 8.24869243104871,
+            "rank": 12
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 8.229617358392453,
+            "rank": 13
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 8.207429245979387,
+            "rank": 14
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 8.118530934866751,
+            "rank": 15
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 7.822148293524085,
+            "rank": 16
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 7.665311087166757,
+            "rank": 17
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 7.6249135211863575,
+            "rank": 18
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 7.54171022864216,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 7.444007422775009,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "hybrid::n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "hybrid::n2",
+        "hybrid::n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.03200204813108039,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.03128054740957967,
+            "rank": 3
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.03055037313432836,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.028083267871170464,
+            "rank": 5
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.0261986301369863,
+            "rank": 6
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.015873015873015872,
+            "rank": 7
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.015625,
+            "rank": 8
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::1",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.015384615384615385,
+            "rank": 10
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.014492753623188406,
+            "rank": 14
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 0.014492753623188406,
+            "rank": 15
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.014285714285714285,
+            "rank": 16
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "hybrid::n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "hybrid::n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.03200204813108039,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": 0.03128054740957967,
+            "rank": 3
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.03055037313432836,
+            "rank": 4
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.028083267871170464,
+            "rank": 5
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::0",
+            "score": 0.0261986301369863,
+            "rank": 6
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.015873015873015872,
+            "rank": 7
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": 0.015625,
+            "rank": 8
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::1",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.015384615384615385,
+            "rank": 10
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 0.015151515151515152,
+            "rank": 11
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::1",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.014492753623188406,
+            "rank": 14
+          },
+          {
+            "chunk_id": "grounding-and-the-citation-contract::1",
+            "score": 0.014492753623188406,
+            "rank": 15
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.014285714285714285,
+            "rank": 16
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::0",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "embeddings-and-semantic-search::1",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 2.9545538425445557,
+            "rank": 1
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": -0.30628132820129395,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::1",
+            "score": -1.4645981788635254,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hybrid-search-with-bm25-and-dense-vectors::0",
+            "score": -3.206996440887451,
+            "rank": 4
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": -3.264543294906616,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "hybrid::n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "hybrid::n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "The engine\u2019s defaults are set by the constants **`CHUNK_TARGET_TOKENS`** (the target chunk size) and **`CHUNK_OVERLAP_TOKENS`** (the amount of overlap)\u202f\u2014\u202fset to 250 and 50 tokens respectively\u3010chunk-overlap-and-why-it-matters::0\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1676
+      }
+    }
+  ]
+}

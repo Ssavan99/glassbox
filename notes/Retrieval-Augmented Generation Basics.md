@@ -1,3 +1,0 @@
-Retrieval-augmented generation, or RAG, improves a language model by giving it relevant external context before it answers. A typical RAG pipeline splits documents into chunks, embeds those chunks into vectors, stores them in a vector database, retrieves similar chunks for a user query, and passes the retrieved text into the model prompt.
-
-RAG is useful when answers should depend on private, recent, or specialized information that the base model may not know. Common failure modes include poor chunking, retrieving irrelevant passages, missing key context, and overstuffing the prompt with too much text. Evaluation should test whether the system retrieves the right evidence, cites sources accurately, and refuses to answer when the notes do not contain enough support.

@@ -1,0 +1,363 @@
+{
+  "trace_id": "corrective::q07",
+  "architecture": "corrective",
+  "question": "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?",
+  "answer": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
+  "metrics": {
+    "latency_ms": 5773.128166998504,
+    "llm_calls": 6,
+    "prompt_tokens": 5972,
+    "completion_tokens": 931
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.1029377281665802,
+          0.006630679126828909,
+          -0.03471687436103821,
+          -0.012747044675052166,
+          0.011179924942553043,
+          0.09131450206041336,
+          -0.015661010518670082,
+          0.0075264740735292435
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.711386501789093,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.632522463798523,
+            "rank": 2
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.3681974411010742,
+            "rank": 3
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "score": 0.35294175148010254,
+            "rank": 4
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 0.33690008521080017,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "verdict": "correct",
+            "reason": "Directly supports the core privacy risk PII redaction is meant to prevent in a fine-tuned model by explaining that unredacted PII can be memorized and reproduced verbatim."
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "verdict": "ambiguous",
+            "reason": "While it discusses the process of PII redaction, it does not directly address the core privacy risk PII redaction is meant to prevent in a fine-tuned model."
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "verdict": "incorrect",
+            "reason": "It discusses guardrails for autonomous actions but does not pertain to the specific core privacy risk of PII redaction."
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "verdict": "incorrect",
+            "reason": "It explains a different issue related to hallucinations from prompt injection rather than the core privacy risk of PII redaction."
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "verdict": "incorrect",
+            "reason": "It discusses a separate threat model involving prompt injection attacks, not directly relevant to the core privacy risk of PII redaction in fine-tuned models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "What is the core privacy risk PII redaction is meant to prevent in a fine-tuned model?",
+        "to": "What are the primary privacy risks associated with PII redaction in fine-tuned machine learning models?",
+        "reason": "This query directly targets the core privacy risk of PII redaction in fine-tuned models, avoiding tangential topics like guardrails or hallucinations from prompt injection."
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.10406305640935898,
+          -0.012349230237305164,
+          -0.02881033346056938,
+          0.002034831093624234,
+          0.020558755844831467,
+          0.06707298010587692,
+          -0.012835720553994179,
+          -0.04667001590132713
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.6806360483169556,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.5913161635398865,
+            "rank": 2
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "score": 0.32468023896217346,
+            "rank": 3
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "score": 0.312819242477417,
+            "rank": 4
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "score": 0.3064953088760376,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 2)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "verdict": "correct",
+            "reason": "Directly supports the core privacy risk PII redaction is meant to prevent in a fine-tuned model."
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "verdict": "ambiguous",
+            "reason": "Relates to the topic but does not directly address the specific privacy risk of unredacted PII in training data."
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::1",
+            "verdict": "incorrect",
+            "reason": "Discusses a different failure mode (prompt injection) rather than the core privacy risk PII redaction prevents."
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "verdict": "incorrect",
+            "reason": "Focuses on labeling quality for fine-tuning data, not the specific privacy risks of unredacted PII in training data."
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "verdict": "incorrect",
+            "reason": "Discusses a different failure mode (prompt injection) rather than the core privacy risk PII redaction prevents."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "What are the primary privacy risks associated with PII redaction in fine-tuned machine learning models?",
+        "to": "What are the primary privacy risks associated with including unredacted PII in fine-tuned machine learning models during training?",
+        "reason": "This query directly addresses the core issue of unredacted PII in training data and is more likely to yield relevant evidence about the specific privacy risks that need to be mitigated through redaction."
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 3)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.08859137445688248,
+          0.015283004380762577,
+          -0.02453779987990856,
+          -0.005537557415664196,
+          0.032238561660051346,
+          0.06440780311822891,
+          -0.020315205678343773,
+          -0.039534542709589005
+        ]
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 3)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 0.6144236326217651,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.475538969039917,
+            "rank": 2
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.34323498606681824,
+            "rank": 3
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.3397260308265686,
+            "rank": 4
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "score": 0.3396923542022705,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 3)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "verdict": "correct",
+            "reason": "Directly supports the core privacy risk PII redaction is meant to prevent."
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "verdict": "ambiguous",
+            "reason": "While related, it does not directly address the specific privacy risk."
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "verdict": "incorrect",
+            "reason": "Discusses a different issue (catastrophic forgetting) unrelated to PII redaction's core privacy risk."
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "verdict": "ambiguous",
+            "reason": ""
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "verdict": "incorrect",
+            "reason": "Focuses on data labeling quality, not the specific privacy risks of PII redaction."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The core privacy risk PII redaction is meant to prevent in a fine-tuned model is that \"a fine-tuned model reveals training data verbatim under the right (or wrong) prompting.\" This risk is cited from [pii-redaction-in-training-data::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1001
+      }
+    }
+  ]
+}

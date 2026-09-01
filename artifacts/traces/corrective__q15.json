@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q15",
+  "architecture": "corrective",
+  "question": "The KV cache is described as making per-token generation roughly linear rather than quadratic in cost \u2014 given that, why can't a serving system just treat continuous batching as an independent scheduling optimization with no coupling to how the cache is managed?",
+  "answer": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
+  "metrics": {
+    "latency_ms": 8796.302916998684,
+    "llm_calls": 2,
+    "prompt_tokens": 2801,
+    "completion_tokens": 308
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.028044944629073143,
+          0.045588117092847824,
+          -0.015548923052847385,
+          0.03590899333357811,
+          -0.06443866342306137,
+          -0.003807778237387538,
+          -0.06403370201587677,
+          0.009320821613073349
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.7388319969177246,
+            "rank": 1
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.6317634582519531,
+            "rank": 2
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.5515793561935425,
+            "rank": 3
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.5514694452285767,
+            "rank": 4
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.5498610734939575,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "verdict": "correct",
+            "reason": "Directly supports the question by explaining why treating continuous batching as an independent optimization without considering KV cache management would be problematic."
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "verdict": "correct",
+            "reason": "Directly supports the question by highlighting the coupling between continuous batching and efficient per-request KV cache management."
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "verdict": "ambiguous",
+            "reason": ""
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "verdict": "ambiguous",
+            "reason": "Topically related but does not directly address the specific issue of how KV cache management interacts with continuous batching."
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "verdict": "correct",
+            "reason": "Directly supports the question by explaining why treating continuous batching as an independent optimization without considering KV cache management would be problematic."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The KV cache and continuous batching are tightly coupled because each request in a dynamically changing batch needs its own cache state tracked and freed independently as requests join and leave. If the system had to reshuffle or recompute cache state on every batch change, it would lose most of the latency benefit that continuous batching is trying to provide. Continuous batching's effectiveness depends on efficient per-request KV cache management; otherwise, the scheduling benefits are diminished.\n\n[citation: continuous-batching-and-throughput::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1492
+      }
+    }
+  ]
+}

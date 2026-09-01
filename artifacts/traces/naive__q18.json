@@ -1,0 +1,90 @@
+{
+  "trace_id": "naive::q18",
+  "architecture": "naive",
+  "question": "What is the exact reranking model identifier this engine uses?",
+  "answer": "The engine uses the model identified as **`cross-encoder/ms-marco-MiniLM-L-6-v2`**. \u3010reranking-with-cross-encoders::0\u3011",
+  "metrics": {
+    "latency_ms": 29.25070800120011,
+    "llm_calls": 1,
+    "prompt_tokens": 1478,
+    "completion_tokens": 130
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.12029821425676346,
+          -0.047466035932302475,
+          -0.04110768809914589,
+          0.04012021794915199,
+          0.029141947627067566,
+          0.08300893753767014,
+          -0.04064352810382843,
+          0.013970744796097279
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.4996113181114197,
+            "rank": 1
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.43787750601768494,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::1",
+            "score": 0.4236644506454468,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.406625896692276,
+            "rank": 4
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.39436855912208557,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "The engine uses the model identified as **`cross-encoder/ms-marco-MiniLM-L-6-v2`**. \u3010reranking-with-cross-encoders::0\u3011",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1608
+      }
+    }
+  ]
+}

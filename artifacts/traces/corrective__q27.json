@@ -1,0 +1,363 @@
+{
+  "trace_id": "corrective::q27",
+  "architecture": "corrective",
+  "question": "Which cloud provider hosts the vector database this engine uses in production?",
+  "answer": "The provided context does not contain information about which cloud provider hosts the vector database used by this engine in production. [vector-databases-and-index-types::1] and [vector-databases-and-index-types::0] discuss the nature of vector databases and how they are used, but do not specify a particular cloud provider. [cost-aware-model-routing::1] talks about model routing decisions and their validation but does not mention a cloud provider either. [ai-agents-and-tool-use::0] describes AI agents combining models with tools, memory, and planning loops without referencing any cloud provider. [latency-budgets-in-a-rag-pipeline::2] discusses latency budgets in RAG pipelines and generation costs but also does not specify the cloud provider hosting the vector database. Therefore, I cannot answer which cloud provider hosts the vector database this engine uses in production based on the given context.",
+  "metrics": {
+    "latency_ms": 14.76724999884027,
+    "llm_calls": 6,
+    "prompt_tokens": 6147,
+    "completion_tokens": 1051
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.015153004787862301,
+          -0.052164070308208466,
+          -0.03867470845580101,
+          -0.017306163907051086,
+          0.034075845032930374,
+          -0.03763560578227043,
+          -0.03781991824507713,
+          -0.04897310212254524
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.3324347734451294,
+            "rank": 1
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 0.2953835129737854,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.20506927371025085,
+            "rank": 3
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.204635351896286,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.18740682303905487,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "verdict": "ambiguous",
+            "reason": "Discusses vector databases in the context of metadata and embedding dimensions but does not directly address cloud providers."
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "verdict": "ambiguous",
+            "reason": "Discusses vector databases and scaling considerations but does not mention cloud providers."
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "verdict": "incorrect",
+            "reason": "Focuses on embedding dimensions and model size trade-offs without mentioning cloud providers."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "incorrect",
+            "reason": "Discusses model routing decisions but does not mention cloud providers or vector databases."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "verdict": "incorrect",
+            "reason": "Focuses on latency budgets and stages of RAG pipelines without mentioning cloud providers."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "Which cloud provider hosts the vector database this engine uses in production?",
+        "to": "Which cloud provider hosts the vector database used by this engine in production?",
+        "reason": "The rewritten query directly asks about the cloud provider hosting the specific vector database used by the engine, which should more closely match the required information and reduce irrelevant results."
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.02032627910375595,
+          -0.03830461949110031,
+          -0.04238192364573479,
+          -0.0166690181940794,
+          0.026951288804411888,
+          -0.04223193973302841,
+          -0.030485639348626137,
+          -0.048087023198604584
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.3109821379184723,
+            "rank": 1
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 0.28282052278518677,
+            "rank": 2
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 0.20303131639957428,
+            "rank": 3
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.20149439573287964,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "score": 0.18769153952598572,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 2)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "verdict": "ambiguous",
+            "reason": "Discusses vector databases in the context of metadata and embedding dimensions but does not directly address cloud providers."
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "verdict": "ambiguous",
+            "reason": "Discusses vector databases and scaling considerations but does not mention cloud providers."
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "verdict": "incorrect",
+            "reason": "Focuses on embedding dimensions and model size trade-offs without mentioning cloud providers."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "incorrect",
+            "reason": "Discusses model routing decisions but does not mention cloud providers or vector databases."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::0",
+            "verdict": "incorrect",
+            "reason": "Focuses on latency budgets and stages of RAG pipelines without mentioning cloud providers."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "Which cloud provider hosts the vector database used by this engine in production?",
+        "to": "Which cloud service provider hosts the production vector database for this AI engine?",
+        "reason": "The new query explicitly asks for the cloud provider (e.g., AWS, GCP, Azure) that hosts the vector database in production, using clear keywords like \"cloud service provider,\" \"production,\" and \"vector database.\" This should filter out unrelated discussions about model dimensions, routing, or latency and surface documents that mention the hosting environment of the vector store."
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 3)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.04439665004611015,
+          -0.08510861545801163,
+          -0.027381032705307007,
+          -0.018139556050300598,
+          0.01907758228480816,
+          -0.036769501864910126,
+          -0.04604262486100197,
+          -0.05434214323759079
+        ]
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 3)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 0.2716104984283447,
+            "rank": 1
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 0.23368388414382935,
+            "rank": 2
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.22342704236507416,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.20782044529914856,
+            "rank": 4
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.2021973431110382,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 3)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "verdict": "incorrect",
+            "reason": "The chunk does not mention any cloud provider or the specific vector database used by the system."
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "verdict": "incorrect",
+            "reason": "The chunk discusses general concepts of vector databases and indexing but does not specify a particular cloud provider."
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "verdict": "incorrect",
+            "reason": "This chunk talks about model routing and cost considerations, not the specific vector database or its cloud hosting."
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "verdict": "incorrect",
+            "reason": "The chunk focuses on AI agents and tool use but does not mention a vector database or its hosting provider."
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "verdict": "incorrect",
+            "reason": "This chunk discusses latency budgets and generation costs in RAG pipelines, without mentioning the cloud provider of any vector database."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The provided context does not contain information about which cloud provider hosts the vector database used by this engine in production. [vector-databases-and-index-types::1] and [vector-databases-and-index-types::0] discuss the nature of vector databases and how they are used, but do not specify a particular cloud provider. [cost-aware-model-routing::1] talks about model routing decisions and their validation but does not mention a cloud provider either. [ai-agents-and-tool-use::0] describes AI agents combining models with tools, memory, and planning loops without referencing any cloud provider. [latency-budgets-in-a-rag-pipeline::2] discusses latency budgets in RAG pipelines and generation costs but also does not specify the cloud provider hosting the vector database. Therefore, I cannot answer which cloud provider hosts the vector database this engine uses in production based on the given context.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1544
+      }
+    }
+  ]
+}

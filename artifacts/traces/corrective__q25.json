@@ -1,0 +1,246 @@
+{
+  "trace_id": "corrective::q25",
+  "architecture": "corrective",
+  "question": "Does fine-tuning a model with LoRA reduce a RAG pipeline's exposure to prompt injection attacks?",
+  "answer": "The context provided does not directly address whether fine-tuning with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The discussion in [prompt-injection-attacks-explained::1] focuses on mitigations for prompt injection attacks but does not compare the security of models fine-tuned with LoRA versus those that are fully fine-tuned.\n\nTherefore, I cannot make a direct claim about whether fine-tuning with LoRA reduces exposure to prompt injection attacks based solely on the given context.",
+  "metrics": {
+    "latency_ms": 13.136417001078371,
+    "llm_calls": 4,
+    "prompt_tokens": 4257,
+    "completion_tokens": 649
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.04431987553834915,
+          0.013980419375002384,
+          0.06845957040786743,
+          0.021292082965373993,
+          -0.06373696774244308,
+          -0.06247760355472565,
+          -0.019123205915093422,
+          0.031229054555296898
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.4931873679161072,
+            "rank": 1
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.46844547986984253,
+            "rank": 2
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.46454373002052307,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.456434041261673,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.4453861117362976,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "verdict": "ambiguous",
+            "reason": "The chunk discusses the parameter efficiency of LoRA but does not directly address its impact on RAG pipelines or prompt injection attacks."
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "verdict": "incorrect",
+            "reason": "The chunk discusses catastrophic forgetting and fine-tuning in general but does not relate to LoRA or RAG pipelines specifically."
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "verdict": "ambiguous",
+            "reason": "Similar to the previous chunk, this one focuses on LoRA's parameter efficiency without addressing the specific question."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "verdict": "ambiguous",
+            "reason": "This chunk compares LoRA with full fine-tuning but does not address the question about prompt injection attacks."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "verdict": "ambiguous",
+            "reason": "Similar to the previous chunk, this one focuses on comparison rather than directly addressing the question."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "rewrite",
+      "label": "Rewrite query (correction 1)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Most retrieved chunks were graded incorrect, so the query is rewritten and retrieval is retried. This project has no web-search fallback (D7, deliberate deviation from the CRAG paper) -- the only correction available is a better search query against the same local corpus, not fetching new external evidence. That's an honest, documented limitation, not a bug.",
+      "payload": {
+        "from": "Does fine-tuning a model with LoRA reduce a RAG pipeline's exposure to prompt injection attacks?",
+        "to": "LoRA fine-tuning effect on prompt injection vulnerability in Retrieval-Augmented Generation (RAG) pipelines",
+        "reason": "Specifies the LoRA method, the action (fine-tuning), the security concern (prompt injection), and the context (RAG pipelines), which should retrieve evidence directly addressing how LoRA-based fine-tuning influences a RAG system's exposure to prompt injection attacks."
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 2)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06922213733196259,
+          0.00615334277972579,
+          0.01708882488310337,
+          -0.022864408791065216,
+          -0.09967730939388275,
+          -0.0736306831240654,
+          -0.03487993776798248,
+          0.020947134122252464
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 0.44067084789276123,
+            "rank": 1
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.4160018265247345,
+            "rank": 2
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "score": 0.41239356994628906,
+            "rank": 3
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.38032400608062744,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.3769429326057434,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 2)",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "verdict": "ambiguous",
+            "reason": ""
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "verdict": "ambiguous",
+            "reason": ""
+          },
+          {
+            "chunk_id": "prompt-injection-attacks-explained::1",
+            "verdict": "correct",
+            "reason": "This chunk directly explains the concept of prompt injection attacks and how they can be embedded in retrieved chunks, which is relevant to understanding if LoRA reduces exposure to such attacks."
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "verdict": "ambiguous",
+            "reason": ""
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "verdict": "ambiguous",
+            "reason": "While this chunk discusses fine-tuning methods, it does not specifically address whether LoRA reduces exposure to prompt injection attacks."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "The context provided does not directly address whether fine-tuning with LoRA reduces a RAG pipeline's exposure to prompt injection attacks. The discussion in [prompt-injection-attacks-explained::1] focuses on mitigations for prompt injection attacks but does not compare the security of models fine-tuned with LoRA versus those that are fully fine-tuned.\n\nTherefore, I cannot make a direct claim about whether fine-tuning with LoRA reduces exposure to prompt injection attacks based solely on the given context.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1407
+      }
+    }
+  ]
+}

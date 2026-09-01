@@ -1,0 +1,1533 @@
+{
+  "trace_id": "agentic::q27",
+  "architecture": "agentic",
+  "question": "Which cloud provider hosts the vector database this engine uses in production?",
+  "answer": "The provided context does not specify which cloud provider hosts the vector database used in production.",
+  "metrics": {
+    "latency_ms": 23301.97520799993,
+    "llm_calls": 8,
+    "prompt_tokens": 9003,
+    "completion_tokens": 608
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.556500002858229,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What vector database does this engine use?",
+          "In which cloud provider is the vector database deployed for production use?",
+          "Is there any public information confirming the cloud provider for the production deployment?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.3038750000996515,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.2207910001743585,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "vector database"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.11579199781408533,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "used by",
+            "dst": "semantic search"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "embedding model",
+            "rel": "enables",
+            "dst": "semantic search"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "citation"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.4866250019404106,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not mention any specific vector database used by the engine.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0017499987734481692,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.4168329978710972,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::0",
+            "score": 11.234758168844156,
+            "rank": 1
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 10.886468094783543,
+            "rank": 2
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 9.330064489619168,
+            "rank": 3
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 8.550475258077967,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 7.6562340138295095,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.3208339985576458,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not specify which vector database is used by the engine.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.2565419999882579,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 1 known entity matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.24500000290572643,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "vector database"
+        ]
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.05091700586490333,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets compute cost of",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "used by",
+            "dst": "semantic search"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "embedding model",
+            "rel": "enables",
+            "dst": "semantic search"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "citation"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "uses",
+            "dst": "cosine similarity"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1"
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.37766700552310795,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "None of the provided excerpts mention any cloud provider or vector database deployment details.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n12"
+      ],
+      "duration_ms": 0.0014170000213198364,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.48141699517145753,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "vector-databases-and-index-types::1",
+            "score": 17.922821532255078,
+            "rank": 1
+          },
+          {
+            "chunk_id": "vector-databases-and-index-types::0",
+            "score": 15.405567038200598,
+            "rank": 2
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 12.651573000647387,
+            "rank": 3
+          },
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 12.282926964214287,
+            "rank": 4
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 12.103484417994565,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.33558299764990807,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not mention any specific cloud provider or the deployment of a vector database in production.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.27079099527327344,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 45.96970899729058,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.023710306733846664,
+          -0.055440355092287064,
+          0.04814526066184044,
+          -0.024726739153265953,
+          0.04066893830895424,
+          -0.010444286279380322,
+          -0.01054330449551344,
+          -0.06570878624916077
+        ]
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.10804100020322949,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.10362626612186432,
+            "rank": 1
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 0.08015548437833786,
+            "rank": 2
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.07686519622802734,
+            "rank": 3
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.06021631509065628,
+            "rank": 4
+          },
+          {
+            "chunk_id": "streaming-responses-and-perceived-latency::0",
+            "score": 0.0583612397313118,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.3545829968061298,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not contain any information regarding the cloud provider for the production deployment.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n19"
+      ],
+      "duration_ms": 0.0011669981176964939,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n21",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n20"
+      ],
+      "duration_ms": 9.41758300177753,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "embedding-dimension-and-model-size-tradeoffs::1",
+            "score": 14.076229434712266,
+            "rank": 1
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 12.38453649505268,
+            "rank": 2
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 12.059292713310615,
+            "rank": 3
+          },
+          {
+            "chunk_id": "needle-in-a-haystack-evaluation::0",
+            "score": 12.049271825623688,
+            "rank": 4
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 11.66168119877042,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n22",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n21"
+      ],
+      "duration_ms": 0.3594579975469969,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The retrieved evidence does not contain any information related to cloud providers or production deployments.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n23",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n15",
+        "n22"
+      ],
+      "duration_ms": 23241.14854200161,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "The provided context does not specify which cloud provider hosts the vector database used in production.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 3068
+      }
+    }
+  ]
+}

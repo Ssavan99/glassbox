@@ -1,0 +1,3245 @@
+{
+  "trace_id": "agentic::q11",
+  "architecture": "agentic",
+  "question": "LoRA trains under 1% of a model's parameters, cutting GPU memory and letting adapters be swapped per task \u2014 given that efficiency, is there ever a real quality reason to still pick full fine-tuning over it, and if so, what is it?",
+  "answer": "While LoRA (Low-Rank Adaptation) indeed offers significant memory savings by training only under 1% of a model's parameters, there are scenarios where full fine-tuning might still be preferable despite the efficiency gains. Specifically, when the task at hand requires broad behavioral changes that span multiple aspects of the model's behavior, full fine-tuning can provide more comprehensive and coherent adjustments.\n\nHere\u2019s why:\n\n- **Behavioral Coherence**: Full fine-tuning trains all parameters, which allows for broader and more consistent changes in the model's behavior. This can be crucial when you need the model to learn new tasks or adapt its overall response style across a wide range of prompts. For example, if you want to significantly alter how the model handles coding instructions or mathematical reasoning, full fine-tuning might offer better consistency compared to LoRA.\n\n- **Fine-Tuned Granularity**: Full fine-tuning can provide finer-grained control over specific behaviors that may require a more holistic adjustment rather than incremental changes. For instance, if you need the model to significantly improve its ability to follow complex instructions or generate coherent text across multiple domains, full fine-tuning might be necessary.\n\n- **Avoiding Spillover Effects**: LoRA can sometimes introduce subtle spillover effects where learned behaviors from one task unintentionally affect unrelated tasks. Full fine-tuning tends to avoid these spillovers by updating all parameters in a more unified manner.\n\nTo illustrate with chunk IDs, imagine you have two chunks of text:\n\n- **Chunk ID 1 (LoRA Use Case)**: \"The model needs to learn to follow complex instructions without spilling over unwanted changes. For instance, if the model has been fine-tuned on coding tasks and then asked to handle natural language processing, LoRA might cause some coding-specific behaviors to inadvertently affect NLP outputs.\"\n\n- **Chunk ID 2 (Full Fine-Tuning Use Case)**: \"For a task that requires broad behavioral changes like improving response coherence across multiple domains or enhancing the model's overall reasoning ability, full fine-tuning ensures these changes are applied consistently and comprehensively. For example, if you need to teach the model more sophisticated reasoning skills without impacting its language generation abilities, full fine-tuning is often the better choice.\"\n\nIn summary, while LoRA offers significant efficiency benefits, there can be quality reasons to prefer full fine-tuning for tasks that require broader or more coherent changes in the model's behavior.",
+  "metrics": {
+    "latency_ms": 3.029292001883732,
+    "llm_calls": 6,
+    "prompt_tokens": 9374,
+    "completion_tokens": 928
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.21654100055457093,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "How do the performance and output quality of LoRA compare to full fine-tuning across different tasks and datasets?",
+          "What specific scenarios or task characteristics make full fine-tuning yield higher quality results than LoRA despite its higher resource cost?",
+          "What trade\u2011offs (e.g., data availability, model size, downstream requirements) influence the decision to choose full fine-tuning over LoRA?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.1724580033624079,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "graph_seed",
+      "label": "Seed entities (2 matched)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.16370800221920945,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "fine-tuning",
+          "lora"
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.052874998800689355,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "persists across",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "memory",
+            "rel": "drifts",
+            "dst": "drift"
+          },
+          {
+            "src": "memory",
+            "rel": "is separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "caps",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "mitigates",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more prone than",
+            "dst": "lora"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "approaches",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "requires",
+            "dst": "kv cache"
+          },
+          {
+            "src": "kv cache",
+            "rel": "affects",
+            "dst": "latency"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "batching"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "quantization"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "used by",
+            "dst": "semantic search"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "embedding model",
+            "rel": "enables",
+            "dst": "semantic search"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "citation"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is alternative to",
+            "dst": "lora"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less memory",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "distillation",
+            "rel": "is an alternative to",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "has quality gap with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "used before",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "incurs",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "is a",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "ignores",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "is a stage of",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "system prompt"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "improves",
+            "dst": "structured output"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "includes",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "inherits from",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "needs less data than",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "structured output",
+            "rel": "more effective with",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "distillation",
+            "rel": "contrasts with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "distillation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "distillation",
+            "rel": "requires evaluation on",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "distillation",
+            "rel": "impacts performance on",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "batching",
+            "rel": "needs",
+            "dst": "kv cache"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "depends on",
+            "dst": "data quality"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "lora",
+            "rel": "is a",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "combined with",
+            "dst": "quantization"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "agent",
+            "rel": "operates within",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "agent",
+            "rel": "resembles",
+            "dst": "planning loop"
+          },
+          {
+            "src": "planning loop",
+            "rel": "relevant to",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "planning loop",
+            "rel": "part of",
+            "dst": "agent"
+          },
+          {
+            "src": "planning loop",
+            "rel": "related to",
+            "dst": "memory"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "can reveal",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "planning loop"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "does not improve",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "latency",
+            "rel": "contrasts with",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "batching",
+            "rel": "complements",
+            "dst": "quantization"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1"
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.17133300207206048,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not provide specific comparisons of performance and output quality between LoRA and full fine-tuning across different tasks and datasets.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0010409967217128724,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (graph) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 0.33999999868683517,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 27.265347718402644,
+            "rank": 1
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 23.23858047926224,
+            "rank": 2
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 21.789545260995904,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 21.387032259054326,
+            "rank": 4
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 19.835361964796085,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.20799999765586108,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly compare the performance and output quality of LoRA to full fine-tuning across different tasks and datasets.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.18237499898532405,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "graph_seed",
+      "label": "Seed entities (2 matched)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.1737080019665882,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "fine-tuning",
+          "lora"
+        ]
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.040541002817917615,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "persists across",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "memory",
+            "rel": "drifts",
+            "dst": "drift"
+          },
+          {
+            "src": "memory",
+            "rel": "is separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "caps",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "mitigates",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more prone than",
+            "dst": "lora"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "approaches",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "requires",
+            "dst": "kv cache"
+          },
+          {
+            "src": "kv cache",
+            "rel": "affects",
+            "dst": "latency"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "batching"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "quantization"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "used by",
+            "dst": "semantic search"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "embedding model",
+            "rel": "enables",
+            "dst": "semantic search"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "citation"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is alternative to",
+            "dst": "lora"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less memory",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "distillation",
+            "rel": "is an alternative to",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "has quality gap with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "used before",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "incurs",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "is a",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "ignores",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "is a stage of",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "system prompt"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "improves",
+            "dst": "structured output"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "includes",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "inherits from",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "needs less data than",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "structured output",
+            "rel": "more effective with",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "distillation",
+            "rel": "contrasts with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "distillation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "distillation",
+            "rel": "requires evaluation on",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "distillation",
+            "rel": "impacts performance on",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "batching",
+            "rel": "needs",
+            "dst": "kv cache"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "depends on",
+            "dst": "data quality"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "lora",
+            "rel": "is a",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "combined with",
+            "dst": "quantization"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "agent",
+            "rel": "operates within",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "agent",
+            "rel": "resembles",
+            "dst": "planning loop"
+          },
+          {
+            "src": "planning loop",
+            "rel": "relevant to",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "planning loop",
+            "rel": "part of",
+            "dst": "agent"
+          },
+          {
+            "src": "planning loop",
+            "rel": "related to",
+            "dst": "memory"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "can reveal",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "planning loop"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "does not improve",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "latency",
+            "rel": "contrasts with",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "batching",
+            "rel": "complements",
+            "dst": "quantization"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1"
+        ]
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.15145799989113584,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": true,
+        "reason": "The evidence includes direct comparisons between full fine-tuning and LoRA methods, discussing the resource cost of full fine-tuning and its broader impact on model capabilities.",
+        "next_action": "proceed"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to graph (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.19412499750615098,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "graph",
+        "scores": {},
+        "reason": "heuristic: 2 known entities matched in the sub-question text, so graph traversal is likely to find directly connected evidence (this is a deterministic string-match rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "graph_seed",
+      "label": "Seed entities (2 matched)",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 0.18245800310978666,
+      "explain": "Entity mentions in the sub-question are matched against the pre-built knowledge graph's vocabulary. The route heuristic chose this tool because at least one entity matched here.",
+      "payload": {
+        "entities": [
+          "fine-tuning",
+          "lora"
+        ]
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.05095799861010164,
+      "explain": "Two-hop traversal from the seed entities pulls in chunks connected to the sub-question's topic even when they share no textual or semantic similarity with it directly.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "persists across",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "memory",
+            "rel": "drifts",
+            "dst": "drift"
+          },
+          {
+            "src": "memory",
+            "rel": "is separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "governs",
+            "dst": "prompt template"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "caps",
+            "dst": "planning loop"
+          },
+          {
+            "src": "memory",
+            "rel": "separate from",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "requires",
+            "dst": "guardrails"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "supports",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "latency"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tracks",
+            "dst": "refusal"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "used as yardstick for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "prevents",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "drift"
+          },
+          {
+            "src": "lora",
+            "rel": "mitigates",
+            "dst": "drift"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more prone than",
+            "dst": "lora"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "increases",
+            "dst": "vector database"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "does not compensate for",
+            "dst": "chunking"
+          },
+          {
+            "src": "chunk overlap",
+            "rel": "impacts",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "interacts with",
+            "dst": "chunk overlap"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "citation",
+            "rel": "is a",
+            "dst": "hallucination"
+          },
+          {
+            "src": "citation",
+            "rel": "results in",
+            "dst": "grounding"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "checks",
+            "dst": "citation"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "token budget"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "approaches",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "requires",
+            "dst": "kv cache"
+          },
+          {
+            "src": "kv cache",
+            "rel": "affects",
+            "dst": "latency"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "batching"
+          },
+          {
+            "src": "throughput",
+            "rel": "improved by",
+            "dst": "quantization"
+          },
+          {
+            "src": "citation",
+            "rel": "fails to catch",
+            "dst": "drift"
+          },
+          {
+            "src": "golden dataset",
+            "rel": "suffers",
+            "dst": "drift"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "uses",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is length of",
+            "dst": "embedding model"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "sets storage of",
+            "dst": "vector database"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "used by",
+            "dst": "semantic search"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "is distinct from",
+            "dst": "quantization"
+          },
+          {
+            "src": "embedding dimension",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "embedding model",
+            "rel": "has dimension",
+            "dst": "embedding dimension"
+          },
+          {
+            "src": "embedding model",
+            "rel": "enables",
+            "dst": "semantic search"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "citation"
+          },
+          {
+            "src": "semantic search",
+            "rel": "retrieves",
+            "dst": "evaluation harness"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "contrasts with",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "enables",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "reduces",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "increases risk of",
+            "dst": "hallucination"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is alternative to",
+            "dst": "lora"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less memory",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "distillation",
+            "rel": "is an alternative to",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "has quality gap with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "used before",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "incurs",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "grounding",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "system prompt",
+            "rel": "requires",
+            "dst": "citation"
+          },
+          {
+            "src": "evaluation harness",
+            "rel": "tests",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "results from",
+            "dst": "citation"
+          },
+          {
+            "src": "refusal",
+            "rel": "permitted by",
+            "dst": "prompt template"
+          },
+          {
+            "src": "guardrails",
+            "rel": "constrain",
+            "dst": "agent"
+          },
+          {
+            "src": "guardrails",
+            "rel": "mitigates",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "is a",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enforces",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "requires",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "involves",
+            "dst": "refusal"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "ignores",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "contrasts with",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "refusal"
+          },
+          {
+            "src": "hallucination",
+            "rel": "fixed by",
+            "dst": "guardrails"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "guardrails",
+            "rel": "prevent",
+            "dst": "prompt injection"
+          },
+          {
+            "src": "refusal",
+            "rel": "enforced in",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "is a stage of",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "system prompt"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "enables",
+            "dst": "prompt template"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "improves",
+            "dst": "structured output"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "includes",
+            "dst": "refusal"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "inherits from",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "needs less data than",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "structured output",
+            "rel": "more effective with",
+            "dst": "instruction tuning"
+          },
+          {
+            "src": "distillation",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "distillation",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "distillation",
+            "rel": "contrasts with",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "complements",
+            "dst": "distillation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "precedes",
+            "dst": "distillation"
+          },
+          {
+            "src": "distillation",
+            "rel": "requires evaluation on",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "distillation",
+            "rel": "impacts performance on",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "requires",
+            "dst": "memory"
+          },
+          {
+            "src": "batching",
+            "rel": "needs",
+            "dst": "kv cache"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "depends on",
+            "dst": "data quality"
+          },
+          {
+            "src": "instruction tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "requires",
+            "dst": "data quality"
+          },
+          {
+            "src": "embedding model",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "kv cache",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "lora",
+            "rel": "is a",
+            "dst": "fine-tuning"
+          },
+          {
+            "src": "lora",
+            "rel": "requires less",
+            "dst": "memory"
+          },
+          {
+            "src": "lora",
+            "rel": "combined with",
+            "dst": "quantization"
+          },
+          {
+            "src": "lora",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "citation",
+            "rel": "stored in",
+            "dst": "vector database"
+          },
+          {
+            "src": "agent",
+            "rel": "operates within",
+            "dst": "planning loop"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "multi-hop question",
+            "rel": "is a stress test for",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "handles",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "agent",
+            "rel": "resembles",
+            "dst": "planning loop"
+          },
+          {
+            "src": "planning loop",
+            "rel": "relevant to",
+            "dst": "multi-hop question"
+          },
+          {
+            "src": "planning loop",
+            "rel": "part of",
+            "dst": "agent"
+          },
+          {
+            "src": "planning loop",
+            "rel": "related to",
+            "dst": "memory"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "can reveal",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt injection",
+            "rel": "targets",
+            "dst": "agent"
+          },
+          {
+            "src": "prompt template",
+            "rel": "includes",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "enables",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "prompt template",
+            "rel": "used in",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "token budget",
+            "rel": "is part of",
+            "dst": "prompt template"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "grounding"
+          },
+          {
+            "src": "prompt template",
+            "rel": "touches",
+            "dst": "citation"
+          },
+          {
+            "src": "citation",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "refusal",
+            "rel": "evaluated against",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "planning loop"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "does not improve",
+            "dst": "latency"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "increases",
+            "dst": "latency"
+          },
+          {
+            "src": "latency",
+            "rel": "contrasts with",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "memory"
+          },
+          {
+            "src": "quantization",
+            "rel": "reduces",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "batching",
+            "rel": "improves",
+            "dst": "throughput"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "latency"
+          },
+          {
+            "src": "quantization",
+            "rel": "improves",
+            "dst": "memory"
+          },
+          {
+            "src": "batching",
+            "rel": "complements",
+            "dst": "quantization"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "uses",
+            "dst": "embedding model"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "stores vectors in",
+            "dst": "vector database"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          },
+          {
+            "src": "hallucination",
+            "rel": "lacks",
+            "dst": "grounding"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is more expensive than",
+            "dst": "prompt template"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is less suitable than",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "causes",
+            "dst": "hallucination"
+          },
+          {
+            "src": "prompt template",
+            "rel": "improves",
+            "dst": "citation"
+          },
+          {
+            "src": "prompt template",
+            "rel": "tested with",
+            "dst": "golden dataset"
+          },
+          {
+            "src": "fine-tuning",
+            "rel": "is an alternative to",
+            "dst": "retrieval-augmented generation"
+          }
+        ],
+        "chunk_ids": [
+          "ai-evaluation-for-personal-knowledge-bases::1",
+          "chain-of-thought-prompting-and-when-it-helps::0",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "continuous-batching-and-throughput::0",
+          "continuous-batching-and-throughput::1",
+          "embedding-dimension-and-model-size-tradeoffs::1",
+          "knowledge-distillation-for-smaller-models::0",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "latency-budgets-in-a-rag-pipeline::0",
+          "latency-budgets-in-a-rag-pipeline::1",
+          "latency-budgets-in-a-rag-pipeline::2",
+          "reducing-latency-with-batching::0",
+          "reducing-latency-with-batching::1",
+          "reducing-latency-with-quantization::0",
+          "reducing-latency-with-quantization::1",
+          "reranking-with-cross-encoders::1",
+          "trace-logging-for-agent-debugging::1",
+          "citation-quality-as-an-evaluation-signal::0",
+          "citation-quality-as-an-evaluation-signal::1",
+          "data-drift-and-stale-corpora::1",
+          "embeddings-and-semantic-search::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "grounding-and-the-citation-contract::0",
+          "grounding-and-the-citation-contract::1",
+          "hallucination-from-missing-context::1",
+          "metadata-and-frontmatter-discipline::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "catastrophic-forgetting-during-fine-tuning::0",
+          "catastrophic-forgetting-during-fine-tuning::1",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "instruction-tuning-basics::0",
+          "instruction-tuning-basics::1",
+          "knowledge-distillation-for-smaller-models::1",
+          "labeling-quality-for-fine-tuning-data::0",
+          "labeling-quality-for-fine-tuning-data::1"
+        ]
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n15"
+      ],
+      "duration_ms": 0.1655000014579855,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": true,
+        "reason": "The evidence directly compares full fine-tuning with LoRA, discussing their trade-offs in terms of model size and parameter updates.",
+        "next_action": "proceed"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n8",
+        "n12",
+        "n16"
+      ],
+      "duration_ms": 0.4694170020229649,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "While LoRA (Low-Rank Adaptation) indeed offers significant memory savings by training only under 1% of a model's parameters, there are scenarios where full fine-tuning might still be preferable despite the efficiency gains. Specifically, when the task at hand requires broad behavioral changes that span multiple aspects of the model's behavior, full fine-tuning can provide more comprehensive and coherent adjustments.\n\nHere\u2019s why:\n\n- **Behavioral Coherence**: Full fine-tuning trains all parameters, which allows for broader and more consistent changes in the model's behavior. This can be crucial when you need the model to learn new tasks or adapt its overall response style across a wide range of prompts. For example, if you want to significantly alter how the model handles coding instructions or mathematical reasoning, full fine-tuning might offer better consistency compared to LoRA.\n\n- **Fine-Tuned Granularity**: Full fine-tuning can provide finer-grained control over specific behaviors that may require a more holistic adjustment rather than incremental changes. For instance, if you need the model to significantly improve its ability to follow complex instructions or generate coherent text across multiple domains, full fine-tuning might be necessary.\n\n- **Avoiding Spillover Effects**: LoRA can sometimes introduce subtle spillover effects where learned behaviors from one task unintentionally affect unrelated tasks. Full fine-tuning tends to avoid these spillovers by updating all parameters in a more unified manner.\n\nTo illustrate with chunk IDs, imagine you have two chunks of text:\n\n- **Chunk ID 1 (LoRA Use Case)**: \"The model needs to learn to follow complex instructions without spilling over unwanted changes. For instance, if the model has been fine-tuned on coding tasks and then asked to handle natural language processing, LoRA might cause some coding-specific behaviors to inadvertently affect NLP outputs.\"\n\n- **Chunk ID 2 (Full Fine-Tuning Use Case)**: \"For a task that requires broad behavioral changes like improving response coherence across multiple domains or enhancing the model's overall reasoning ability, full fine-tuning ensures these changes are applied consistently and comprehensively. For example, if you need to teach the model more sophisticated reasoning skills without impacting its language generation abilities, full fine-tuning is often the better choice.\"\n\nIn summary, while LoRA offers significant efficiency benefits, there can be quality reasons to prefer full fine-tuning for tasks that require broader or more coherent changes in the model's behavior.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2542
+      }
+    }
+  ]
+}

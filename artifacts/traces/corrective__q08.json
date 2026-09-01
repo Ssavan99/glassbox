@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q08",
+  "architecture": "corrective",
+  "question": "What is a planning loop, and what four-step cycle does it repeat?",
+  "answer": "A planning loop is the reasoning structure that decides what an agent does next. It follows a four-step cycle:\n1. Observe the current state.\n2. Reason about the remaining gap between that state and the goal.\n3. Choose an action.\n4. Execute it, and repeat until the goal is reached or the loop gives up.\n\nThis cycle is described in [planning-loops-in-agents::0].",
+  "metrics": {
+    "latency_ms": 6.4943329998641275,
+    "llm_calls": 2,
+    "prompt_tokens": 2538,
+    "completion_tokens": 325
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.002986201085150242,
+          0.036855392158031464,
+          -0.04274217039346695,
+          0.0028365333564579487,
+          -0.026944532990455627,
+          0.019024215638637543,
+          -0.0700116902589798,
+          -0.03317961096763611
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.7005970478057861,
+            "rank": 1
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.5933675765991211,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.445375919342041,
+            "rank": 3
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.4365803003311157,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.3509066104888916,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "verdict": "correct",
+            "reason": "Directly supports the definition and cycle of a planning loop."
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "verdict": "ambiguous",
+            "reason": "Partially repeats information from chunk 0, not adding new relevant details about the four-step cycle."
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "verdict": "incorrect",
+            "reason": "Does not directly address the planning loop's four-step cycle but focuses on tools and memory."
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "verdict": "ambiguous",
+            "reason": "Discusses tracing loops but does not provide specific details about the four-step cycle of a planning loop."
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "verdict": "correct",
+            "reason": "Provides a general description of an AI agent that includes the concept of a planning loop and its basic function, though it does not explicitly detail the four steps."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "A planning loop is the reasoning structure that decides what an agent does next. It follows a four-step cycle:\n1. Observe the current state.\n2. Reason about the remaining gap between that state and the goal.\n3. Choose an action.\n4. Execute it, and repeat until the goal is reached or the loop gives up.\n\nThis cycle is described in [planning-loops-in-agents::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1212
+      }
+    }
+  ]
+}

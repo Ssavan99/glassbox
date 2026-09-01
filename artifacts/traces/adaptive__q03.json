@@ -1,0 +1,112 @@
+{
+  "trace_id": "adaptive::q03",
+  "architecture": "adaptive",
+  "question": "What is the difference between recall@k and MRR as retrieval metrics?",
+  "answer": "Recall\u202f@\u202fk and mean reciprocal rank (MRR) measure different aspects of a retriever\u2019s output.\n\n* **Recall\u202f@\u202fk** asks whether the correct supporting chunk appears anywhere in the top\u202fk results. It is a binary \u201cyes/no\u201d per query that is averaged over the dataset, and it does **not** distinguish where within the top\u2011k the correct chunk was placed \u2013 a hit at position\u202f1 and a hit at position\u202fk are treated the same\u202f[retrieval-metrics-recall-at-k-and-mrr::0].\n\n* **MRR** looks at the rank of the **first** correct chunk. For each query it computes\u202f`1\u202f/\u202frank` (so a hit at position\u202f1 scores\u202f1.0, at position\u202f2 scores\u202f0.5, at position\u202f10 scores\u202f0.1, etc.) and then averages these scores across queries. Because it penalizes lower\u2011rank placements, MRR is more sensitive to ordering quality\u202f[retrieval-metrics-recall-at-k-and-mrr::0][retrieval-metrics-recall-at-k-and-mrr::1].",
+  "metrics": {
+    "latency_ms": 5.642999996780418,
+    "llm_calls": 2,
+    "prompt_tokens": 2118,
+    "completion_tokens": 461
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "route",
+      "label": "Route question to naive",
+      "parent_ids": [],
+      "duration_ms": 0.6301659996097442,
+      "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
+      "payload": {
+        "chosen": "naive",
+        "scores": {
+          "naive": 1.0,
+          "hybrid": 0.0,
+          "hyde": 0.0,
+          "corrective": 0.0,
+          "graph": 0.0,
+          "agentic": 0.0
+        },
+        "reason": "The question asks for a definition or explanation of concepts (recall@k and MRR), which is a single factual concept and does not require complex decomposition or relationships between entities."
+      }
+    },
+    {
+      "id": "naive::n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once, up front, into the same vector space as the corpus chunks \u2014 naive RAG never rewrites or decomposes the query, so this single embedding is all the retrieval step has to work with.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.05425426363945007,
+          -0.05136818811297417,
+          -0.07146880775690079,
+          -0.01798461750149727,
+          -0.01048400066792965,
+          0.06113962084054947,
+          -0.00853488314896822,
+          0.02085130661725998
+        ]
+      }
+    },
+    {
+      "id": "naive::n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "naive::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Naive RAG retrieves the top-k chunks by raw cosine similarity to the question \u2014 no reranking, no query rewriting, no fusion; this is the simplest possible retrieval step and everything else in the project is a deliberate improvement on it.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.6741985082626343,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.6377052068710327,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.5033210515975952,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.48713165521621704,
+            "rank": 4
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.43530768156051636,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "naive::n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "naive::n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The retrieved chunks are stuffed directly into a single prompt and handed to the LLM in one shot \u2014 naive RAG trusts that whatever the top-k retrieval found is sufficient context, with no verification or correction step before generating.",
+      "payload": {
+        "output": "Recall\u202f@\u202fk and mean reciprocal rank (MRR) measure different aspects of a retriever\u2019s output.\n\n* **Recall\u202f@\u202fk** asks whether the correct supporting chunk appears anywhere in the top\u202fk results. It is a binary \u201cyes/no\u201d per query that is averaged over the dataset, and it does **not** distinguish where within the top\u2011k the correct chunk was placed \u2013 a hit at position\u202f1 and a hit at position\u202fk are treated the same\u202f[retrieval-metrics-recall-at-k-and-mrr::0].\n\n* **MRR** looks at the rank of the **first** correct chunk. For each query it computes\u202f`1\u202f/\u202frank` (so a hit at position\u202f1 scores\u202f1.0, at position\u202f2 scores\u202f0.5, at position\u202f10 scores\u202f0.1, etc.) and then averages these scores across queries. Because it penalizes lower\u2011rank placements, MRR is more sensitive to ordering quality\u202f[retrieval-metrics-recall-at-k-and-mrr::0][retrieval-metrics-recall-at-k-and-mrr::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1896
+      }
+    }
+  ]
+}

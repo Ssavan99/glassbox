@@ -1,0 +1,465 @@
+{
+  "trace_id": "agentic::q04",
+  "architecture": "agentic",
+  "question": "What is a silent failure, and why is it considered the most expensive category of failure?",
+  "answer": "A silent failure is when the system returns an answer that looks perfectly normal\u2014confidently phrased, well\u2011formatted, and presented just like a correct response\u2014but actually is wrong, incomplete, or based on incorrect evidence, and it gives no indication that anything went awry. Because users automatically trust such output and only discover the mistake if they independently verify the claim (something most people never do), silent failures are the costliest type of error for any relied\u2011upon system. \u3010silent-failures-and-the-value-of-refusal::0\u3011",
+  "metrics": {
+    "latency_ms": 28477.52687499451,
+    "llm_calls": 7,
+    "prompt_tokens": 5431,
+    "completion_tokens": 655
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "plan",
+      "label": "Plan (3 sub-question(s))",
+      "parent_ids": [],
+      "duration_ms": 0.31354200473288074,
+      "explain": "The question is decomposed into up to 3 sub-questions that together cover what's needed to answer it. If the LLM's response was malformed, empty, or not a list, this falls back to treating the original question as the sole sub-question rather than proceeding with zero sub-questions.",
+      "payload": {
+        "sub_questions": [
+          "What is a silent failure in the context of systems or software?",
+          "What are the characteristics and consequences of silent failures that differentiate them from other types of failures?",
+          "Why are silent failures considered the most expensive category of failure, in terms of detection, impact, and remediation costs?"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.3018750066985376,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 29.23383300367277,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.0012818099930882454,
+          -0.014674827456474304,
+          -0.01628016121685505,
+          -0.0011024987325072289,
+          0.036381952464580536,
+          -0.06692621111869812,
+          0.0395357646048069,
+          0.0676581859588623
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.9130839971476234,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::0",
+            "score": 0.6644622087478638,
+            "rank": 1
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::2",
+            "score": 0.34645965695381165,
+            "rank": 2
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 0.3329242467880249,
+            "rank": 3
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::0",
+            "score": 0.32998746633529663,
+            "rank": 4
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.32362550497055054,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.672499998472631,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": true,
+        "reason": "The excerpts provide a clear definition of silent failures in the context of systems or software.",
+        "next_action": "proceed"
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.14512499910779297,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n7",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n6"
+      ],
+      "duration_ms": 44.90562499995576,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.014451275579631329,
+          -0.009982867166399956,
+          0.07759761810302734,
+          0.048261865973472595,
+          0.010515709407627583,
+          -0.000523083726875484,
+          0.01096614170819521,
+          0.02727583795785904
+        ]
+      }
+    },
+    {
+      "id": "n8",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n7"
+      ],
+      "duration_ms": 0.04379099846119061,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::0",
+            "score": 0.6370511054992676,
+            "rank": 1
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 0.36280983686447144,
+            "rank": 2
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.28936266899108887,
+            "rank": 3
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 0.27592161297798157,
+            "rank": 4
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.27228233218193054,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n9",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n8"
+      ],
+      "duration_ms": 0.9982080009649508,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The evidence does not directly address the characteristics and consequences of silent failures that differentiate them from other types of failures.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n9"
+      ],
+      "duration_ms": 0.0012500022421590984,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n10"
+      ],
+      "duration_ms": 0.3659170033643022,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::0",
+            "score": 17.661533414139544,
+            "rank": 1
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 15.02233988385656,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::0",
+            "score": 14.703312018860561,
+            "rank": 3
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": 14.407804023455729,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 13.706071499853174,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n11"
+      ],
+      "duration_ms": 0.16691700147930533,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address the characteristics and consequences of silent failures or how they differ from other types of failures.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "route",
+      "label": "Route sub-question to dense (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.14399999781744555,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "dense",
+        "scores": {},
+        "reason": "heuristic: no graph entities matched and no exact-looking token was found, so semantic similarity search is the default choice (this is a deterministic fallback rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "embed_query",
+      "label": "Embed sub-question for dense retrieval",
+      "parent_ids": [
+        "n13"
+      ],
+      "duration_ms": 41.53349999978673,
+      "explain": "The sub-question is embedded so it can be compared against the corpus's dense vector store. Same embedding step every other dense-retrieval architecture in this project uses.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.037193458527326584,
+          -0.019964750856161118,
+          0.0483645498752594,
+          0.03810782730579376,
+          0.07384246587753296,
+          -0.01824863813817501,
+          0.019423583522439003,
+          0.07730003446340561
+        ]
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n14"
+      ],
+      "duration_ms": 0.5453330013551749,
+      "explain": "Standard top-k dense retrieval by cosine similarity, chosen by the route heuristic as the default tool when no graph entities or exact-looking tokens matched this sub-question.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::0",
+            "score": 0.5465739369392395,
+            "rank": 1
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 0.32150667905807495,
+            "rank": 2
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::1",
+            "score": 0.3013434112071991,
+            "rank": 3
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.2603453993797302,
+            "rank": 4
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.2578582465648651,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 1)",
+      "parent_ids": [
+        "n15"
+      ],
+      "duration_ms": 0.31308300094679,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address the cost aspects of silent failures in terms of detection, impact, and remediation. It focuses on the nature and implications of silent failures but lacks specific information on costs.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "route",
+      "label": "Route sub-question to sparse (attempt 2)",
+      "parent_ids": [
+        "n16"
+      ],
+      "duration_ms": 0.0010830044629983604,
+      "explain": "Tool choice is a cheap deterministic heuristic, not an LLM judgment (unlike Adaptive's router) -- this is what keeps the LLM-call budget provably bounded while still doing three genuinely different kinds of retrieval. heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)",
+      "payload": {
+        "chosen": "sparse",
+        "scores": {},
+        "reason": "heuristic: retry attempt after attempt 1 was judged insufficient -- deterministically switching away from the first attempt's tool (dense) to sparse rather than re-running the same search (this is a deterministic rule, not an LLM judgment)"
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "retrieve_sparse",
+      "label": "Top-5 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n17"
+      ],
+      "duration_ms": 0.3785410008276813,
+      "explain": "Keyword/BM25 retrieval, chosen by the route heuristic because this sub-question contained an exact-looking token (a quoted string, a --flag, or an ALL-CAPS acronym) that literal keyword matching handles better than semantic similarity would.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::0",
+            "score": 24.892361435049423,
+            "rank": 1
+          },
+          {
+            "chunk_id": "guardrails-for-autonomous-actions::0",
+            "score": 14.049190456758065,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::1",
+            "score": 13.787406309282325,
+            "rank": 3
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 13.51437834536212,
+            "rank": 4
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 13.338580723676348,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "reflect",
+      "label": "Reflect on sufficiency (attempt 2)",
+      "parent_ids": [
+        "n18"
+      ],
+      "duration_ms": 0.22891700064064935,
+      "explain": "This is the actual 'agentic' judgment in this architecture: a genuine LLM self-assessment of whether the retrieved evidence is enough to answer the sub-question, deciding whether a second retrieval attempt (with a different tool) is worth its cost. This is what separates Agentic from a fixed pipeline -- every other decision in this run is a zero-cost heuristic.",
+      "payload": {
+        "sufficient": false,
+        "reason": "The provided evidence does not directly address the costs associated with silent failures in terms of detection, impact, or remediation. The excerpts are about different topics such as autonomous actions, latency reduction, citation quality, and fine-tuning.",
+        "next_action": "retrieve_more"
+      }
+    },
+    {
+      "id": "n20",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5",
+        "n12",
+        "n19"
+      ],
+      "duration_ms": 28356.20412499702,
+      "explain": "The final answer is generated from the *original* question (never a sub-question) using the deduplicated union of chunks gathered from each sub-question's last attempt -- attempt 2's results if a retry happened for that sub-question, otherwise attempt 1's. Parented on every sub-question's last node, not just the final one processed, since the answer draws on evidence from all of them.",
+      "payload": {
+        "output": "A silent failure is when the system returns an answer that looks perfectly normal\u2014confidently phrased, well\u2011formatted, and presented just like a correct response\u2014but actually is wrong, incomplete, or based on incorrect evidence, and it gives no indication that anything went awry. Because users automatically trust such output and only discover the mistake if they independently verify the claim (something most people never do), silent failures are the costliest type of error for any relied\u2011upon system. \u3010silent-failures-and-the-value-of-refusal::0\u3011",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 3546
+      }
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q10",
+  "architecture": "corrective",
+  "question": "Why does a golden dataset need to stay fixed rather than being regenerated each time a system is evaluated?",
+  "answer": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions. This is explicitly stated in [building-a-golden-dataset-for-rag-evaluation::0].",
+  "metrics": {
+    "latency_ms": 5.994125000142958,
+    "llm_calls": 2,
+    "prompt_tokens": 2791,
+    "completion_tokens": 326
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.04428138956427574,
+          -0.024705590680241585,
+          -0.0043214899487793446,
+          0.04816683381795883,
+          0.044154368340969086,
+          -0.04122016951441765,
+          -0.024035437032580376,
+          -0.0033498380798846483
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "score": 0.5534127354621887,
+            "rank": 1
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "score": 0.4605345129966736,
+            "rank": 2
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.45847973227500916,
+            "rank": 3
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.4515267610549927,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.44375213980674744,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "building-a-golden-dataset-for-rag-evaluation::0",
+            "verdict": "correct",
+            "reason": "This chunk directly supports the question by explaining why a golden dataset needs to stay fixed, highlighting the importance of stability for evaluating system improvements."
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::1",
+            "verdict": "correct",
+            "reason": "This chunk provides additional context on why a fixed evaluation set is necessary, discussing how changes in the corpus can make recorded correct answers outdated, thus supporting the need for a fixed dataset."
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "verdict": "ambiguous",
+            "reason": "While this chunk discusses drift and its implications, it does not directly address why a golden dataset needs to stay fixed during system evaluations."
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "verdict": "ambiguous",
+            "reason": ""
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "verdict": "correct",
+            "reason": "This chunk further reinforces the need for a fixed evaluation set by explaining how such a dataset allows for consistent and measurable testing, directly supporting why a golden dataset should remain unchanged during evaluations."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "A golden dataset needs to stay fixed rather than being regenerated each time a system is evaluated because if the test set drifts every time you evaluate, you cannot tell whether a score change reflects a real improvement or just a different, easier set of questions. This is explicitly stated in [building-a-golden-dataset-for-rag-evaluation::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1440
+      }
+    }
+  ]
+}

@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q01",
+  "architecture": "hybrid",
+  "question": "What does LoRA freeze, and roughly what fraction of a model's parameters does it actually train?",
+  "answer": "LoRA leaves **all of the original model\u2019s weights frozen** \u2013 it does not modify any of the pretrained weight matrices.\u202fInstead it inserts a tiny pair of low\u2011rank adapter matrices for each layer and **only updates those added matrices** during training.\u202fBecause the adapters are so small, the trainable portion is typically **well under\u202f1\u202f% of the total parameters** of the base model\u3010lora-and-parameter-efficient-fine-tuning::0\u3011.",
+  "metrics": {
+    "latency_ms": 3211.497208001674,
+    "llm_calls": 1,
+    "prompt_tokens": 1424,
+    "completion_tokens": 290
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.055106084793806076,
+          -0.09353601932525635,
+          -0.005627036560326815,
+          0.05775719881057739,
+          0.03663691133260727,
+          -0.004505167715251446,
+          -0.051977843046188354,
+          0.01977098360657692
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.5921176075935364,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.5837281942367554,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.5608687400817871,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.5349644422531128,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.46263113617897034,
+            "rank": 5
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.38626837730407715,
+            "rank": 6
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.3819776773452759,
+            "rank": 7
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.3485260009765625,
+            "rank": 8
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.3212845027446747,
+            "rank": 9
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.31151652336120605,
+            "rank": 10
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.2856040298938751,
+            "rank": 11
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.2810751497745514,
+            "rank": 12
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.2809978723526001,
+            "rank": 13
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.26018428802490234,
+            "rank": 14
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::0",
+            "score": 0.25867295265197754,
+            "rank": 15
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::2",
+            "score": 0.25728678703308105,
+            "rank": 16
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::1",
+            "score": 0.24938111007213593,
+            "rank": 17
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.2385106086730957,
+            "rank": 18
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.23652413487434387,
+            "rank": 19
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::1",
+            "score": 0.22936873137950897,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 18.04922415004237,
+            "rank": 1
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 15.359222661214234,
+            "rank": 2
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 15.209285372815385,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 14.252173156789699,
+            "rank": 4
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 13.721973693523436,
+            "rank": 5
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 12.733659507009353,
+            "rank": 6
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 11.645149983053885,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 11.427376103224178,
+            "rank": 8
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 11.235886219441454,
+            "rank": 9
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 11.061641078905597,
+            "rank": 10
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 10.691100229102384,
+            "rank": 11
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 10.270240017148398,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 9.954833681736918,
+            "rank": 13
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 9.68665872251228,
+            "rank": 14
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 9.603485280276495,
+            "rank": 15
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 9.471694244371294,
+            "rank": 16
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 9.205586986743823,
+            "rank": 17
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 9.19881867799262,
+            "rank": 18
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 9.197638547755805,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 9.176196709259212,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.032018442622950824,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.03200204813108039,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.03200204813108039,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.031009615384615385,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.03047794966520434,
+            "rank": 5
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.029437229437229435,
+            "rank": 6
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.028814262023217248,
+            "rank": 7
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.028381642512077296,
+            "rank": 8
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.015151515151515152,
+            "rank": 10
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.014925373134328358,
+            "rank": 11
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.014492753623188406,
+            "rank": 14
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.014285714285714285,
+            "rank": 15
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.014084507042253521,
+            "rank": 16
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.0136986301369863,
+            "rank": 17
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.0136986301369863,
+            "rank": 18
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.013513513513513514,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.013513513513513514,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.032018442622950824,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.03200204813108039,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.03200204813108039,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.031009615384615385,
+            "rank": 4
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.03047794966520434,
+            "rank": 5
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.029437229437229435,
+            "rank": 6
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.028814262023217248,
+            "rank": 7
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.028381642512077296,
+            "rank": 8
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::0",
+            "score": 0.015384615384615385,
+            "rank": 9
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.015151515151515152,
+            "rank": 10
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.014925373134328358,
+            "rank": 11
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::1",
+            "score": 0.014492753623188406,
+            "rank": 14
+          },
+          {
+            "chunk_id": "temperature-and-sampling-controls::0",
+            "score": 0.014285714285714285,
+            "rank": 15
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.014084507042253521,
+            "rank": 16
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.0136986301369863,
+            "rank": 17
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.0136986301369863,
+            "rank": 18
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.013513513513513514,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.013513513513513514,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 5.843773365020752,
+            "rank": 1
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 4.9152679443359375,
+            "rank": 2
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.9861763119697571,
+            "rank": 3
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.05425640195608139,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": -0.3244345486164093,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "LoRA leaves **all of the original model\u2019s weights frozen** \u2013 it does not modify any of the pretrained weight matrices.\u202fInstead it inserts a tiny pair of low\u2011rank adapter matrices for each layer and **only updates those added matrices** during training.\u202fBecause the adapters are so small, the trainable portion is typically **well under\u202f1\u202f% of the total parameters** of the base model\u3010lora-and-parameter-efficient-fine-tuning::0\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1714
+      }
+    }
+  ]
+}

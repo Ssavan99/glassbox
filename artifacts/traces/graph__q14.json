@@ -1,0 +1,269 @@
+{
+  "trace_id": "graph::q14",
+  "architecture": "graph",
+  "question": "A needle-in-a-haystack test can score perfectly on recall@k while the assembled answer is still wrong \u2014 what's the mechanism behind that gap, and where in the pipeline does the actual fix belong?",
+  "answer": "A needle-in-a-haystack (NiAH) test can score perfectly on recall@k but still have an incorrect final answer because the model finds exactly k relevant chunks containing correct information, but those chunks are not logically coherent or do not fully address the query. The mechanism behind this gap is often related to how the system assembles and integrates these chunks.\n\nIn such cases, the issue lies more in the integration and contextual understanding of the retrieved chunks rather than their individual correctness. This highlights a limitation in how well the model synthesizes information from multiple sources to produce a cohesive answer.\n\n**Fixing the Issue:**\n\n1. **Grounding and Contextualization**: The problem often stems from a lack of proper grounding, where the system may not be effectively leveraging the context within which retrieved chunks are provided. This can be addressed by enhancing the chunk selection process to ensure that the selected chunks logically connect to form a coherent response.\n\n2. **Post-Processing Logic**: Implementing more sophisticated post-processing logic, such as logical connectors or natural language generation techniques, can help in stitching together the retrieved chunks into a seamless and contextually appropriate answer.\n\n3. **Refinement Steps**: Adding refinement steps that evaluate the logical consistency of the assembled answer could help identify and correct inconsistencies between the selected chunks.\n\n4. **Knowledge Integration Frameworks**: Utilizing more advanced knowledge integration frameworks that can handle the complex task of synthesizing multiple pieces of information into a single, coherent response might be necessary.\n\nIn summary, while recall@k focuses on finding relevant chunks, ensuring that these chunks form a logically consistent and contextually appropriate answer involves steps beyond just chunk selection. Addressing this requires refining how the system integrates and contextualizes the retrieved information.\n\n**Citation:**\n\n- [full-fine-tuning-vs-adapters::0] Discusses the importance of model grounding in adapting to new tasks.\n- [kv-cache-and-why-it-matters-for-serving::0] Highlights the need for proper chunk handling and context management in serving large models efficiently.\n- [reducing-latency-with-quantization::0] Suggests improving efficiency through better integration, even when memory footprint is reduced.",
+  "metrics": {
+    "latency_ms": 0.8664999986649491,
+    "llm_calls": 1,
+    "prompt_tokens": 2050,
+    "completion_tokens": 439
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "graph_seed",
+      "label": "Seed entities (1 matched)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "Graph RAG finds a completely different entry point than embedding-based retrieval: instead of measuring semantic similarity between a query vector and chunk vectors, it matches literal entity mentions in the question against the pre-built knowledge graph's vocabulary to jump straight to a set of graph nodes. This is a pure string-matching heuristic with no LLM call \u2014 the corpus was already mined for entities and relations offline when the graph was built.",
+      "payload": {
+        "entities": [
+          "needle in a haystack"
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "graph_expand",
+      "label": "2-hop expansion (40 chunks)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Two-hop traversal from the seed entities can surface facts connected to the question's topic that never share a chunk with it at all \u2014 a fact only reachable by walking src -> rel -> dst -> rel -> dst through the graph. This is the opposite failure mode from embedding-based retrieval, which can only find chunks that are textually or semantically close to the query itself, not ones connected to it only through an intermediate entity.",
+      "payload": {
+        "hops": 2,
+        "edges": [
+          {
+            "src": "memory",
+            "rel": "limited by",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "needs",
+            "dst": "memory"
+          },
+          {
+            "src": "memory",
+            "rel": "outlives",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "remembers",
+            "dst": "memory"
+          },
+          {
+            "src": "context window",
+            "rel": "constrained by",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "has",
+            "dst": "memory"
+          },
+          {
+            "src": "agent",
+            "rel": "affected by",
+            "dst": "memory"
+          },
+          {
+            "src": "chunking",
+            "rel": "influences",
+            "dst": "retrieval-augmented generation"
+          },
+          {
+            "src": "chunking",
+            "rel": "conserves",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "uses",
+            "dst": "token budget"
+          },
+          {
+            "src": "chunking",
+            "rel": "wastes",
+            "dst": "token budget"
+          },
+          {
+            "src": "system prompt",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "chunking",
+            "rel": "counts toward",
+            "dst": "context window"
+          },
+          {
+            "src": "token budget",
+            "rel": "exceeds",
+            "dst": "context window"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "cost is",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "has tradeoff with",
+            "dst": "token budget"
+          },
+          {
+            "src": "few-shot prompting",
+            "rel": "consumes",
+            "dst": "context window"
+          },
+          {
+            "src": "system prompt",
+            "rel": "alternative to",
+            "dst": "few-shot prompting"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "depends on",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "hands off to",
+            "dst": "agent"
+          },
+          {
+            "src": "memory",
+            "rel": "is dumped into",
+            "dst": "context window"
+          },
+          {
+            "src": "agent",
+            "rel": "exceeds",
+            "dst": "token budget"
+          },
+          {
+            "src": "agent",
+            "rel": "uses",
+            "dst": "context window"
+          },
+          {
+            "src": "context window",
+            "rel": "affects",
+            "dst": "needle in a haystack"
+          },
+          {
+            "src": "system prompt",
+            "rel": "provides",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "degrades",
+            "dst": "grounding"
+          },
+          {
+            "src": "context window",
+            "rel": "constrains",
+            "dst": "token budget"
+          },
+          {
+            "src": "token budget",
+            "rel": "allocates space for",
+            "dst": "system prompt"
+          },
+          {
+            "src": "retrieval-augmented generation",
+            "rel": "retrieves",
+            "dst": "chunking"
+          }
+        ],
+        "chunk_ids": [
+          "building-a-golden-dataset-for-rag-evaluation::0",
+          "chunk-overlap-and-why-it-matters::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::0",
+          "few-shot-prompting-for-grounded-answers::0",
+          "fine-tuning-versus-retrieval-augmented-generation::0",
+          "fine-tuning-versus-retrieval-augmented-generation::1",
+          "multi-hop-questions-and-why-they-break-retrieval::1",
+          "prompt-templates-for-retrieval-augmented-answers::0",
+          "retrieval-augmented-generation-basics::0",
+          "when-fine-tuning-is-the-wrong-tool::0",
+          "when-fine-tuning-is-the-wrong-tool::1",
+          "agent-memory-and-context-management::0",
+          "agent-memory-and-context-management::1",
+          "ai-agents-and-tool-use::0",
+          "ai-agents-and-tool-use::1",
+          "ai-agents-and-tool-use::2",
+          "guardrails-for-autonomous-actions::0",
+          "multi-agent-systems-and-handoffs::0",
+          "multi-agent-systems-and-handoffs::1",
+          "planning-loops-in-agents::1",
+          "prompt-injection-attacks-explained::1",
+          "rate-limits-and-retry-storms::1",
+          "chunking-strategy-and-chunk-size-tradeoffs::1",
+          "context-window-overflow-and-truncation::0",
+          "few-shot-prompting-for-grounded-answers::1",
+          "needle-in-a-haystack-evaluation::1",
+          "prompt-engineering-as-interface-design::1",
+          "chain-of-thought-prompting-and-when-it-helps::1",
+          "cleaning-noisy-source-documents::1",
+          "context-window-overflow-and-truncation::1",
+          "context-window-overflow-and-truncation::2",
+          "prompt-templates-for-retrieval-augmented-answers::1",
+          "full-fine-tuning-vs-adapters::0",
+          "full-fine-tuning-vs-adapters::1",
+          "full-fine-tuning-vs-adapters::2",
+          "kv-cache-and-why-it-matters-for-serving::0",
+          "kv-cache-and-why-it-matters-for-serving::1",
+          "lora-and-parameter-efficient-fine-tuning::0",
+          "lora-and-parameter-efficient-fine-tuning::1",
+          "reducing-latency-with-quantization::0"
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The chunks gathered from graph expansion, plus the community summaries for any communities the touched entities belong to, are stuffed into a single prompt and handed to the LLM in one shot \u2014 the only LLM call this architecture makes online, since seeding and expansion are both pure graph traversal.",
+      "payload": {
+        "output": "A needle-in-a-haystack (NiAH) test can score perfectly on recall@k but still have an incorrect final answer because the model finds exactly k relevant chunks containing correct information, but those chunks are not logically coherent or do not fully address the query. The mechanism behind this gap is often related to how the system assembles and integrates these chunks.\n\nIn such cases, the issue lies more in the integration and contextual understanding of the retrieved chunks rather than their individual correctness. This highlights a limitation in how well the model synthesizes information from multiple sources to produce a cohesive answer.\n\n**Fixing the Issue:**\n\n1. **Grounding and Contextualization**: The problem often stems from a lack of proper grounding, where the system may not be effectively leveraging the context within which retrieved chunks are provided. This can be addressed by enhancing the chunk selection process to ensure that the selected chunks logically connect to form a coherent response.\n\n2. **Post-Processing Logic**: Implementing more sophisticated post-processing logic, such as logical connectors or natural language generation techniques, can help in stitching together the retrieved chunks into a seamless and contextually appropriate answer.\n\n3. **Refinement Steps**: Adding refinement steps that evaluate the logical consistency of the assembled answer could help identify and correct inconsistencies between the selected chunks.\n\n4. **Knowledge Integration Frameworks**: Utilizing more advanced knowledge integration frameworks that can handle the complex task of synthesizing multiple pieces of information into a single, coherent response might be necessary.\n\nIn summary, while recall@k focuses on finding relevant chunks, ensuring that these chunks form a logically consistent and contextually appropriate answer involves steps beyond just chunk selection. Addressing this requires refining how the system integrates and contextualizes the retrieved information.\n\n**Citation:**\n\n- [full-fine-tuning-vs-adapters::0] Discusses the importance of model grounding in adapting to new tasks.\n- [kv-cache-and-why-it-matters-for-serving::0] Highlights the need for proper chunk handling and context management in serving large models efficiently.\n- [reducing-latency-with-quantization::0] Suggests improving efficiency through better integration, even when memory footprint is reduced.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 2489
+      }
+    }
+  ]
+}

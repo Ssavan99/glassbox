@@ -1,0 +1,127 @@
+{
+  "trace_id": "adaptive::q09",
+  "architecture": "adaptive",
+  "question": "What is few-shot prompting, and what tradeoff does it create specifically in a RAG prompt?",
+  "answer": "Few\u2011shot prompting means putting a small number of complete input\u2011output demonstrations directly into the prompt so the model can infer the desired format and behavior from those examples rather than from abstract instructions\u202f\u2014\u202ffor a retrieval\u2011augmented generation (RAG) system this usually looks like showing a question, some retrieved context, and a correctly grounded answer with citations before the real query\u202f\u3010few-shot-prompting-for-grounded-answers::0\u3011.  \n\nThe trade\u2011off it creates in a RAG prompt is that each demonstration consumes tokens in the limited context window, competing with the space needed for the retrieved evidence and the model\u2019s answer. Consequently, a prompt with many or verbose few\u2011shot examples leaves less room for the retrieved chunks, whereas using fewer or tighter examples preserves more evidence for the current question\u202f\u3010few-shot-prompting-for-grounded-answers::1\u3011.",
+  "metrics": {
+    "latency_ms": 3753.599416995712,
+    "llm_calls": 3,
+    "prompt_tokens": 2091,
+    "completion_tokens": 449
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "route",
+      "label": "Route question to hyde",
+      "parent_ids": [],
+      "duration_ms": 0.4162920013186522,
+      "explain": "This is the one genuinely LLM-driven routing decision in the whole project: the LLM classifies the question and picks which entire architecture -- not which retrieval tool -- is best suited to answer it, weighing tradeoffs like keyword-sensitivity, multi-hop complexity, or likely-unanswerability. Contrast this with Agentic's `route` node, which shares this node kind but is a zero-cost deterministic heuristic picking a retrieval tool for one sub-question, not an LLM judgment picking a pipeline. If the router's response was malformed, missing, or named an architecture that doesn't exist, this falls back to naive as the safe default rather than crashing or guessing.",
+      "payload": {
+        "chosen": "hyde",
+        "scores": {
+          "naive": 0.0,
+          "hybrid": 0.0,
+          "hyde": 1.0,
+          "corrective": 0.0,
+          "graph": 0.0,
+          "agentic": 0.0
+        },
+        "reason": "The question asks for a definition and an explanation of few-shot prompting, which involves understanding different phrasings and concepts. This makes the hyde architecture suitable as it generates a hypothetical answer first before retrieving from the corpus."
+      }
+    },
+    {
+      "id": "hyde::n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "Few-shot prompting involves providing a few example tasks or solutions within the initial prompt to guide the model. This approach can reduce the need for extensive instructions but may introduce a tradeoff by potentially increasing the response length, as the examples themselves contribute to the output size.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 170
+      }
+    },
+    {
+      "id": "hyde::n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "hyde::n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.0752711370587349,
+          0.03158899396657944,
+          0.06030243635177612,
+          0.013306918554008007,
+          0.0765366181731224,
+          0.014579089358448982,
+          -0.01886652782559395,
+          0.06789851933717728
+        ]
+      }
+    },
+    {
+      "id": "hyde::n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "hyde::n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::1",
+            "score": 0.7684643864631653,
+            "rank": 1
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.762742280960083,
+            "rank": 2
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.5895156860351562,
+            "rank": 3
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::1",
+            "score": 0.5141777992248535,
+            "rank": 4
+          },
+          {
+            "chunk_id": "instruction-tuning-basics::0",
+            "score": 0.4923855662345886,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "hyde::n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "hyde::n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "Few\u2011shot prompting means putting a small number of complete input\u2011output demonstrations directly into the prompt so the model can infer the desired format and behavior from those examples rather than from abstract instructions\u202f\u2014\u202ffor a retrieval\u2011augmented generation (RAG) system this usually looks like showing a question, some retrieved context, and a correctly grounded answer with citations before the real query\u202f\u3010few-shot-prompting-for-grounded-answers::0\u3011.  \n\nThe trade\u2011off it creates in a RAG prompt is that each demonstration consumes tokens in the limited context window, competing with the space needed for the retrieved evidence and the model\u2019s answer. Consequently, a prompt with many or verbose few\u2011shot examples leaves less room for the retrieved chunks, whereas using fewer or tighter examples preserves more evidence for the current question\u202f\u3010few-shot-prompting-for-grounded-answers::1\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1673
+      }
+    }
+  ]
+}

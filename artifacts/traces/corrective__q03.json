@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q03",
+  "architecture": "corrective",
+  "question": "What is the difference between recall@k and MRR as retrieval metrics?",
+  "answer": "Recall\u202f@\u202fk and mean reciprocal rank (MRR) measure different aspects of a retriever\u2019s output.  \n\n* **Recall\u202f@\u202fk** asks, for each query, whether any correct chunk appears anywhere in the top\u2011k results. It is a binary yes/no per query that is then averaged over the dataset, and it treats a correct chunk at position\u202f1 the same as one at position\u202fk\u202f\u2014 it does **not** consider the exact rank, only presence within the top\u202fk\u202f[retrieval-metrics-recall-at-k-and-mrr::0].\n\n* **MRR** looks at the exact position of the first correct chunk. For each query it computes\u202f`1\u202f/\u202frank` of that chunk (so rank\u202f1\u202f\u2192\u202f1.0, rank\u202f2\u202f\u2192\u202f0.5, rank\u202f10\u202f\u2192\u202f0.1) and then averages across queries. Because it rewards higher\u2011ranked hits and penalizes lower\u2011ranked ones, it is a more **sensitive** metric for raw ranking quality [retrieval-metrics-recall-at-k-and-mrr::0][retrieval-metrics-recall-at-k-and-mrr::1].\n\nIn short, recall\u202f@\u202fk measures *whether* the right evidence is retrieved within the top\u2011k, while MRR measures *how high* that evidence appears in the ranking.",
+  "metrics": {
+    "latency_ms": 10562.79650000215,
+    "llm_calls": 2,
+    "prompt_tokens": 2618,
+    "completion_tokens": 697
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.05425426363945007,
+          -0.05136818811297417,
+          -0.07146880775690079,
+          -0.01798461750149727,
+          -0.01048400066792965,
+          0.06113962084054947,
+          -0.00853488314896822,
+          0.02085130661725998
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.6741985082626343,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.6377052068710327,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.5033210515975952,
+            "rank": 3
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "score": 0.48713165521621704,
+            "rank": 4
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "score": 0.43530768156051636,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "verdict": "correct",
+            "reason": "Directly supports the question by explaining the differences and applications of recall@k and MRR."
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "verdict": "correct",
+            "reason": "Clearly defines and contrasts recall@k and MRR, directly answering the question."
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "verdict": "ambiguous",
+            "reason": "While related to retrieval metrics, it does not specifically address the difference between recall@k and MRR."
+          },
+          {
+            "chunk_id": "retrieval-failures-lost-in-the-middle::0",
+            "verdict": "incorrect",
+            "reason": "Does not pertain to the question about recall@k and MRR but discusses a different issue in retrieval systems."
+          },
+          {
+            "chunk_id": "deduplication-in-training-and-corpus-data::0",
+            "verdict": "incorrect",
+            "reason": "Focuses on deduplication issues rather than explaining the difference between recall@k and MRR."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "Recall\u202f@\u202fk and mean reciprocal rank (MRR) measure different aspects of a retriever\u2019s output.  \n\n* **Recall\u202f@\u202fk** asks, for each query, whether any correct chunk appears anywhere in the top\u2011k results. It is a binary yes/no per query that is then averaged over the dataset, and it treats a correct chunk at position\u202f1 the same as one at position\u202fk\u202f\u2014 it does **not** consider the exact rank, only presence within the top\u202fk\u202f[retrieval-metrics-recall-at-k-and-mrr::0].\n\n* **MRR** looks at the exact position of the first correct chunk. For each query it computes\u202f`1\u202f/\u202frank` of that chunk (so rank\u202f1\u202f\u2192\u202f1.0, rank\u202f2\u202f\u2192\u202f0.5, rank\u202f10\u202f\u2192\u202f0.1) and then averages across queries. Because it rewards higher\u2011ranked hits and penalizes lower\u2011ranked ones, it is a more **sensitive** metric for raw ranking quality [retrieval-metrics-recall-at-k-and-mrr::0][retrieval-metrics-recall-at-k-and-mrr::1].\n\nIn short, recall\u202f@\u202fk measures *whether* the right evidence is retrieved within the top\u2011k, while MRR measures *how high* that evidence appears in the ranking.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1494
+      }
+    }
+  ]
+}

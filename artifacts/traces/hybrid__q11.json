@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q11",
+  "architecture": "hybrid",
+  "question": "LoRA trains under 1% of a model's parameters, cutting GPU memory and letting adapters be swapped per task \u2014 given that efficiency, is there ever a real quality reason to still pick full fine-tuning over it, and if so, what is it?",
+  "answer": "Yes.  While LoRA\u2019s parameter\u2011efficiency makes it attractive, full fine\u2011tuning can still be the better choice when the target task demands a **substantially larger behavioural shift** than the base model already supports.  \n\n* Full fine\u2011tuning updates every weight, giving the model the **largest hypothesis space** and, in most published studies, a **small but real edge in final task performance** \u2013 especially on tasks that are **far outside the model\u2019s pre\u2011training distribution**\u202f\u3010full-fine-tuning-vs-adapters::0\u3011.  \n* That quality gap **widens** for tasks that require the model to acquire **new capabilities** that the frozen base cannot capture with a low\u2011rank adapter\u202f\u3010full-fine-tuning-vs-adapters::1\u3011.  \n* Consequently, practitioners \u201cescalate to full fine\u2011tuning only if a measured evaluation gap actually justifies the added memory and storage cost\u201d\u202f\u3010full-fine-tuning-vs-adapters::2\u3011.  \n\nSo the real quality reason to pick full fine\u2011tuning is when the task\u2019s demands are sufficiently different from what the frozen model can already do, and the resulting performance gain outweighs the extra computational and storage cost.",
+  "metrics": {
+    "latency_ms": 109.39654100002372,
+    "llm_calls": 1,
+    "prompt_tokens": 1312,
+    "completion_tokens": 529
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.027536718174815178,
+          -0.05848206952214241,
+          0.006716218311339617,
+          0.034121572971343994,
+          0.02877112291753292,
+          -0.06472139060497284,
+          -0.03301621228456497,
+          0.026598697528243065
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.8248744010925293,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.7980577945709229,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.7673168182373047,
+            "rank": 3
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.6805148124694824,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.6758871078491211,
+            "rank": 5
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.5672070980072021,
+            "rank": 6
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.5059671401977539,
+            "rank": 7
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.4176735579967499,
+            "rank": 8
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::0",
+            "score": 0.40975257754325867,
+            "rank": 9
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.401895135641098,
+            "rank": 10
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.3993123471736908,
+            "rank": 11
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.39611151814460754,
+            "rank": 12
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::1",
+            "score": 0.3859363794326782,
+            "rank": 13
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.3744683265686035,
+            "rank": 14
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::0",
+            "score": 0.37279847264289856,
+            "rank": 15
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.36735999584198,
+            "rank": 16
+          },
+          {
+            "chunk_id": "latency-budgets-in-a-rag-pipeline::2",
+            "score": 0.3629755675792694,
+            "rank": 17
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.3394511640071869,
+            "rank": 18
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.3302292823791504,
+            "rank": 19
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::1",
+            "score": 0.327133446931839,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 54.5391873888611,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 54.0565152983896,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 46.003769654018214,
+            "rank": 3
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 38.9375357073019,
+            "rank": 4
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 33.82333152386583,
+            "rank": 5
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 30.443722084945104,
+            "rank": 6
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 29.894905347266235,
+            "rank": 7
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 29.483201421565493,
+            "rank": 8
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 28.65446120798257,
+            "rank": 9
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 28.174328095268688,
+            "rank": 10
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 27.240829192329535,
+            "rank": 11
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 26.726774339338913,
+            "rank": 12
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 26.645514952123644,
+            "rank": 13
+          },
+          {
+            "chunk_id": "caching-retrieval-results::0",
+            "score": 26.379249591316317,
+            "rank": 14
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 25.94478364244012,
+            "rank": 15
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::0",
+            "score": 25.791360309036087,
+            "rank": 16
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 25.454090940948824,
+            "rank": 17
+          },
+          {
+            "chunk_id": "pii-redaction-in-training-data::1",
+            "score": 25.333306474789623,
+            "rank": 18
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 25.180972973935038,
+            "rank": 19
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 24.93226695621847,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.031754032258064516,
+            "rank": 2
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.031754032258064516,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.031746031746031744,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.030536130536130537,
+            "rank": 5
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.029437229437229435,
+            "rank": 6
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.029273504273504274,
+            "rank": 7
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.028258706467661692,
+            "rank": 8
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.02581612258494337,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.025645240835114255,
+            "rank": 10
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.02532051282051282,
+            "rank": 11
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::0",
+            "score": 0.014492753623188406,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.031754032258064516,
+            "rank": 2
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.031754032258064516,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.031746031746031744,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.030536130536130537,
+            "rank": 5
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.029437229437229435,
+            "rank": 6
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 0.029273504273504274,
+            "rank": 7
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.028258706467661692,
+            "rank": 8
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::1",
+            "score": 0.02581612258494337,
+            "rank": 9
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.025645240835114255,
+            "rank": 10
+          },
+          {
+            "chunk_id": "fine-tuning-versus-retrieval-augmented-generation::0",
+            "score": 0.02532051282051282,
+            "rank": 11
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.014925373134328358,
+            "rank": 12
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.014705882352941176,
+            "rank": 14
+          },
+          {
+            "chunk_id": "labeling-quality-for-fine-tuning-data::0",
+            "score": 0.014492753623188406,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.014492753623188406,
+            "rank": 16
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.014285714285714285,
+            "rank": 17
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.014084507042253521,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.013888888888888888,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 6.294062614440918,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 3.84875226020813,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.5179595947265625,
+            "rank": 3
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.23749081790447235,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": -1.1446430683135986,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "Yes.  While LoRA\u2019s parameter\u2011efficiency makes it attractive, full fine\u2011tuning can still be the better choice when the target task demands a **substantially larger behavioural shift** than the base model already supports.  \n\n* Full fine\u2011tuning updates every weight, giving the model the **largest hypothesis space** and, in most published studies, a **small but real edge in final task performance** \u2013 especially on tasks that are **far outside the model\u2019s pre\u2011training distribution**\u202f\u3010full-fine-tuning-vs-adapters::0\u3011.  \n* That quality gap **widens** for tasks that require the model to acquire **new capabilities** that the frozen base cannot capture with a low\u2011rank adapter\u202f\u3010full-fine-tuning-vs-adapters::1\u3011.  \n* Consequently, practitioners \u201cescalate to full fine\u2011tuning only if a measured evaluation gap actually justifies the added memory and storage cost\u201d\u202f\u3010full-fine-tuning-vs-adapters::2\u3011.  \n\nSo the real quality reason to pick full fine\u2011tuning is when the task\u2019s demands are sufficiently different from what the frozen model can already do, and the resulting performance gain outweighs the extra computational and storage cost.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1841
+      }
+    }
+  ]
+}

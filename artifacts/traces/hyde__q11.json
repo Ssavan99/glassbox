@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q11",
+  "architecture": "hyde",
+  "question": "LoRA trains under 1% of a model's parameters, cutting GPU memory and letting adapters be swapped per task \u2014 given that efficiency, is there ever a real quality reason to still pick full fine-tuning over it, and if so, what is it?",
+  "answer": "Yes.\u202fAlthough LoRA (and similar adapters) are dramatically cheaper\u2014training <\u202f1\u202f% of the parameters, using a fraction of the GPU memory and letting many task\u2011specific adapters share a frozen base model\u2014full fine\u2011tuning can still be chosen when the last bit of quality matters.  Because full fine\u2011tuning updates **every** parameter, it gives the model the largest possible hypothesis space and, in most published head\u2011to\u2011head studies, yields a modest but real edge in final task performance, especially on tasks that are **substantially different** from anything seen during the model\u2019s pre\u2011training\u202f[full-fine-tuning-vs-adapters::0].  In those cases the small quality gap can justify the extra memory, storage and checkpoint cost of full fine\u2011tuning.",
+  "metrics": {
+    "latency_ms": 26.896125000348547,
+    "llm_calls": 2,
+    "prompt_tokens": 1567,
+    "completion_tokens": 700
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "Full\u2011parameter fine\u2011tuning can still outperform LoRA when the target task requires substantial changes to the model\u2019s internal representations\u2014e.g., a very large domain shift, heavy modification of token embeddings, or when the downstream objective depends on fine\u2011grained interactions that only a full weight update can capture. In those cases the extra capacity of updating every weight may yield measurable gains in perplexity or downstream accuracy that outweigh the modest GPU\u2011memory savings of a low\u2011rank adapter. Additionally, certain research workflows (e.g., probing the effect of specific layer\u2011wise changes or training with extremely limited data where regularisation through adapters is undesirable) prefer full fine\u2011tuning for its deterministic, end\u2011to\u2011end optimisation.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 439
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.008156864903867245,
+          -0.059388380497694016,
+          0.032055459916591644,
+          0.07069675624370575,
+          0.08528916537761688,
+          -0.04238252341747284,
+          -0.030581017956137657,
+          0.004079714883118868
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.7692533731460571,
+            "rank": 1
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::1",
+            "score": 0.6628704071044922,
+            "rank": 2
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.6343467235565186,
+            "rank": 3
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::0",
+            "score": 0.6259943246841431,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.6166467666625977,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "Yes.\u202fAlthough LoRA (and similar adapters) are dramatically cheaper\u2014training <\u202f1\u202f% of the parameters, using a fraction of the GPU memory and letting many task\u2011specific adapters share a frozen base model\u2014full fine\u2011tuning can still be chosen when the last bit of quality matters.  Because full fine\u2011tuning updates **every** parameter, it gives the model the largest possible hypothesis space and, in most published head\u2011to\u2011head studies, yields a modest but real edge in final task performance, especially on tasks that are **substantially different** from anything seen during the model\u2019s pre\u2011training\u202f[full-fine-tuning-vs-adapters::0].  In those cases the small quality gap can justify the extra memory, storage and checkpoint cost of full fine\u2011tuning.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1828
+      }
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q22",
+  "architecture": "hyde",
+  "question": "What is the exact wording of the error this engine raises when a request's token count exceeds the model's maximum context length?",
+  "answer": "The exact wording of the error when a request's token count exceeds the model's maximum context length is:\n\n`This model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens`\n\nThis is cited from [context-window-overflow-and-truncation::0] and [context-window-overflow-and-truncation::1].",
+  "metrics": {
+    "latency_ms": 5.505083998286864,
+    "llm_calls": 2,
+    "prompt_tokens": 1333,
+    "completion_tokens": 126
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "The exact wording of the error message raised by this engine when a request's token count exceeds the model's maximum context length is: \"Error: Request exceeds maximum context length; please refine your input to stay within the token limit.\"",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 169
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.05134342983365059,
+          -0.01178643200546503,
+          0.017451511695981026,
+          0.035644520074129105,
+          -0.005614100955426693,
+          -0.0012452179798856378,
+          -0.012332400307059288,
+          0.10647690296173096
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.6874498128890991,
+            "rank": 1
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.6298321485519409,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.4143112003803253,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.4076593816280365,
+            "rank": 4
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.40755796432495117,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "The exact wording of the error when a request's token count exceeds the model's maximum context length is:\n\n`This model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens`\n\nThis is cited from [context-window-overflow-and-truncation::0] and [context-window-overflow-and-truncation::1].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1290
+      }
+    }
+  ]
+}

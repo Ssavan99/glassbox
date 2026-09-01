@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q08",
+  "architecture": "hybrid",
+  "question": "What is a planning loop, and what four-step cycle does it repeat?",
+  "answer": "A planning loop is the reasoning structure that governs an agent\u2019s next move: it repeatedly\u202fobserves the current state, reasons about the remaining gap between that state and the goal, chooses an action, and executes that action, looping until the goal is reached or the loop gives up\u202f[planning-loops-in-agents::0].",
+  "metrics": {
+    "latency_ms": 79.79666599931079,
+    "llm_calls": 1,
+    "prompt_tokens": 1347,
+    "completion_tokens": 196
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          0.002986201085150242,
+          0.036855392158031464,
+          -0.04274217039346695,
+          0.0028365333564579487,
+          -0.026944532990455627,
+          0.019024215638637543,
+          -0.0700116902589798,
+          -0.03317961096763611
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.7005970478057861,
+            "rank": 1
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.5933675765991211,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.445375919342041,
+            "rank": 3
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.4365803003311157,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.3509066104888916,
+            "rank": 5
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": 0.3398708403110504,
+            "rank": 6
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.33894678950309753,
+            "rank": 7
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::0",
+            "score": 0.31789708137512207,
+            "rank": 8
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 0.2945101261138916,
+            "rank": 9
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.2783590853214264,
+            "rank": 10
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.27560415863990784,
+            "rank": 11
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.2628447413444519,
+            "rank": 12
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.262088418006897,
+            "rank": 13
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 0.2612249553203583,
+            "rank": 14
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 0.23419395089149475,
+            "rank": 15
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.22534626722335815,
+            "rank": 16
+          },
+          {
+            "chunk_id": "catastrophic-forgetting-during-fine-tuning::0",
+            "score": 0.22364403307437897,
+            "rank": 17
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 0.21721938252449036,
+            "rank": 18
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.21511958539485931,
+            "rank": 19
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::1",
+            "score": 0.21381913125514984,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": 14.112748754829193,
+            "rank": 1
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 13.384696211933631,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 13.282900404572862,
+            "rank": 3
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 12.61851788981938,
+            "rank": 4
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 12.01925274484516,
+            "rank": 5
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 11.594327334238656,
+            "rank": 6
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 11.199833315958164,
+            "rank": 7
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 10.527923299466165,
+            "rank": 8
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 10.011968718113971,
+            "rank": 9
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 8.80911563890108,
+            "rank": 10
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 8.76717982051126,
+            "rank": 11
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 8.736102423999709,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 8.555501434956076,
+            "rank": 13
+          },
+          {
+            "chunk_id": "data-drift-and-stale-corpora::0",
+            "score": 8.526905187904749,
+            "rank": 14
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 8.422532562475324,
+            "rank": 15
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 8.40606415009661,
+            "rank": 16
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::0",
+            "score": 8.300796149747624,
+            "rank": 17
+          },
+          {
+            "chunk_id": "silent-failures-and-the-value-of-refusal::1",
+            "score": 8.226686499333994,
+            "rank": 18
+          },
+          {
+            "chunk_id": "citation-quality-as-an-evaluation-signal::0",
+            "score": 8.174077580921573,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 8.126669605137375,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.031754032258064516,
+            "rank": 1
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": 0.031544957774465976,
+            "rank": 2
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.03131881575727918,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.03125763125763126,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.031024531024531024,
+            "rank": 5
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 0.02964254577157803,
+            "rank": 6
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.029083245521601686,
+            "rank": 7
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.027650648360030512,
+            "rank": 8
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 0.027417840375586856,
+            "rank": 9
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.015625,
+            "rank": 10
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.014925373134328358,
+            "rank": 11
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::0",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 0.014492753623188406,
+            "rank": 14
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.014285714285714285,
+            "rank": 15
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 0.014285714285714285,
+            "rank": 16
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.014084507042253521,
+            "rank": 17
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.013888888888888888,
+            "rank": 18
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.013888888888888888,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.0136986301369863,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 0.031754032258064516,
+            "rank": 1
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": 0.031544957774465976,
+            "rank": 2
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.03131881575727918,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::0",
+            "score": 0.03125763125763126,
+            "rank": 4
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.031024531024531024,
+            "rank": 5
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 0.02964254577157803,
+            "rank": 6
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 0.029083245521601686,
+            "rank": 7
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.027650648360030512,
+            "rank": 8
+          },
+          {
+            "chunk_id": "multi-hop-questions-and-why-they-break-retrieval::1",
+            "score": 0.027417840375586856,
+            "rank": 9
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.015625,
+            "rank": 10
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::0",
+            "score": 0.014925373134328358,
+            "rank": 11
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::0",
+            "score": 0.014705882352941176,
+            "rank": 12
+          },
+          {
+            "chunk_id": "tool-use-and-function-calling::1",
+            "score": 0.014705882352941176,
+            "rank": 13
+          },
+          {
+            "chunk_id": "chain-of-thought-prompting-and-when-it-helps::0",
+            "score": 0.014492753623188406,
+            "rank": 14
+          },
+          {
+            "chunk_id": "continuous-batching-and-throughput::0",
+            "score": 0.014285714285714285,
+            "rank": 15
+          },
+          {
+            "chunk_id": "llm-as-judge-evaluation-pitfalls::1",
+            "score": 0.014285714285714285,
+            "rank": 16
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.014084507042253521,
+            "rank": 17
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::0",
+            "score": 0.013888888888888888,
+            "rank": 18
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.013888888888888888,
+            "rank": 19
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.0136986301369863,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 6.041275501251221,
+            "rank": 1
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::1",
+            "score": 4.7695746421813965,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 2.0018396377563477,
+            "rank": 3
+          },
+          {
+            "chunk_id": "trace-logging-for-agent-debugging::1",
+            "score": 0.6227399706840515,
+            "rank": 4
+          },
+          {
+            "chunk_id": "multi-agent-systems-and-handoffs::1",
+            "score": -1.3821654319763184,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "A planning loop is the reasoning structure that governs an agent\u2019s next move: it repeatedly\u202fobserves the current state, reasons about the remaining gap between that state and the goal, chooses an action, and executes that action, looping until the goal is reached or the loop gives up\u202f[planning-loops-in-agents::0].",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1543
+      }
+    }
+  ]
+}

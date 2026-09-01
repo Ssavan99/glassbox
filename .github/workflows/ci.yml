@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Ruff
+        run: ruff check .
+      - name: Pytest
+        run: pytest
+      - name: Verify corpus
+        run: python scripts/verify_corpus.py
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check web/ exists
+        id: check
+        run: echo "exists=$( [ -f web/package.json ] && echo true || echo false )" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.exists == 'true'
+        with:
+          python-version: "3.12"
+      - name: Export artifacts/ to web/public/data/
+        if: steps.check.outputs.exists == 'true'
+        # scripts/export_web.py only touches engine.config plus pyyaml (to
+        # derive questions.json from evaluation/questions.yaml, added in
+        # Phase 8) -- pyyaml alone, not the full project, keeps this step
+        # fast since the rest of pyproject.toml's deps aren't needed here.
+        # Needed in this job (not just deploy.yml) because
+        # web/src/lib/data.test.ts reads the real exported JSON off disk.
+        run: |
+          pip install pyyaml
+          python scripts/export_web.py
+      - name: Extract code excerpts from engine/ source
+        if: steps.check.outputs.exists == 'true'
+        # Must run after export_web.py -- see deploy.yml's identical step
+        # for why. No extra deps (stdlib only).
+        run: python scripts/extract_code_excerpts.py
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.exists == 'true'
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+      - name: Install deps
+        if: steps.check.outputs.exists == 'true'
+        working-directory: web
+        run: npm ci
+      - name: Typecheck
+        if: steps.check.outputs.exists == 'true'
+        working-directory: web
+        run: npx tsc --noEmit
+      - name: Test
+        if: steps.check.outputs.exists == 'true'
+        working-directory: web
+        run: npm run test
+      - name: Build
+        if: steps.check.outputs.exists == 'true'
+        working-directory: web
+        run: npm run build

@@ -1,0 +1,129 @@
+{
+  "trace_id": "corrective::q01",
+  "architecture": "corrective",
+  "question": "What does LoRA freeze, and roughly what fraction of a model's parameters does it actually train?",
+  "answer": "LoRA leaves the entire pretrained \u201cbase\u201d model untouched \u2013 it **freezes all of the original model\u2019s weights** and only adds and updates tiny low\u2011rank adapter matrices that are injected alongside each frozen weight matrix\u202f\u3010lora-and-parameter-efficient-fine-tuning::0\u3011. Because those adapters are very small, the amount of parameters actually trained is only a **tiny fraction of the whole model \u2013 usually well under\u202f1\u202f% of the total parameters**\u202f\u3010lora-and-parameter-efficient-fine-tuning::0\u3011\u3010full-fine-tuning-vs-adapters::0\u3011.",
+  "metrics": {
+    "latency_ms": 6.288958000368439,
+    "llm_calls": 2,
+    "prompt_tokens": 2482,
+    "completion_tokens": 1202
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed query (attempt 1)",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The current search query (the original question on the first attempt, or a rewritten query on a correction attempt) is embedded for dense retrieval against the corpus.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.055106084793806076,
+          -0.09353601932525635,
+          -0.005627036560326815,
+          0.05775719881057739,
+          0.03663691133260727,
+          -0.004505167715251446,
+          -0.051977843046188354,
+          0.01977098360657692
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval (attempt 1)",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Standard top-k dense retrieval by cosine similarity. Corrective RAG doesn't treat this result as final \u2014 it's handed to a grading step next, which is what makes this architecture 'corrective' rather than naive.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "score": 0.5921176075935364,
+            "rank": 1
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "score": 0.5837281942367554,
+            "rank": 2
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "score": 0.5608687400817871,
+            "rank": 3
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "score": 0.5349644422531128,
+            "rank": 4
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "score": 0.46263113617897034,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "grade",
+      "label": "Grade retrieved chunks (attempt 1)",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Corrective RAG doesn't trust retrieval blindly \u2014 an LLM judge checks whether each retrieved chunk actually supports answering the question, since a semantically-close chunk can still be topically wrong. This is the step that decides whether to proceed to generation or trigger a correction.",
+      "payload": {
+        "judgements": [
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::1",
+            "verdict": "ambiguous",
+            "reason": "Mentions a frozen base model but does not explicitly state that LoRA freezes all original weights nor gives a concrete fraction of parameters trained."
+          },
+          {
+            "chunk_id": "lora-and-parameter-efficient-fine-tuning::0",
+            "verdict": "correct",
+            "reason": "Clearly states LoRA freezes the original model's weights and trains only low\u2011rank adapters, typically well under 1% of the total parameters."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::0",
+            "verdict": "ambiguous",
+            "reason": "Notes that LoRA trains under 1% of parameters but only implies freezing by contrast with full fine\u2011tuning; no explicit statement of what is frozen."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::1",
+            "verdict": "ambiguous",
+            "reason": "Repeats the under\u20111% figure without directly stating the frozen component of the model."
+          },
+          {
+            "chunk_id": "full-fine-tuning-vs-adapters::2",
+            "verdict": "incorrect",
+            "reason": "Mentions LoRA generally but provides no information about what it freezes or the proportion of parameters trained."
+          }
+        ]
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question (never a rewritten query -- rewriting was only ever a retrieval aid) using whichever chunks survived grading: chunks graded 'incorrect' are dropped from context, and if that would leave nothing, the full last-retrieved set is used unfiltered rather than generating from empty context.",
+      "payload": {
+        "output": "LoRA leaves the entire pretrained \u201cbase\u201d model untouched \u2013 it **freezes all of the original model\u2019s weights** and only adds and updates tiny low\u2011rank adapter matrices that are injected alongside each frozen weight matrix\u202f\u3010lora-and-parameter-efficient-fine-tuning::0\u3011. Because those adapters are very small, the amount of parameters actually trained is only a **tiny fraction of the whole model \u2013 usually well under\u202f1\u202f% of the total parameters**\u202f\u3010lora-and-parameter-efficient-fine-tuning::0\u3011\u3010full-fine-tuning-vs-adapters::0\u3011.",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1429
+      }
+    }
+  ]
+}

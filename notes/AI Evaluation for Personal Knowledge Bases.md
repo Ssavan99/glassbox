@@ -1,3 +1,0 @@
-Testing an AI notes system requires more than checking whether answers sound good. A useful evaluation set should include factual questions, vague questions, multi-hop questions, and impossible questions where the correct behavior is to admit that the notes do not contain enough information. The goal is not just fluency, but grounded usefulness.
-
-A practical test suite might track retrieval accuracy, answer correctness, citation quality, refusal behavior, and latency. For personal RAG, it is also worth testing “needle in the haystack” queries, where one small note contains the answer among many similar notes. Good evaluations turn the system from a charming fog machine into a dependable little research ferret.

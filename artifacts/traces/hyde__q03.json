@@ -1,0 +1,105 @@
+{
+  "trace_id": "hyde::q03",
+  "architecture": "hyde",
+  "question": "What is the difference between recall@k and MRR as retrieval metrics?",
+  "answer": "Recall@k and MRR are both retrieval metrics but answer different questions. Recall@k asks whether among the top k retrieved chunks, the correct supporting chunk is present at all. It scores a binary yes/no for each query on whether the correct chunk is within the top k results and then averages these across queries. On the other hand, MRR cares about the order of the retrieval; it assigns a score of `1 / rank` to the first correct chunk in the ranked list and averages these scores across all queries. This means that a correctly retrieved chunk at position 1 gets a full point, while one at position k gets only a fraction of a point. MRR is more sensitive for judging raw ranking quality because it directly penalizes retrievers that bury the right chunk too low in the results, potentially missing it entirely.\n\n[retrieval-metrics-recall-at-k-and-mrr::0]\n[retrieval-metrics-recall-at-k-and-mrr::1]",
+  "metrics": {
+    "latency_ms": 12355.56783300126,
+    "llm_calls": 2,
+    "prompt_tokens": 1574,
+    "completion_tokens": 257
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "generate_hypothetical",
+      "label": "Draft hypothetical passage",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "HyDE drafts a fake answer first and embeds *that* instead of the question, because a plausible answer sits closer in embedding space to real answer-shaped passages than a question does \u2014 this can retrieve differently than embedding the question directly, for better or worse depending on how good the hypothetical draft is.",
+      "payload": {
+        "output": "Recall@k measures the proportion of relevant items among the top-k ranked items retrieved by a system. In contrast, Mean Reciprocal Rank (MRR) evaluates the ranking quality by considering the reciprocal of the rank at which the first relevant item appears across multiple queries.",
+        "prompt_preview": "Write a short, plausible-sounding passage (2-4 sentences) that would answer the following question, as if it were an excerpt from a technical knowledge base. It does not need to be factually verified ",
+        "tokens": 168
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "embed_query",
+      "label": "Embed the hypothetical passage",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage drafted in the previous step is what gets embedded here \u2014 not the original question. This is the entire mechanism HyDE relies on: retrieval happens in answer-shaped embedding space instead of question-shaped embedding space.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06200560927391052,
+          -0.059405189007520676,
+          -0.06925716996192932,
+          0.002304761903360486,
+          0.012447807006537914,
+          0.08103715628385544,
+          0.0003686692798510194,
+          0.03482009470462799
+        ]
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_dense",
+      "label": "Top-5 dense retrieval",
+      "parent_ids": [
+        "n2"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The hypothetical passage's embedding is used to retrieve the top-k chunks by cosine similarity \u2014 so retrieval quality here depends entirely on how well the hypothetical passage's vocabulary and phrasing match real corpus passages.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::0",
+            "score": 0.75941002368927,
+            "rank": 1
+          },
+          {
+            "chunk_id": "retrieval-metrics-recall-at-k-and-mrr::1",
+            "score": 0.6602405309677124,
+            "rank": 2
+          },
+          {
+            "chunk_id": "reciprocal-rank-fusion-explained::0",
+            "score": 0.49285590648651123,
+            "rank": 3
+          },
+          {
+            "chunk_id": "ai-evaluation-for-personal-knowledge-bases::1",
+            "score": 0.4915067255496979,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 0.4458380341529846,
+            "rank": 5
+          }
+        ],
+        "k": 5
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The final answer is generated from the *original* question and the retrieved chunks \u2014 the hypothetical passage was only ever a retrieval aid and never becomes part of the grounding context handed to the LLM here.",
+      "payload": {
+        "output": "Recall@k and MRR are both retrieval metrics but answer different questions. Recall@k asks whether among the top k retrieved chunks, the correct supporting chunk is present at all. It scores a binary yes/no for each query on whether the correct chunk is within the top k results and then averages these across queries. On the other hand, MRR cares about the order of the retrieval; it assigns a score of `1 / rank` to the first correct chunk in the ranked list and averages these scores across all queries. This means that a correctly retrieved chunk at position 1 gets a full point, while one at position k gets only a fraction of a point. MRR is more sensitive for judging raw ranking quality because it directly penalizes retrievers that bury the right chunk too low in the results, potentially missing it entirely.\n\n[retrieval-metrics-recall-at-k-and-mrr::0]\n[retrieval-metrics-recall-at-k-and-mrr::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Each chunk in the Context section below begins with its own real id in square brackets. When you use a chunk, cite it by co",
+        "tokens": 1663
+      }
+    }
+  ]
+}

@@ -1,0 +1,543 @@
+{
+  "trace_id": "hybrid::q22",
+  "architecture": "hybrid",
+  "question": "What is the exact wording of the error this engine raises when a request's token count exceeds the model's maximum context length?",
+  "answer": "The engine raises an error that reads:\n\n```\nThis model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens\n``` \n\n[context-window-overflow-and-truncation::0]  \n[context-window-overflow-and-truncation::1]",
+  "metrics": {
+    "latency_ms": 108.72962499706773,
+    "llm_calls": 1,
+    "prompt_tokens": 1332,
+    "completion_tokens": 217
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "embed_query",
+      "label": "Embed the question",
+      "parent_ids": [],
+      "duration_ms": 0.0,
+      "explain": "The question is embedded once up front so it can be compared against the corpus in vector space. Hybrid retrieval still needs this embedding for its dense branch, even though the sparse BM25 branch below works over raw tokens instead.",
+      "payload": {
+        "dims": 384,
+        "preview": [
+          -0.06054358184337616,
+          -0.010426433756947517,
+          0.0187366995960474,
+          0.037519149482250214,
+          -0.008090076968073845,
+          -0.01273584645241499,
+          -0.011982938274741173,
+          0.10458073019981384
+        ]
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "retrieve_dense",
+      "label": "Top-20 dense retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "Dense retrieval ranks chunks by cosine similarity in embedding space, which generalizes well across paraphrase and synonymy but can miss a chunk whose relevance hinges on an exact literal term, identifier, or number that the embedding model smooths over.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.7005957365036011,
+            "rank": 1
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.6511959433555603,
+            "rank": 2
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.47194790840148926,
+            "rank": 3
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.45481568574905396,
+            "rank": 4
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.4429992139339447,
+            "rank": 5
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.4383555054664612,
+            "rank": 6
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.42364510893821716,
+            "rank": 7
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.41643938422203064,
+            "rank": 8
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.4039280414581299,
+            "rank": 9
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.3840402364730835,
+            "rank": 10
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.3622664213180542,
+            "rank": 11
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.34154707193374634,
+            "rank": 12
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.3383775055408478,
+            "rank": 13
+          },
+          {
+            "chunk_id": "when-fine-tuning-is-the-wrong-tool::1",
+            "score": 0.3353145122528076,
+            "rank": 14
+          },
+          {
+            "chunk_id": "structured-output-and-json-mode::0",
+            "score": 0.32157647609710693,
+            "rank": 15
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.32090693712234497,
+            "rank": 16
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::0",
+            "score": 0.31815463304519653,
+            "rank": 17
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::1",
+            "score": 0.317940354347229,
+            "rank": 18
+          },
+          {
+            "chunk_id": "hallucination-from-prompt-injection::0",
+            "score": 0.31351912021636963,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.312895804643631,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "retrieve_sparse",
+      "label": "Top-20 sparse (BM25) retrieval",
+      "parent_ids": [
+        "n1"
+      ],
+      "duration_ms": 0.0,
+      "explain": "BM25 ranks chunks by exact term overlap and term frequency, which is the mirror-image strength of dense retrieval: it reliably surfaces a chunk containing a literal keyword or identifier even when that chunk isn't semantically close to how the question happens to be phrased. It is structurally parented to the query embedding step here, even though it consumes the raw question text rather than the vector, because both retrieval branches fire off the same query.",
+      "payload": {
+        "results": [
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 35.344978004262366,
+            "rank": 1
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 23.420811193433003,
+            "rank": 2
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 20.391121892387353,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 19.024776859267305,
+            "rank": 4
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 18.731405843407302,
+            "rank": 5
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 18.50502898748428,
+            "rank": 6
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 18.127559323919826,
+            "rank": 7
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 18.107296875462538,
+            "rank": 8
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 17.538025251522967,
+            "rank": 9
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 17.4124064108077,
+            "rank": 10
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 17.289289629481548,
+            "rank": 11
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 17.25792396552277,
+            "rank": 12
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::0",
+            "score": 17.10903159847974,
+            "rank": 13
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 17.076813112284302,
+            "rank": 14
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::0",
+            "score": 17.021487904723138,
+            "rank": 15
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::1",
+            "score": 16.856191791867786,
+            "rank": 16
+          },
+          {
+            "chunk_id": "cost-aware-model-routing::1",
+            "score": 16.5882897647787,
+            "rank": 17
+          },
+          {
+            "chunk_id": "hallucination-from-missing-context::0",
+            "score": 16.400120915117153,
+            "rank": 18
+          },
+          {
+            "chunk_id": "knowledge-distillation-for-smaller-models::0",
+            "score": 16.367024817205262,
+            "rank": 19
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 16.317861171138038,
+            "rank": 20
+          }
+        ],
+        "k": 20
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "fuse",
+      "label": "Reciprocal rank fusion",
+      "parent_ids": [
+        "n2",
+        "n3"
+      ],
+      "duration_ms": 0.0,
+      "explain": "RRF combines two independently-ranked lists without needing to normalize their raw score scales, since it only uses each result's rank position (1 / (RRF_K + rank)) \u2014 this is why a keyword-exact BM25 hit and a semantically-close dense hit can be merged fairly, and why a chunk found by only one branch still earns a nonzero fused score instead of being dropped.",
+      "payload": {
+        "method": "rrf",
+        "k": 60,
+        "inputs": [
+          "n2",
+          "n3"
+        ],
+        "results": [
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.03128054740957967,
+            "rank": 2
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.031009615384615385,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.03021353930031804,
+            "rank": 4
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.030117753623188408,
+            "rank": 5
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.029211087420042643,
+            "rank": 6
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.027799227799227798,
+            "rank": 7
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.027046783625730993,
+            "rank": 8
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.025,
+            "rank": 9
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.015873015873015872,
+            "rank": 10
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.015873015873015872,
+            "rank": 11
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.015384615384615385,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.015151515151515152,
+            "rank": 13
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.014925373134328358,
+            "rank": 14
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.013888888888888888,
+            "rank": 19
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.0136986301369863,
+            "rank": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "rerank",
+      "label": "Cross-encoder rerank to top-5",
+      "parent_ids": [
+        "n4"
+      ],
+      "duration_ms": 0.0,
+      "explain": "A cross-encoder scores the query and each candidate chunk together in one forward pass, letting the two attend to each other directly, which catches relevance a bi-encoder's separately-computed cosine similarity misses. The cost is one forward pass per candidate, which is why it only runs over the small fused pool rather than the whole corpus.",
+      "payload": {
+        "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "before": [
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 0.03278688524590164,
+            "rank": 1
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": 0.03128054740957967,
+            "rank": 2
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::2",
+            "score": 0.031009615384615385,
+            "rank": 3
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": 0.03021353930031804,
+            "rank": 4
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": 0.030117753623188408,
+            "rank": 5
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": 0.029211087420042643,
+            "rank": 6
+          },
+          {
+            "chunk_id": "agent-memory-and-context-management::1",
+            "score": 0.027799227799227798,
+            "rank": 7
+          },
+          {
+            "chunk_id": "few-shot-prompting-for-grounded-answers::0",
+            "score": 0.027046783625730993,
+            "rank": 8
+          },
+          {
+            "chunk_id": "retrieval-augmented-generation-basics::1",
+            "score": 0.025,
+            "rank": 9
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::1",
+            "score": 0.015873015873015872,
+            "rank": 10
+          },
+          {
+            "chunk_id": "ai-agents-and-tool-use::1",
+            "score": 0.015873015873015872,
+            "rank": 11
+          },
+          {
+            "chunk_id": "reducing-latency-with-quantization::0",
+            "score": 0.015384615384615385,
+            "rank": 12
+          },
+          {
+            "chunk_id": "reranking-with-cross-encoders::1",
+            "score": 0.015151515151515152,
+            "rank": 13
+          },
+          {
+            "chunk_id": "planning-loops-in-agents::0",
+            "score": 0.014925373134328358,
+            "rank": 14
+          },
+          {
+            "chunk_id": "system-prompts-and-role-framing::1",
+            "score": 0.014705882352941176,
+            "rank": 15
+          },
+          {
+            "chunk_id": "reducing-latency-with-batching::1",
+            "score": 0.014705882352941176,
+            "rank": 16
+          },
+          {
+            "chunk_id": "rate-limits-and-retry-storms::0",
+            "score": 0.014492753623188406,
+            "rank": 17
+          },
+          {
+            "chunk_id": "chunking-strategy-and-chunk-size-tradeoffs::0",
+            "score": 0.014084507042253521,
+            "rank": 18
+          },
+          {
+            "chunk_id": "cleaning-noisy-source-documents::0",
+            "score": 0.013888888888888888,
+            "rank": 19
+          },
+          {
+            "chunk_id": "chunk-overlap-and-why-it-matters::0",
+            "score": 0.0136986301369863,
+            "rank": 20
+          }
+        ],
+        "after": [
+          {
+            "chunk_id": "context-window-overflow-and-truncation::0",
+            "score": 4.734159469604492,
+            "rank": 1
+          },
+          {
+            "chunk_id": "context-window-overflow-and-truncation::1",
+            "score": -1.0312395095825195,
+            "rank": 2
+          },
+          {
+            "chunk_id": "kv-cache-and-why-it-matters-for-serving::0",
+            "score": -2.2252511978149414,
+            "rank": 3
+          },
+          {
+            "chunk_id": "prompt-templates-for-retrieval-augmented-answers::1",
+            "score": -3.4374823570251465,
+            "rank": 4
+          },
+          {
+            "chunk_id": "prompt-engineering-as-interface-design::1",
+            "score": -3.9805092811584473,
+            "rank": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "n6",
+      "kind": "generate",
+      "label": "Generate answer",
+      "parent_ids": [
+        "n5"
+      ],
+      "duration_ms": 0.0,
+      "explain": "The reranked top-k chunks are stuffed into a single prompt and handed to the LLM. By this point the pipeline has already spent its retrieval effort on getting the best possible evidence set, so generation itself is a single one-shot call, same as naive RAG.",
+      "payload": {
+        "output": "The engine raises an error that reads:\n\n```\nThis model's maximum context length is 8192 tokens. However, your messages resulted in 9147 tokens\n``` \n\n[context-window-overflow-and-truncation::0]  \n[context-window-overflow-and-truncation::1]",
+        "prompt_preview": "You are a careful assistant answering from the provided context chunks only. Cite the chunk id(s) you used for each claim, in square brackets, e.g. [chunk-id::0]. If the context does not contain the a",
+        "tokens": 1549
+      }
+    }
+  ]
+}
