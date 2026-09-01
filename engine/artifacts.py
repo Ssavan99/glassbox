@@ -49,7 +49,7 @@ def retrieval_build_id(corpus_dir: Path) -> str:
         ("embedding_model", EMBEDDING_MODEL),
         ("embedding_dim", EMBEDDING_DIM),
     ):
-        digest.update(f"{name}={value}".encode("utf-8"))
+        digest.update(f"{name}={value}".encode())
         digest.update(b"\0")
     return digest.hexdigest()
 
