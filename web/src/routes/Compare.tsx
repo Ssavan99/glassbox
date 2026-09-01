@@ -13,8 +13,11 @@ const DEFAULT_QUESTION_ID = "q11";
 
 /** How many retrieved chunks to show per column before collapsing the rest.
  * Graph/Agentic/Adaptive rows really do carry 40+ chunk ids on some
- * questions -- showing them all inline would bury the answer text. */
-const CHUNKS_SHOWN = 6;
+ * questions -- showing them all inline would bury the answer text. Lowered
+ * from 6 to 4: with more breathing room per row (see ChunkRow), 6 rows made
+ * every column read as a wall of small text before you ever reached the
+ * "Show more" toggle. 4 is enough to see real divergence at a glance. */
+const CHUNKS_SHOWN = 4;
 
 const TYPE_LABEL: Record<string, string> = {
   factual: "Factual",
@@ -222,7 +225,7 @@ export function Compare() {
             <span className="md:hidden">Scroll sideways to compare all seven →</span>
           </div>
           <div className="-mx-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6">
-            <div className="reveal-grid flex min-w-max gap-6">
+            <div className="reveal-grid flex min-w-max gap-8">
               {ARCHITECTURE_ORDER.map((id) => (
                 <ArchitectureColumn
                   key={id}
@@ -276,8 +279,8 @@ function ArchitectureColumn({
   const accent = architectureColor(architecture);
 
   return (
-    <section className="compare-column flex flex-col gap-5 bg-surface">
-      <header className="flex flex-col gap-2 border-b-2 border-border pb-3">
+    <section className="compare-column flex flex-col gap-6 bg-surface">
+      <header className="flex flex-col gap-2.5 border-b-2 border-border pb-4">
         <div className="flex items-center gap-2">
           {/* Colour is never the only identity signal -- 3 of the 7 accents
            * fail 3:1 on the light surface by design, so the name always
@@ -310,7 +313,7 @@ function ArchitectureColumn({
             </div>
           )}
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2.5">
             <Metric label="Recall (full)" value={formatScore(row.recall_full)} tone={scoreTone(row.recall_full)} />
             <Metric label="Faithfulness" value={formatScore(row.faithfulness)} tone={scoreTone(row.faithfulness)} />
           </div>
@@ -321,7 +324,7 @@ function ArchitectureColumn({
             </span>
           )}
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <div className="text-xs font-medium text-ink-muted">Answer</div>
             <AnswerText text={row.answer} accent={accent} />
           </div>
@@ -367,21 +370,21 @@ function RetrievedChunks({
   );
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2.5">
       <div className="text-xs font-medium text-ink-muted">
         Retrieved ({ids.length} chunk{ids.length === 1 ? "" : "s"})
       </div>
       {ids.length === 0 ? (
         <p className="text-xs text-ink-muted">Nothing retrieved.</p>
       ) : (
-        <ul className="flex flex-col gap-1">{shown.map(renderChunk)}</ul>
+        <ul className="flex flex-col gap-2">{shown.map(renderChunk)}</ul>
       )}
       {rest.length > 0 && (
         <details className="text-xs">
-          <summary className="cursor-pointer text-ink-secondary hover:text-ink">
+          <summary className="cursor-pointer py-1 text-ink-secondary hover:text-ink">
             Show {rest.length} more
           </summary>
-          <ul className="mt-1 flex max-h-64 flex-col gap-1 overflow-y-auto">
+          <ul className="mt-2 flex max-h-64 flex-col gap-2 overflow-y-auto pr-1">
             {rest.map((id, i) => renderChunk(id, i + CHUNKS_SHOWN))}
           </ul>
         </details>
@@ -414,23 +417,23 @@ function ChunkRow({
   const rare = count * 2 < architectureCount;
   return (
     <li
-      className={`rounded-xl border-2 px-3 py-2 ${
+      className={`rounded-xl border-2 px-3.5 py-3 ${
         rare ? "border-status-warning/60 bg-status-warning/10" : "border-border bg-page"
       }`}
     >
-      <div className="flex items-start gap-1.5">
-        <span className="shrink-0 pt-px text-[10px] tabular-nums text-ink-muted">{rank}</span>
-        <span className="min-w-0 flex-1 break-all font-mono text-[11px] text-ink">{chunkId}</span>
+      <div className="flex items-start gap-2">
+        <span className="shrink-0 pt-px text-[11px] tabular-nums text-ink-muted">{rank}</span>
+        <span className="min-w-0 flex-1 break-all font-mono text-xs text-ink">{chunkId}</span>
         {isGold && (
           <span
-            className="shrink-0 rounded-full bg-status-good/15 px-1.5 text-[10px] font-medium text-status-good"
+            className="shrink-0 rounded-full bg-status-good/15 px-2 text-[11px] font-medium text-status-good"
             title="In this row's gold chunk set"
           >
             ✓ gold
           </span>
         )}
         <span
-          className={`shrink-0 rounded-full px-1.5 text-[10px] font-medium tabular-nums ${
+          className={`shrink-0 rounded-full px-2 text-[11px] font-medium tabular-nums ${
             rare ? "bg-status-warning/25 text-ink" : "text-ink-muted"
           }`}
           title={`Retrieved by ${count} of ${architectureCount} architectures`}
@@ -438,7 +441,7 @@ function ChunkRow({
           {count}/{architectureCount}
         </span>
       </div>
-      <div className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-muted">
+      <div className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-muted">
         {chunkExcerpt(chunkIndex, chunkId)}
       </div>
     </li>
@@ -447,9 +450,9 @@ function ChunkRow({
 
 function Metric({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <div className="flex flex-col rounded-xl border-2 border-border bg-page px-3 py-2">
-      <span className="text-[10px] uppercase tracking-wide text-ink-muted">{label}</span>
-      <span className={`text-sm font-semibold tabular-nums ${tone}`}>{value}</span>
+    <div className="flex flex-col gap-0.5 rounded-xl border-2 border-border bg-page px-3.5 py-2.5">
+      <span className="text-[11px] uppercase tracking-wide text-ink-muted">{label}</span>
+      <span className={`text-base font-semibold tabular-nums ${tone}`}>{value}</span>
     </div>
   );
 }

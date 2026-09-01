@@ -312,9 +312,9 @@ input {
 }
 
 .compare-column {
-  width: 324px;
-  min-width: 324px;
-  padding: 1.1rem;
+  width: 372px;
+  min-width: 372px;
+  padding: 1.5rem;
 }
 
 .pipeline-step {
@@ -352,7 +352,7 @@ input {
 .text-input:focus { border-color: var(--arch-naive); outline: none; }
 
 @media (max-width: 640px) {
-  .compare-column { width: 292px; min-width: 292px; }
+  .compare-column { width: 312px; min-width: 312px; padding: 1.25rem; }
   .pipeline-step { width: min(100%, 18rem); }
 }
 
