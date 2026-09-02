@@ -13,3 +13,6 @@ web/public/data/
 .env
 *.egg-info/
 graphify-out/
+
+# Local editor and agent preview config — machine-specific, not for clones
+.claude/
